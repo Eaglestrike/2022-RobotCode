@@ -76,9 +76,33 @@ DriveConstants{
     const double rotD = 0.0;
 }
 
-
+//TODO: determine constants
 namespace
-ShooterConstants{}
+ShooterConstants{
+    //turret pid
+    const double Tp = 0.0;
+    const double Ti = 0.0;
+    const double Td = 0.0;
+
+    //flywheel pid
+    const double FWp = 0.0;
+    const double FWi = 0.0;
+    const double FWd = 0.0;
+
+    //hood pid
+    const double Hp = 0.0;
+    const double Hi = 0.0;
+    const double Hd = 0.0;
+
+    //turret rotation limts
+    const double UpperRotLimit = 0.0;
+    const double LowerRotLimit = 0.0;
+
+    //error tolerances (kicker is counting as part of channel)
+    const double TurretTolerance = 0.0;
+    const double FlywheelTolerance = 0.0;
+    const double HoodTolerance = 0.0;
+}
 
 namespace
 IntakeConstants{}
