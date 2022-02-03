@@ -34,6 +34,11 @@ class Shooter{
         bool Aimed();
         void Calibrate();
         void setPID();
+        double interpolate(double dist, double prev_setting, double next_setting, double prev_dist, double next_dist);
+
+        //getters for testing
+        frc::DigitalInput & getLimitSwitch() {return m_turretLimitSwitch;}
+        WPI_TalonFX & getFlywheelMaster() {return m_flywheelMaster;}
 
     private:
         WPI_TalonFX m_flywheelMaster{ShooterConstants::shootMotorPortMaster};
