@@ -71,8 +71,10 @@ Shooter::Aim(){
             angle2 = data2.first;
             speed2 = data2.second;
 
-            m_angle = (angle1 + angle2)/2;
-            m_speed = (speed1 + speed2)/2;
+            // m_angle = (angle1 + angle2)/2;
+            // m_speed = (speed1 + speed2)/2;
+            m_angle = interpolate(point, angle1, angle2, point, point2);
+            m_speed= interpolate(point, speed1, speed2, point, point2);
         }else{
             m_angle = 0;
             m_speed = 0;
@@ -90,6 +92,10 @@ Shooter::Aim(){
     m_flywheelMaster.Set(m_flywheelController.Calculate(m_flywheelMaster.GetSelectedSensorVelocity(), m_speed));
     m_flywheelSlave.Set(-m_flywheelController.Calculate(m_flywheelSlave.GetSelectedSensorVelocity(), m_speed));
     m_hood.Set(m_hoodController.Calculate(m_hood.GetSelectedSensorPosition(), m_angle));
+}
+
+double Shooter::interpolate(double dist, double prev_setting, double next_setting, double prev_dist, double next_dist) {
+    return prev_setting + (next_setting - prev_setting)*((dist-prev_dist)/(next_dist-prev_dist));
 }
 
 
