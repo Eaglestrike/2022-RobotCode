@@ -65,12 +65,12 @@ Robot::TeleopPeriodic() {
     //Run the intake
     if(r_joy.GetTriggerPressed()){
       std::cout << "Intake" << std::endl;
-      m_intake.setState(Intake::State::RUN);
+      //m_intake.setState(Intake::State::RUN);
     }
 
     if(l_joy.GetTriggerPressed()){
       std::cout << "Shoot" << std::endl;
-      m_shooter.setState(Shooter::State::SHOOT);
+      //m_shooter.setState(Shooter::State::SHOOT);
     }
     
     if(xbox.GetRawButton(1)){
@@ -85,15 +85,16 @@ Robot::TeleopPeriodic() {
 
     if(xbox.GetRawButton(3)){
       std::cout << "Set Rot Controller PID" << std::endl;
-      m_swerve.SetDriveControllerROTPID();
+      //m_swerve.SetDriveControllerROTPID();
+      m_swerve.SetPID();
     }
 
     else{
-      m_intake.setState(Intake::State::IDLE);
+      //m_intake.setState(Intake::State::IDLE);
       m_shooter.setState(Shooter::State::IDLE);
     }
 
-    m_intake.Periodic();
+    //m_intake.Periodic();
     m_shooter.Periodic();
 
     frc::SmartDashboard::PutNumber("Y", m_swerve.GetYPosition());

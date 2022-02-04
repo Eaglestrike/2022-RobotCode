@@ -2,7 +2,9 @@
 
 //Constructor
 Climber::Climber(){
-
+    // climbStage1.Set(true);
+    // climbStage2.Set(true);
+    
 }
 
 
@@ -27,7 +29,8 @@ Climber::Periodic(){
 //Idle function
 void
 Climber::Idle(){
-
+    // climbStage1.Set(false);
+    // climbStage2.Set(true);
 }
 
 

@@ -12,7 +12,7 @@
 #include <Trajectory.h>
 #include <Constants.h>
 #include <frc/Compressor.h>
-#include "Intake.h"
+//#include "Intake.h"
 #include "Shooter.h"
 
 
@@ -42,7 +42,7 @@ class Robot : public frc::TimedRobot {
  private:
 
   SwerveDrive m_swerve;
-  Intake m_intake;
+  //Intake m_intake;
   Shooter m_shooter;
 
   frc::SendableChooser<std::string> m_chooser;

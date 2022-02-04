@@ -21,17 +21,17 @@ Channel::Periodic(){
 //Run function
 void
 Channel::Run(){
-    m_channel.Set(ControlMode::PercentOutput, 0.25);
-    if(!photogate1.Get()){
-        Stop();
-    }
+    // m_channel.Set(ControlMode::PercentOutput, 0.25);
+    // if(!photogate1.Get()){
+    //     Stop();
+    // }
 }
 
 
 //Stop all channel movement
 void
 Channel::Stop(){
-    m_channel.Set(ControlMode::PercentOutput, 0);
+    // m_channel.Set(ControlMode::PercentOutput, 0);
 }
 
 

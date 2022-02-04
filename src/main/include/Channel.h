@@ -21,8 +21,8 @@ class Channel{
     private:
         WPI_TalonFX m_channel{ChannelConstants::channelMotorPort};
 
-        // 2 Photogates
-        frc::DigitalInput photogate1{ChannelConstants::photogate1};
-        frc::DigitalInput photogate2{ChannelConstants::photogate2};
+        // // 2 Photogates
+        // frc::DigitalInput photogate1{ChannelConstants::photogate1};
+        // frc::DigitalInput photogate2{ChannelConstants::photogate2};
         State state;
 };

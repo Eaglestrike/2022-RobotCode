@@ -24,8 +24,8 @@ OIConstants{
 namespace
 DriveConstants{
     //Dimensions of the Robot - SwerveDrive.h
-    const double Width = 0.394;
-    const double Length = 0.394;
+    const double Width = 29;
+    const double Length = 29;
 
     //Absolute Encoder Offset Values - SwerveDrive.h
     const double FLOFF = 0.43;
@@ -87,11 +87,11 @@ namespace
 ShooterConstants{
 
     //TalonFX MotorID
-    const int shootMotorPortMaster = 21;
-    const int shootMotorPortSlave = 22;
-    const int turretMotorPort = 23;
-    const int hoodMotorPort = 24;
-    const int kickerMotorPort = 25;
+    const int shootMotorPortMaster = 22; //confirmed
+    const int shootMotorPortSlave = 23; //confirmed
+    const int turretMotorPort = 20; //confirmed
+    const int hoodMotorPort = 19; //confirmed
+    const int kickerMotorPort = 21; //confirmed
 
     //Limit Switch
     const int turretLimitSwitch = 9;
@@ -138,8 +138,8 @@ IntakeConstants{
 //None of these values are set yet
 namespace
 ClimbConstants{
-    const int gearboxPort1 = 30;
-    const int gearboxPort2 = 31;
+    const int gearboxPort1 = 30; //confirmed
+    const int gearboxPort2 = 31; //confirmed
     const int solenoid1Port = 1;
     const int solenoid2Port = 2;
 }
@@ -147,7 +147,7 @@ ClimbConstants{
 
 namespace
 ChannelConstants{
-    const int channelMotorPort = 27;
+    const int channelMotorPort = 40; //confirmed
 
     const int photogate1 = 9;
     const int photogate2 = 10;

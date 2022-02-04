@@ -1,7 +1,6 @@
 #include <Shooter.h>
 
 
-
 Shooter::Shooter(){
     m_turret.SetNeutralMode(NeutralMode::Brake);
     m_hood.SetNeutralMode(NeutralMode::Brake);
@@ -48,59 +47,49 @@ Shooter::Periodic(){
     m_channel.Periodic();
 }
 
+
 //Aim Function for Turret
 void
 Shooter::Aim(){
     m_limelight->setLEDMode("ON");
 
     //Check if the limelight sees the target
-    if(!m_limelight->targetAquired()){
-        double point = m_limelight->calculateDistance();
-        auto data = dataMap.find(point);
-        if(data != dataMap.end()){
-            m_angle = data->second.first;
-            m_speed = data->second.second;
-        } else {
-            double point1, point2;
-            if(withinRange(dataPoints, point, point1, point2)){
-                auto data1 = dataMap[point1];
-                auto data2 = dataMap[point2];
-                double angle1, speed1;
-                double angle2, speed2;
-                angle1 = data1.first;
-                speed1 = data1.second;
-                angle2 = data2.first;
-                speed2 = data2.second;
+    double point = m_limelight->calculateDistance();
+    auto data = dataMap.find(point);
+    if(data != dataMap.end()){
+        m_angle = data->second.first;
+        m_speed = data->second.second;
+    } else {
+        double point1, point2;
+        if(withinRange(dataPoints, point, point1, point2)){
+            auto data1 = dataMap[point1];
+            auto data2 = dataMap[point2];
+            double angle1, speed1;
+            double angle2, speed2;
+            angle1 = data1.first;
+            speed1 = data1.second;
+            angle2 = data2.first;
+            speed2 = data2.second;
 
-              //  m_angle = (angle1 + angle2)/2;
-              // m_speed = (speed1 + speed2)/2;
-                m_angle = interpolate(point, angle1, angle2, point, point2);
-                m_speed= interpolate(point, speed1, speed2, point, point2);
-            }else{
-                m_angle = 0;
-                m_speed = 0;
-            }
+            m_angle = (angle1 + angle2)/2;
+            m_speed = (speed1 + speed2)/2;
+        }else{
+            m_angle = 0;
+            m_speed = 0;
         }
-
-        double x_off = m_limelight->getXOff();
-        m_turret.Set(m_turretController.Calculate(x_off));
-        if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax ||
-            m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin){
-                return;
-        }
-        //Check
-        //Setting the flywheel speed
-        m_flywheelMaster.Set(ControlMode::Velocity, 
-            m_flywheelController.Calculate(m_flywheelMaster.GetSelectedSensorVelocity(), m_speed));
-        m_flywheelSlave.Set(ControlMode::Velocity,
-            -m_flywheelController.Calculate(m_flywheelSlave.GetSelectedSensorVelocity(), m_speed));
-        m_hood.Set(ControlMode::Position,
-            m_hoodController.Calculate(m_hood.GetSelectedSensorPosition(), m_angle));
     }
-}
 
-double Shooter::interpolate(double dist, double prev_setting, double next_setting, double prev_dist, double next_dist) {
-    return prev_setting + (next_setting - prev_setting)*((dist-prev_dist)/(next_dist-prev_dist));
+    double x_off = m_limelight->getXOff();
+    m_turret.Set(m_turretController.Calculate(x_off));
+    if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax ||
+        m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin){
+            return;
+    }
+    //Check
+    //Setting the flywheel speed
+    m_flywheelMaster.Set(m_flywheelController.Calculate(m_flywheelMaster.GetSelectedSensorVelocity(), m_speed));
+    m_flywheelSlave.Set(-m_flywheelController.Calculate(m_flywheelSlave.GetSelectedSensorVelocity(), m_speed));
+    m_hood.Set(m_hoodController.Calculate(m_hood.GetSelectedSensorPosition(), m_angle));
 }
 
 
@@ -145,16 +134,16 @@ Shooter::Shoot(){
 //fix
 void
 Shooter::Zero(){
-    if(!m_turretLimitSwitch.Get()){
-        m_turret.Set(ControlMode::PercentOutput, 0.0);
-        m_turret.SetSelectedSensorPosition(0);
-    }
-    if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
-        m_hood.Set(ControlMode::PercentOutput, 0.0);
-        m_hood.SetSelectedSensorPosition(0);
-    } 
-    m_turret.Set(ControlMode::PercentOutput, 0.25);
-    m_hood.Set(ControlMode::PercentOutput, 0.25);
+    // if(!m_turretLimitSwitch.Get()){
+    //     m_turret.Set(ControlMode::PercentOutput, 0.0);
+    //     m_turret.SetSelectedSensorPosition(0);
+    // }
+    // if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
+    //     m_hood.Set(ControlMode::PercentOutput, 0.0);
+    //     m_hood.SetSelectedSensorPosition(0);
+    // } 
+    // m_turret.Set(ControlMode::PercentOutput, 0.25);
+    // m_hood.Set(ControlMode::PercentOutput, 0.25);
     
 }
 
@@ -162,20 +151,20 @@ Shooter::Zero(){
 //Load Function
 void
 Shooter::Load(){
-    if(m_state == State::SHOOT){
-        m_kicker.Set(0.5);
-    } 
-    //The else if might not be nessecary
-    else if (m_state == State::LOAD){
-        //Go until photogate catches the ball
-        if(!m_photogate.Get()){
-            m_kicker.Set(0);
-            m_channel.setState(Channel::State::IDLE);
-        } else {
-            m_kicker.Set(0.25);
-            m_channel.setState(Channel::State::RUN);
-        }
-    }
+    // if(m_state == State::SHOOT){
+    //     m_kicker.Set(0.5);
+    // } 
+    // //The else if might not be nessecary
+    // else if (m_state == State::LOAD){
+    //     //Go until photogate catches the ball
+    //     if(!m_photogate.Get()){
+    //         m_kicker.Set(0);
+    //         m_channel.setState(Channel::State::IDLE);
+    //     } else {
+    //         m_kicker.Set(0.25);
+    //         m_channel.setState(Channel::State::RUN);
+    //     }
+    // }
 }
 
 
@@ -230,4 +219,3 @@ Shooter::Stop(){
     m_hood.Set(0);
     m_limelight->setLEDMode("OFF");
 }
-

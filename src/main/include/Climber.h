@@ -24,11 +24,13 @@ class Climber{
     private:
         State state;
 
-        // WPI_TalonFX gearboxMaster{ClimbConstants::gearboxPort1};
-        // WPI_TalonFX gearboxSlave{ClimbConstants::gearboxPort2};
+        WPI_TalonFX gearboxMaster{ClimbConstants::gearboxPort1};
+        WPI_TalonFX gearboxSlave{ClimbConstants::gearboxPort2};
 
         // //Higher pneumatic
-        // frc::Solenoid climbStage1{ClimbConstants::solenoid1Port};
+        // frc::Solenoid climbStage1{frc::PneumaticsModuleType::REVPH, 
+        //     ClimbConstants::solenoid1Port};
         // //Lower pneumatic
-        // frc::Solenoid climbStage2{ClimbConstants::solenoid2Port};
+        // frc::Solenoid climbStage2{frc::PneumaticsModuleType::REVPH,
+        //     ClimbConstants::solenoid2Port};
 };
