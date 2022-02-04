@@ -26,6 +26,7 @@ class Shooter{
         void Periodic();
         void Aim();
         void Shoot();
+        double interpolate(double dist, double prev_setting, double next_setting, double prev_dist, double next_dist);
         bool withinRange(std::vector<double> array, double p, double p1, double p2);
         void Zero();
         void Load();
