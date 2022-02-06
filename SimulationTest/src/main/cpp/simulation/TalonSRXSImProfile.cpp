@@ -1,4 +1,4 @@
-#include "simulation/PhysicsSim.h"
+#include "test/PhysicsSim.h"
 #include "ctre/Phoenix.h"
 
 //taken from ctre
@@ -11,6 +11,7 @@ void PhysicsSim::TalonSRXSimProfile::Run() {
     double const accelAmount = _fullVel / _accelToFullTime * period / 1000;
 
     double outPerc = _talon.GetMotorOutputPercent();
+    std::cout << "output: " << outPerc << "\n";
     if (_sensorPhase) {
         outPerc *= -1;
     }
@@ -25,6 +26,8 @@ void PhysicsSim::TalonSRXSimProfile::Run() {
     _pos += _vel * period / 100;
 
     /// SET SIM PHYSICS INPUTS
+
+    std::cout << "setting physics inputs\n";
 
     _talon.GetSimCollection().AddQuadraturePosition(_vel * period / 100);
     _talon.GetSimCollection().SetQuadratureVelocity(_vel);
