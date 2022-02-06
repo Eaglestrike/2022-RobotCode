@@ -1,4 +1,4 @@
-#include <test/PhysicsSim.h>
+#include <simulation/PhysicsSim.h>
 
 PhysicsSim& PhysicsSim::GetInstance() {
     static PhysicsSim sim;

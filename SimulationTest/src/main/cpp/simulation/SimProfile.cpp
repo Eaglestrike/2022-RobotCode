@@ -1,4 +1,4 @@
-#include <test/PhysicsSim.h>
+#include <simulation/PhysicsSim.h>
 
 double PhysicsSim::SimProfile::GetPeriod() {
     // set the start time if not yet running
