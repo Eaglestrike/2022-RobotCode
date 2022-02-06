@@ -1,17 +1,5 @@
 #include "Climber.h"
 
-/*Logick
-- first arm extend
-- drive forward
-- first arm retract (climb up)
-
-- hooks flip up onto bar --> arms extend diagonally
-- arms tilt up, hooks onto bar
-- retract arms (climb onto second bar)
-
-could repeat for a third bar? idk
-*/
-
 
 //Constructor
 Climber::Climber(){
@@ -28,11 +16,23 @@ Climber::Periodic(double pitch){
         case State::IDLE:
             state = Idle();
             break;
-        case State::INITIALIZE:
-            state = Initialize();
+        case State::FIRST_ARM_EXTEND:
+            state = FirstArmExtend();
             break;
-        case State::CLIMB:
-            state = Climb();
+        case State::DRIVE_FORWARD:
+            state = DriveForward();
+            break;
+         case State::FIRST_ARM_RETRACT:
+            state = FirstArmRetract();
+            break;
+         case State::DIAGONAL_ARM_EXTEND:
+            state = DiagonalArmExtend();
+            break;
+         case State::DIAGONAL_ARM_RAISE:
+            state = DiagonalArmRaise();
+            break;
+         case State::DIAGONAL_ARM_RETRACT:
+            state = DiagonalArmRetract();
             break;
         default:
             break;
@@ -40,25 +40,51 @@ Climber::Periodic(double pitch){
 }
 
 
-//Idle function
-Climber::State
-Climber::Idle(){
-    // climbStage1.Set(false);
-    // climbStage2.Set(true);
+Climber::State Climber::Idle(){
+    //all pneumatics retracted
+    //if recieve correct button push --> return first arm extend
+    //else --> return idle
 }
 
 
-//Initialization function
-Climber::State
-Climber::Initialize(){
-    // climbStage1.Set(false);
+Climber::State Climber::FirstArmExtend(){
+    //set correct solenoid to true
+    //if solenoid is fully extended (how to determine?) --> return drive forward
+    //else --> return first arm extend
 }
 
 
-//Climb function
-Climber::State
-Climber::Climb(){
+Climber::State Climber::DriveForward(){
+    //basically do nothing, wait for driver to position robot
+    //if recieved confirmation from driver --> return first arm retract
+    //else --> return drive forward
+}
 
+
+Climber::State Climber::FirstArmRetract(){
+    //set correct solenoid to false
+    //if solenoid is fully retracted && hooks have booked (how to determine) --> return diagonal arm extend
+    //else --> return first arm retract
+}
+
+
+Climber::State Climber::DiagonalArmExtend(){
+    //set correct double pneumatic to all the way extended
+     //if solenoid is fully extended (how to determine?) && pitch is correct --> return diagonal arm raise
+    //else --> return diagonal arm extend
+}
+
+Climber::State Climber::DiagonalArmRaise(){
+    //set correct double pneumatic halfway extended
+     //if solenoid is done getting to halfway position && hooks are hooked (how to determine?) --> return diagonal arm retract
+    //else --> return diagonal arm raise
+}
+
+Climber::State Climber::DiagonalArmRetract(){
+    //set double solenoid to not extended (vertical, initial position)
+    //set other solenoid to retracted as well
+
+    //either lock/brake pneumatics, or wait for them both to retract && hook and then call diagonal arm extend
 }
 
 
