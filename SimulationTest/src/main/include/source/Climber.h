@@ -12,14 +12,19 @@ class Climber{
             IDLE,
 
            //only for climb to first bar
-            FIRST_ARM_EXTEND,
-            DRIVE_FORWARD,
-            FIRST_ARM_RETRACT,
+            VERTICAL_ARM_EXTEND,
+            VERTICAL_ARM_RETRACT,
 
             //can be used for all subsequent bars
             DIAGONAL_ARM_EXTEND,
             DIAGONAL_ARM_RAISE, //hooks onto bar
             DIAGONAL_ARM_RETRACT //involves retracting & returning to vertical            
+        };
+
+        enum MotorState {
+            RETRACTED,
+            EXTENDED,
+            HOOKED
         };
 
         Climber();
@@ -28,26 +33,28 @@ class Climber{
         //returns next state of climber
         State Idle();
         
-        State FirstArmExtend();
-        State DriveForward();
-        State FirstArmRetract();
+        State VerticalArmExtend();
+        State VerticalArmRetract();
 
+        State TestDiagonalArmExtend();
         State DiagonalArmExtend();
         State DiagonalArmRaise();
         State DiagonalArmRetract();
 
-        void setState(State newState); //can set state manually
+        void SetMotor(MotorState s);
+
+        void SetState(State newState); //can set state manually
 
         void Calibrate();
 
+        bool hooked();
 
     private:
         State state;
+        MotorState motor_state;
 
         WPI_TalonFX gearboxMaster{ClimbConstants::gearboxPort1};
         WPI_TalonFX gearboxSlave{ClimbConstants::gearboxPort2};
-
-        double nextPitch(double currPitch, double time);
 
         //Higher pneumatic
         frc::Solenoid climbStage1{frc::PneumaticsModuleType::REVPH, 
