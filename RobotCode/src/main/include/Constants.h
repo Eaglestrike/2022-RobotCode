@@ -142,6 +142,15 @@ ClimbConstants{
     const int gearboxPort2 = 31; //confirmed
     const int solenoid1Port = 1;
     const int solenoid2Port = 2;
+    const int BrakeSolenoidPort = -1; //what is it?
+
+    //these names are kind of bad, i might change them later
+    const double idleEnoughTime = 0;
+    const double verticalArmExtendEnoughTime = 0;
+    const double verticalArmRetractEnoughTime = 0;
+    const double diagonalArmExtendEnoughTime = 0;
+    const double diagonalArmRaiseEnoughTime = 0;
+    const double diagonalArmRetractEnoughTime = 0;
 }
 
 

@@ -21,27 +21,19 @@ class Climber{
             DIAGONAL_ARM_RETRACT //involves retracting & returning to vertical            
         };
 
-        enum MotorState {
-            RETRACTED,
-            EXTENDED,
-            HOOKED
-        };
-
         Climber();
-        void Periodic(double pitch); //executes state actions
+        void Periodic(double time, bool passIdle, bool drivenForward, bool passDiagonalArmRaise, bool doSecondClimb); //executes state actions
 
         //returns next state of climber
-        State Idle();
+        State Idle(bool passIdle);
         
-        State VerticalArmExtend();
+        State VerticalArmExtend(bool drivenForward);
         State VerticalArmRetract();
 
         State TestDiagonalArmExtend();
         State DiagonalArmExtend();
-        State DiagonalArmRaise();
-        State DiagonalArmRetract();
-
-        void SetMotor(MotorState s);
+        State DiagonalArmRaise(bool passDiagonalArmRaise);
+        State DiagonalArmRetract(bool doSecondClimb);
 
         void SetState(State newState); //can set state manually
 
@@ -49,19 +41,23 @@ class Climber{
 
         bool hooked();
 
+        bool waited(double time, double startTime);
+
     private:
         State state;
-        MotorState motor_state;
+
+        double currTime = 0;
 
         WPI_TalonFX gearboxMaster{ClimbConstants::gearboxPort1};
         WPI_TalonFX gearboxSlave{ClimbConstants::gearboxPort2};
 
         //Higher pneumatic
-        frc::Solenoid climbStage1{frc::PneumaticsModuleType::REVPH, 
+        frc::Solenoid climbFullExtend{frc::PneumaticsModuleType::REVPH, 
             ClimbConstants::solenoid1Port};
         //Lower pneumatic
-        frc::Solenoid climbStage2{frc::PneumaticsModuleType::REVPH,
+        frc::Solenoid climbMedExtend{frc::PneumaticsModuleType::REVPH,
             ClimbConstants::solenoid2Port};
 
-        //pretty sure there should be a double solenoid too...
+        frc::Solenoid brake{frc::PneumaticsModuleType::REVPH, ClimbConstants::BrakeSolenoidPort};
+
 };
