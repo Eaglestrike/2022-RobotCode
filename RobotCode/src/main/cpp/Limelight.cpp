@@ -32,12 +32,8 @@ Limelight::getYOff(){
 //Check if the limeight sees the target
 bool
 Limelight::targetAquired(){
-    double tv = network_table->GetNumber("tv", 0.0);
-    if(tv == 0.0){
-        return false;
-    } else {
-        return true;
-    }
+    double tv = network_table->GetBoolean("tv", false);
+    return tv;
 }
 
 

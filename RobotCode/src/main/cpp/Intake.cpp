@@ -53,10 +53,10 @@ Intake::Retract(){
 
 
 //Unjam the Intake
-//Assume that negative output is reverse
+//positive output is reverse
 void
 Intake::Unjam(){
-    intakeMotor.Set(ControlMode::PercentOutput, -0.25);
+    intakeMotor.Set(ControlMode::PercentOutput, 0.25);
 }
 
 

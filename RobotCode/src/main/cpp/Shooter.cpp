@@ -104,18 +104,18 @@ Shooter::Aim(){
         return;
     }
     else {
-        //m_turret.Set(output);
+        //m_turret.Set(ControlMode:::PercentOutput, output);
     }
 
     //double out = m_flywheelController.Calculate(m_flywheelMaster.GetSelectedSensorVelocity(), m_speed);
-    //m_flywheelMaster.Set(out);
-    //m_flywheelSlave.Set(-out);
+    //m_flywheelMaster.Set(ControlMode::Velocity, out);
+    //m_flywheelSlave.Set(ControlMode::Velocity, -out);
     //frc::SmartDashboard::PutNumber("flywheelError", m_speed-m_flywheelMaster.GetSelectedSensorVelocity());
     //frc::SmartDashboard::PutNumber("flywheelSpeed", m_flywheelMaster.GetSelectedSensorVelocity());
 
-    // //Setting the flywheel speed
-    //m_flywheelMaster.Set(m_flywheelController.Calculate(m_flywheelMaster.GetSelectedSensorVelocity(), m_speed));
-    //m_flywheelSlave.Set(m_flywheelController.Calculate(m_flywheelSlave.GetSelectedSensorVelocity(), -m_speed));
+    // //Setting the flywheel speed)
+    //m_flywheelMaster.Set(ControlMode::Velocity, m_flywheelController.Calculate(m_flywheelMaster.GetSelectedSensorVelocity(), m_speed));
+    //m_flywheelSlave.Set(ControlMode::Velocity, m_flywheelController.Calculate(m_flywheelSlave.GetSelectedSensorVelocity(), -m_speed));
     //m_hood.Set(m_hoodController.Calculate(m_hood.GetSelectedSensorPosition(), m_angle));
     m_flywheelMaster.Set(ControlMode::PercentOutput, 0.9);
     m_flywheelSlave.Set(ControlMode::PercentOutput, -0.9);
@@ -190,19 +190,20 @@ Shooter::Zero(){
 //Load Function
 void
 Shooter::Load(){
-    if(m_state == State::SHOOT){
+    //never called in shoot?
+    // if(m_state == State::SHOOT){
+    //     m_kicker.Set(ControlMode::PercentOutput, 0.2);
+    // } 
+    // else if(m_state == State::LOAD){
+    if(!m_photogate.Get()){
+        m_kicker.Set(ControlMode::PercentOutput, 0.0);
+        m_channel.setState(Channel::State::IDLE);
+    } else {
         m_kicker.Set(ControlMode::PercentOutput, 0.2);
-    } 
-    else if(m_state == State::LOAD){
-        if(!m_photogate.Get()){
-            m_kicker.Set(ControlMode::PercentOutput, 0.0);
-            m_channel.setState(Channel::State::IDLE);
-        } else {
-            m_kicker.Set(ControlMode::PercentOutput, 0.2);
-            m_channel.setState(Channel::State::RUN);
-        }
+        m_channel.setState(Channel::State::RUN);
     }
 }
+//}
 
 
 //set the State of the shooter
@@ -250,11 +251,11 @@ Shooter::Calibrate(){
 void
 Shooter::setPID(){
     double P = frc::SmartDashboard::GetNumber("P", 0.0);
-    frc::SmartDashboard::PutNumber("P", P);
+    frc::SmartDashboard::PutNumber("Shooter P", P);
     double I = frc::SmartDashboard::GetNumber("I", 0.0);
-    frc::SmartDashboard::PutNumber("I", I);
+    frc::SmartDashboard::PutNumber("Shooter I", I);
     double D = frc::SmartDashboard::GetNumber("D", 0.0);
-    frc::SmartDashboard::PutNumber("D", D);
+    frc::SmartDashboard::PutNumber("Shooter D", D);
     //m_turretController.SetPID(P, I, D);
     m_flywheelController.SetPID(P,I,D);
     //m_hoodController.SetPID(P,I,D);
@@ -265,11 +266,11 @@ Shooter::setPID(){
 //Stop All shooter movements
 void
 Shooter::Stop(){
-    m_turret.Set(0);
-    m_flywheelSlave.Set(0);
-    m_flywheelMaster.Set(0);
-    m_kicker.Set(0);
-    m_hood.Set(0);
+    m_turret.Set(ControlMode::PercentOutput, 0);
+    m_flywheelSlave.Set(ControlMode::PercentOutput, 0);
+    m_flywheelMaster.Set(ControlMode::PercentOutput, 0);
+    m_kicker.Set(ControlMode::PercentOutput, 0);
+    m_hood.Set(ControlMode::PercentOutput, 0);
     m_limelight->setLEDMode("OFF");
     m_channel.setState(Channel::State::IDLE);
 }
