@@ -1,5 +1,7 @@
 #include "Climber.h"
 
+//i took out all the pseudo code comments and put them here:
+//https://docs.google.com/document/d/1I5caybg-bhfEYwxfIL1PCXAbqdznW7Qo1R-ZHObqCiY/edit?usp=sharing
 
 //Constructor
 Climber::Climber(){
@@ -121,6 +123,15 @@ Climber::State Climber::DiagonalArmRaise(bool passDiagonalArmRaise){
 
 Climber::State Climber::DiagonalArmRetract(bool doSecondClimb){
     if (motorDone(ClimbConstants::motorRetractedPose) || currTime >= ClimbConstants::almostDoneTime) gearboxMaster.SetNeutralMode(NeutralMode::Brake);
+
+    gearboxMaster.Set(ControlMode::PercentOutput, 
+            std::min(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), ClimbConstants::motorRetractedPose), ClimbConstants::motorMaxOutput));
+    waitStartTime = currTime;
+    if (waited(ClimbConstants::waitToRaiseVerticalTime, waitStartTime)) {
+        climbFullExtend.Set(false);
+        climbMedExtend.Set(false);
+    }
+
 
     if (motorDone(ClimbConstants::motorRetractedPose) && doSecondClimb && currTime <= ClimbConstants::diagonalArmRetractEnoughTime) 
         return TEST_DIAGONAL_ARM_EXTEND;

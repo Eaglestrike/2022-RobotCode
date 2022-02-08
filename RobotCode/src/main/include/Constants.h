@@ -155,6 +155,8 @@ ClimbConstants{
     const double diagonalArmRetractEnoughTime = 0;
     const double almostDoneTime = 0;
 
+    const double waitToRaiseVerticalTime = 0; //how long to wait from after retracting to raise diagonal arm to vertical
+
     const double hookedCurrent = 0;
 
     const double acceptablePitch = 0;
