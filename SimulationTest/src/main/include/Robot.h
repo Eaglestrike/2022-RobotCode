@@ -9,8 +9,10 @@
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/Joystick.h>
-#include <Shooter.h>
-#include "PhysicsSim.h"
+#include <source/Shooter.h>
+#include "simulation/PhysicsSim.h"
+
+
 
 class Robot : public frc::TimedRobot {
  public:

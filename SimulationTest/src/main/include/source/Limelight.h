@@ -17,21 +17,10 @@ class Limelight{
         std::shared_ptr<nt::NetworkTable> GetNetworkTable();
 
     private:
-
         void ReadPeriodicIn();
 
         std::shared_ptr<nt::NetworkTable> network_table;
         std::string table_name = "limelight";
 
         const int PIPELINE = 0;
-
-        //simulation
-         bool simMode = true;
-
-         double getSimulatedXOff();
-         double getSimulatedYOff();
-         double simulatedTargetAquired();
-         
-
-         
 };

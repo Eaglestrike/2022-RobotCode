@@ -27,7 +27,6 @@ class Shooter{
         void Aim();
         void Shoot();
         bool withinRange(std::vector<double> array, double p, double p1, double p2);
-        double interpolate(double dist, double prev_setting, double next_setting, double prev_dist, double next_dist);
         void Zero();
         void Load();
         void Stop();
@@ -35,19 +34,18 @@ class Shooter{
         bool Aimed();
         void Calibrate();
         void setPID();
-
-        WPI_TalonSRX& getFlywheel() {return m_flywheelMaster;}
-        WPI_TalonSRX& getTurret() {return m_turret;}
+        void Manual(double input);
+        void limelightOFF();
 
     private:
-        WPI_TalonSRX m_flywheelMaster{ShooterConstants::shootMotorPortMaster};
-        WPI_TalonSRX m_flywheelSlave{ShooterConstants::shootMotorPortSlave};
-        WPI_TalonSRX m_turret{ShooterConstants::turretMotorPort};
-        WPI_TalonSRX m_hood{ShooterConstants::hoodMotorPort};
-        WPI_TalonSRX m_kicker{ShooterConstants::kickerMotorPort};
+        WPI_TalonFX m_flywheelMaster{ShooterConstants::shootMotorPortMaster};
+        WPI_TalonFX m_flywheelSlave{ShooterConstants::shootMotorPortSlave};
+        WPI_TalonFX m_turret{ShooterConstants::turretMotorPort};
+        WPI_TalonFX m_hood{ShooterConstants::hoodMotorPort};
+        WPI_TalonFX m_kicker{ShooterConstants::kickerMotorPort};
 
         frc::DigitalInput m_turretLimitSwitch{ShooterConstants::turretLimitSwitch};
-        // frc::DigitalInput m_photogate{ShooterConstants::photogate};
+        frc::DigitalInput m_photogate{ShooterConstants::photogate};
 
         frc2::PIDController m_turretController{ShooterConstants::turretP,
             ShooterConstants::turretI, ShooterConstants::turretD};
@@ -64,6 +62,9 @@ class Shooter{
 
         double m_angle;
         double m_speed;
+
+        bool m_hoodZero = false;
+        bool m_turretZero = false;
 
         //For storing hood and angle values for shooting
         //angle , speed

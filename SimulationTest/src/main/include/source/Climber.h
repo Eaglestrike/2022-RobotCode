@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Constants.h"
+#include <iostream>
 #include <ctre/Phoenix.h>
 #include <frc/Solenoid.h>
-
-
+#include <frc/controller/PIDController.h>
 
 class Climber{
     public:
@@ -15,53 +15,72 @@ class Climber{
             VERTICAL_ARM_EXTEND,
             VERTICAL_ARM_RETRACT,
 
+            TEST_DIAGONAL_ARM_EXTEND,
+
             //can be used for all subsequent bars
             DIAGONAL_ARM_EXTEND,
             DIAGONAL_ARM_RAISE, //hooks onto bar
             DIAGONAL_ARM_RETRACT //involves retracting & returning to vertical            
         };
 
-        enum MotorState {
-            RETRACTED,
-            EXTENDED,
-            HOOKED
-        };
-
         Climber();
-        void Periodic(double pitch); //executes state actions
+        void Periodic(double delta_pitch, double pitch, double time, bool passIdle, bool drivenForward, bool passDiagonalArmRaise, bool doSecondClimb); //executes state actions
 
         //returns next state of climber
-        State Idle();
+        State Idle(bool passIdle);
         
-        State VerticalArmExtend();
-        State VerticalArmRetract();
+        State VerticalArmExtend(bool drivenForward);
+        State VerticalArmRetract(double pitch, double delta_pitch);
 
         State TestDiagonalArmExtend();
-        State DiagonalArmExtend();
-        State DiagonalArmRaise();
-        State DiagonalArmRetract();
-
-        void SetMotor(MotorState s);
+        State DiagonalArmExtend(double pitch, double delta_pitch);
+        State DiagonalArmRaise(bool passDiagonalArmRaise);
+        State DiagonalArmRetract(bool doSecondClimb);
 
         void SetState(State newState); //can set state manually
 
         void Calibrate();
 
-        bool hooked();
+
+        //the below public functions are for testing
+        void InitializeTests();
+        void testRaiseVerticalArm();
+        void testRetractVerticalArm();
+        void testSeesIfHooked();
+        void testDiagonalExtension();
+        void testDiagonalArmRaise();
+        void testBarTraversalFromRaised();
+
 
     private:
-        State state;
-        MotorState motor_state;
+        State state = IDLE;
+        State prevState = IDLE; //for state just changed
+
+        double currTime = 0;
+        double waitStartTime = 0;
+
+        bool hooked();
+        bool waited(double time, double startTime);
+        bool motorDone(double pose);
+        bool pitchGood(double pitch, double delta_pitch);
+        bool stateJustChanged();
 
         WPI_TalonFX gearboxMaster{ClimbConstants::gearboxPort1};
         WPI_TalonFX gearboxSlave{ClimbConstants::gearboxPort2};
 
+        //want to be fairly slow...
+         frc2::PIDController motorPIDController{ClimbConstants::motorP,
+            ClimbConstants::motorI, ClimbConstants::motorD};
+
         //Higher pneumatic
-        frc::Solenoid climbStage1{frc::PneumaticsModuleType::REVPH, 
+        frc::Solenoid climbFullExtend{frc::PneumaticsModuleType::REVPH, 
             ClimbConstants::solenoid1Port};
         //Lower pneumatic
-        frc::Solenoid climbStage2{frc::PneumaticsModuleType::REVPH,
+        frc::Solenoid climbMedExtend{frc::PneumaticsModuleType::REVPH,
             ClimbConstants::solenoid2Port};
 
-        //pretty sure there should be a double solenoid too...
+        frc::Solenoid brake{frc::PneumaticsModuleType::REVPH, ClimbConstants::BrakeSolenoidPort};
+
+
+
 };

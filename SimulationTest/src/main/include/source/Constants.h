@@ -76,7 +76,7 @@ DriveConstants{
     const double fwdstrP = 0.45;
     const double fwdstrI = 0.0;
     const double fwdstrD = 0.0;
-    const double rotP = 0.0001;
+    const double rotP = 0.0006;
     const double rotI = 0.00004;
     const double rotD = 0.0;
 }
@@ -94,15 +94,15 @@ ShooterConstants{
     const int kickerMotorPort = 21; //confirmed
 
     //Limit Switch
-    const int turretLimitSwitch = 9;
+    const int turretLimitSwitch = 9; //confirmed
 
     //Photogate
-    const int photogate = 10;
+    const int photogate = 8; 
 
     //Turret Controller
-    const double turretP = 0.0;
-    const double turretI = 0.0;
-    const double turretD = 0.0;
+    const double turretP = 0.019; //wip
+    const double turretI = 0.0006;
+    const double turretD = 0.001;
 
     //Flywheel Controller
     const double flywheelP = 0.0;
@@ -110,26 +110,26 @@ ShooterConstants{
     const double flywheelD = 0.0;
 
     //Hood Controller
-    const double hoodP = 0.0;
-    const double hoodI = 0.0;
-    const double hoodD = 0.0;
+    const double hoodP = 0.00013; //wip
+    const double hoodI = 0.00011;
+    const double hoodD = 0.000007;
 
     //Turret limit values;
-    const double turretMax = 100;
-    const double turretMin = 0;
+    const double turretMax = -1000.0; //confirmed
+    const double turretMin = -63000.0; //confirmed
 
-    const double hoodMax = 100;
-    const double hoodMin = 0;
+    const double hoodMax = 5801; //confirmed
+    const double hoodMin = 0; //confirmed
 
     const double angleOff = 300;
 
-    const double zeroingcurrent = 6;
+    const double zeroingcurrent = 2.5; //confirmed
 }
 
 //None of these values have been set yet
 namespace
 IntakeConstants{
-    const int intakeMotorPort = 20;
+    const int intakeMotorPort = 50; //confirmed
 
     const int solenoidPort = 0;
 }
@@ -142,13 +142,49 @@ ClimbConstants{
     const int gearboxPort2 = 31; //confirmed
     const int solenoid1Port = 1;
     const int solenoid2Port = 2;
+    const int BrakeSolenoidPort = -1; //what is it?
+
+    const double motorPoseTolerance = 50;
+
+    //these names are kind of bad, i might change them later
+    const double idleEnoughTime = 0;
+    const double verticalArmExtendEnoughTime = 0;
+    const double verticalArmRetractEnoughTime = 0;
+    const double diagonalArmExtendEnoughTime = 0;
+    const double diagonalArmRaiseEnoughTime = 0;
+    const double diagonalArmRetractEnoughTime = 0;
+    const double almostDoneTime = 0;
+
+    const double waitToRaiseVerticalTime = 0; //how long to wait from after retracting to raise diagonal arm to vertical
+    const double timeToTestExtension = 0;
+
+    const double hookedCurrent = 0;
+
+    const double acceptablePitch = 0;
+    const double deltaPitchTolerance = 0;
+
+    const double diagonalArmExtendWaitTime = 0;
+    const double diagonalArmRaiseWaitTime = 0;
+
+    const double motorExtendedPose = 0;
+    const double motorTestExtendPose = 0;
+    const double motorRetractedPose = 0;
+
+    const double motorP = 0;
+    const double motorI = 0;
+    const double motorD = 0;
+
+    const double motorMaxOutput = 0.5;
 }
 
 
 namespace
 ChannelConstants{
     const int channelMotorPort = 40; //confirmed
-
-    const int photogate1 = 9;
-    const int photogate2 = 10;
 }
+
+
+//0 is intkae
+//1 is disk brake for climber gearbox
+// 2 is climb first stage
+// 3 is climb 2nd stage

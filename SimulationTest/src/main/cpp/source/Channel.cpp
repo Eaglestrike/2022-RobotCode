@@ -1,7 +1,10 @@
 #include <Channel.h>
+#include <iostream>
 
 //Constructor is empty for now
-Channel::Channel(){}
+Channel::Channel(){
+    m_channel.SetNeutralMode(NeutralMode::Brake);
+}
 
 
 //Periodic Function
@@ -9,8 +12,10 @@ void
 Channel::Periodic(){
     switch(state){
         case State::IDLE:
+            Stop();
             break;
         case State::RUN:
+            Run();
             break;
         default:
             break;
@@ -21,17 +26,14 @@ Channel::Periodic(){
 //Run function
 void
 Channel::Run(){
-    // m_channel.Set(ControlMode::PercentOutput, 0.25);
-    // if(!photogate1.Get()){
-    //     Stop();
-    // }
+    m_channel.Set(ControlMode::PercentOutput, 0.35);
 }
 
 
 //Stop all channel movement
 void
 Channel::Stop(){
-    // m_channel.Set(ControlMode::PercentOutput, 0);
+    m_channel.Set(ControlMode::PercentOutput, 0.0);
 }
 
 

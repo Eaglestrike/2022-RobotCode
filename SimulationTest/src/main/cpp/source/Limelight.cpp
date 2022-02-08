@@ -32,12 +32,8 @@ Limelight::getYOff(){
 //Check if the limeight sees the target
 bool
 Limelight::targetAquired(){
-    double tv = network_table->GetNumber("tv", 0.0);
-    if(tv == 0.0){
-        return false;
-    } else {
-        return true;
-    }
+    double tv = network_table->GetBoolean("tv", false);
+    return tv;
 }
 
 
@@ -46,6 +42,9 @@ void
 Limelight::setLEDMode(std::string mode){
     if(mode == "OFF"){
         network_table->PutNumber("ledMode", 1);
+    }
+    if(mode == "BLINK"){
+        network_table->PutNumber("ledMode", 2);
     }
     if(mode == "ON"){
         network_table->PutNumber("ledMode", 3);

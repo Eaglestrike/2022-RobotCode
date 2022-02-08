@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fmt/core.h>
 
+
 #include <frc/smartdashboard/SmartDashboard.h>
 
 void Robot::RobotInit() {}
@@ -14,8 +15,8 @@ void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
 
 void Robot::SimulationInit() {
-  PhysicsSim::GetInstance().AddTalonSRX(shooter.getFlywheel(), 0.75, 3400, false);
-  PhysicsSim::GetInstance().AddTalonSRX(shooter.getTurret(), 0.75, 3400, false);
+//  PhysicsSim::GetInstance().AddTalonSRX(shooter.getFlywheel(), 0.75, 3400, false);
+//  PhysicsSim::GetInstance().AddTalonSRX(shooter.getTurret(), 0.75, 3400, false);
 }
 
 void Robot::SimulationPeriodic() {
