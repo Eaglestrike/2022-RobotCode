@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Constants.h"
+#include <iostream>
 #include <ctre/Phoenix.h>
 #include <frc/Solenoid.h>
 #include <frc/controller/PIDController.h>
@@ -40,8 +41,20 @@ class Climber{
 
         void Calibrate();
 
+
+        //the below public functions are for testing
+        void InitializeTests();
+        void testRaiseVerticalArm();
+        void testRetractVerticalArm();
+        void testSeesIfHooked();
+        void testDiagonalExtension();
+        void testDiagonalArmRaise();
+        void testBarTraversalFromRaised();
+
+
     private:
-        State state;
+        State state = IDLE;
+        State prevState = IDLE; //for state just changed
 
         double currTime = 0;
         double waitStartTime = 0;
@@ -50,6 +63,7 @@ class Climber{
         bool waited(double time, double startTime);
         bool motorDone(double pose);
         bool pitchGood(double pitch, double delta_pitch);
+        bool stateJustChanged();
 
         WPI_TalonFX gearboxMaster{ClimbConstants::gearboxPort1};
         WPI_TalonFX gearboxSlave{ClimbConstants::gearboxPort2};

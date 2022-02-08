@@ -41,10 +41,6 @@ Robot::TeleopInit() {
 }
 
 
-
-
-double x1, y1, x2;
-
 void Robot::TeleopPeriodicInit() {
   m_time += m_timeStep;
   if(m_time <= 1.8){
@@ -119,9 +115,7 @@ Robot::TestInit() {
   m_swerve.GenerateTrajectory_1();
 }
 
-
-void 
-Robot::TestPeriodic() {
+void Robot::swerveTestPeriodic() {
   m_time += m_timeStep;
   frc::SmartDashboard::PutNumber("Y", m_swerve.GetYPosition());
   frc::SmartDashboard::PutNumber("X", m_swerve.GetXPostion());
@@ -136,6 +130,42 @@ Robot::TestPeriodic() {
     m_swerve.UpdateOdometry(navx->GetYaw());
     m_swerve.TrajectoryFollow(navx->GetYaw(), false);
   }
+}
+
+
+//using this to test climber
+void 
+Robot::TestPeriodic() {
+  //  swerveTestPeriodic();
+
+  TeleopPeriodicInit();  
+
+  m_swerve.Drive(-x1, -y1, -x2, navx->GetYaw(), true);
+  m_swerve.UpdateOdometry(navx->GetYaw());
+
+  if (/*some button*/true) {
+    m_climber.testRaiseVerticalArm();
+  }
+  else if (/*some other button*/true) {
+    m_climber.testRetractVerticalArm();
+  }
+  else if (/*some other button*/true) {
+    m_climber.testSeesIfHooked();
+  }
+  else if (/*some other button*/true) {
+    m_climber.testDiagonalExtension();
+  }
+  else if (/*some other button*/true) {
+    m_climber.testDiagonalArmRaise();
+  }
+  else if (/*some other button*/true) {
+    m_climber.testBarTraversalFromRaised();
+  }
+  else {
+    m_climber.InitializeTests();
+  }
+
+
 }
 
 

@@ -17,35 +17,38 @@ Climber::Climber(){
 
 
 //Periodic Function
+
 void
 Climber::Periodic(double delta_pitch, double pitch, double time, bool passIdle, bool drivenForward, bool passDiagonalArmRaise, bool doSecondClimb){
     currTime = time;
     switch(state){
         case IDLE:
-            state = Idle(passIdle);
+            SetState(Idle(passIdle)); 
             break;
         case VERTICAL_ARM_EXTEND: //needs human input to move on
-            state = VerticalArmExtend(drivenForward);
+            SetState(VerticalArmExtend(drivenForward));
             break;
          case VERTICAL_ARM_RETRACT:
-            state = VerticalArmRetract(pitch, delta_pitch);
+            SetState(VerticalArmRetract(pitch, delta_pitch));
             break;
         case TEST_DIAGONAL_ARM_EXTEND:
-            state = TestDiagonalArmExtend();
+            SetState(TestDiagonalArmExtend());
             break;
          case DIAGONAL_ARM_EXTEND:
-            state = DiagonalArmExtend(pitch, delta_pitch);
+            SetState(DiagonalArmExtend(pitch, delta_pitch));
             break;
          case DIAGONAL_ARM_RAISE:  //needs human input to move on
-            state = DiagonalArmRaise(passDiagonalArmRaise);
+            SetState(DiagonalArmRaise(passDiagonalArmRaise));
             break;
          case DIAGONAL_ARM_RETRACT: 
-            state = DiagonalArmRetract(doSecondClimb);
+            SetState(DiagonalArmRetract(doSecondClimb));
             break;
         default:
             break;
     }
 }
+
+//BE CAREFUL ABOUT CHANGING ORDER OF LINES!!! MAY AFFECT TIME SENSITIVE WAITS!!!
 
 
 Climber::State Climber::Idle(bool passIdle){
@@ -88,8 +91,10 @@ Climber::State Climber::TestDiagonalArmExtend() {
     gearboxMaster.Set(ControlMode::PercentOutput, 
        std::min(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), ClimbConstants::motorTestExtendPose), ClimbConstants::motorMaxOutput));
 
-    if (hooked()) return DIAGONAL_ARM_EXTEND;
-    else return VERTICAL_ARM_RETRACT;
+    if (stateJustChanged()) waitStartTime = currTime;
+
+    if (waited(ClimbConstants::timeToTestExtension, waitStartTime) && hooked()) { std::cout << "hooked\n"; return DIAGONAL_ARM_EXTEND; }
+    else { std::cout << "too early or not hooked\n"; return VERTICAL_ARM_RETRACT; }
 }
 
 
@@ -97,7 +102,7 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch){
     brake.Set(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
 
-    if (!climbMedExtend.Get()) waitStartTime = currTime; //so only at start of state. i might try to implement a better way to determine this
+    if (stateJustChanged()) waitStartTime = currTime; //so only at start of state. i might try to implement a better way to determine this
     climbMedExtend.Set(true);
     climbFullExtend.Set(true);
     if (waited(ClimbConstants::diagonalArmExtendWaitTime, waitStartTime)) {
@@ -114,7 +119,7 @@ Climber::State Climber::DiagonalArmRaise(bool passDiagonalArmRaise){
     brake.Set(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
 
-    if (climbFullExtend.Get()) waitStartTime = currTime;
+    if (stateJustChanged()) waitStartTime = currTime;
     climbFullExtend.Set(false);
     if (waited(ClimbConstants::diagonalArmRaiseWaitTime, waitStartTime) && passDiagonalArmRaise && currTime <= ClimbConstants::diagonalArmRaiseEnoughTime) 
         return DIAGONAL_ARM_RETRACT; 
@@ -126,7 +131,7 @@ Climber::State Climber::DiagonalArmRetract(bool doSecondClimb){
 
     gearboxMaster.Set(ControlMode::PercentOutput, 
             std::min(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), ClimbConstants::motorRetractedPose), ClimbConstants::motorMaxOutput));
-    waitStartTime = currTime;
+    if (stateJustChanged()) waitStartTime = currTime;
     if (waited(ClimbConstants::waitToRaiseVerticalTime, waitStartTime)) {
         climbFullExtend.Set(false);
         climbMedExtend.Set(false);
@@ -159,11 +164,16 @@ bool Climber::pitchGood(double pitch, double delta_pitch) {
 //set new state function
 void
 Climber::SetState(State newState){
+    prevState = state;
     state = newState;
 }
 
 bool Climber::waited(double time, double startTime) {
     return (startTime + time) >= currTime;
+}
+
+bool Climber::stateJustChanged() {
+    return state != prevState;
 }
 
 //Calibration function for whatever

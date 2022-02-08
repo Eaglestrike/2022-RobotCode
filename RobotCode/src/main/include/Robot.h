@@ -13,6 +13,7 @@
 #include <Constants.h>
 #include <frc/Compressor.h>
 #include "Intake.h"
+#include "Climber.h"
 #include "Shooter.h"
 
 
@@ -37,6 +38,7 @@ class Robot : public frc::TimedRobot {
   void TeleopPeriodic() override;
   void DisabledInit() override;
   void DisabledPeriodic() override;
+  void swerveTestPeriodic();
   void TestInit() override;
   void TestPeriodic() override;
 
@@ -45,6 +47,9 @@ class Robot : public frc::TimedRobot {
   SwerveDrive m_swerve;
   Intake m_intake;
   Shooter m_shooter;
+  Climber m_climber;
+
+  double x1, y1, x2;
 
   frc::SendableChooser<std::string> m_chooser;
   const std::string kAutoNameDefault = "Default";
