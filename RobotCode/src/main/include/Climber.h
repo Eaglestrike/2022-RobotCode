@@ -3,8 +3,7 @@
 #include "Constants.h"
 #include <ctre/Phoenix.h>
 #include <frc/Solenoid.h>
-
-
+#include <frc/controller/PIDController.h>
 
 class Climber{
     public:
@@ -15,6 +14,8 @@ class Climber{
             VERTICAL_ARM_EXTEND,
             VERTICAL_ARM_RETRACT,
 
+            TEST_DIAGONAL_ARM_EXTEND,
+
             //can be used for all subsequent bars
             DIAGONAL_ARM_EXTEND,
             DIAGONAL_ARM_RAISE, //hooks onto bar
@@ -22,16 +23,16 @@ class Climber{
         };
 
         Climber();
-        void Periodic(double time, bool passIdle, bool drivenForward, bool passDiagonalArmRaise, bool doSecondClimb); //executes state actions
+        void Periodic(double delta_pitch, double pitch, double time, bool passIdle, bool drivenForward, bool passDiagonalArmRaise, bool doSecondClimb); //executes state actions
 
         //returns next state of climber
         State Idle(bool passIdle);
         
         State VerticalArmExtend(bool drivenForward);
-        State VerticalArmRetract();
+        State VerticalArmRetract(double pitch, double delta_pitch);
 
         State TestDiagonalArmExtend();
-        State DiagonalArmExtend();
+        State DiagonalArmExtend(double pitch, double delta_pitch);
         State DiagonalArmRaise(bool passDiagonalArmRaise);
         State DiagonalArmRetract(bool doSecondClimb);
 
@@ -39,17 +40,23 @@ class Climber{
 
         void Calibrate();
 
-        bool hooked();
-
-        bool waited(double time, double startTime);
-
     private:
         State state;
 
         double currTime = 0;
+        double waitStartTime = 0;
+
+        bool hooked();
+        bool waited(double time, double startTime);
+        bool motorDone(double pose);
+        bool pitchGood(double pitch, double delta_pitch);
 
         WPI_TalonFX gearboxMaster{ClimbConstants::gearboxPort1};
         WPI_TalonFX gearboxSlave{ClimbConstants::gearboxPort2};
+
+        //want to be fairly slow...
+         frc2::PIDController motorPIDController{ClimbConstants::motorP,
+            ClimbConstants::motorI, ClimbConstants::motorD};
 
         //Higher pneumatic
         frc::Solenoid climbFullExtend{frc::PneumaticsModuleType::REVPH, 
@@ -59,5 +66,7 @@ class Climber{
             ClimbConstants::solenoid2Port};
 
         frc::Solenoid brake{frc::PneumaticsModuleType::REVPH, ClimbConstants::BrakeSolenoidPort};
+
+
 
 };

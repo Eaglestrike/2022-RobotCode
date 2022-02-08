@@ -144,6 +144,8 @@ ClimbConstants{
     const int solenoid2Port = 2;
     const int BrakeSolenoidPort = -1; //what is it?
 
+    const double motorPoseTolerance = 50;
+
     //these names are kind of bad, i might change them later
     const double idleEnoughTime = 0;
     const double verticalArmExtendEnoughTime = 0;
@@ -151,6 +153,25 @@ ClimbConstants{
     const double diagonalArmExtendEnoughTime = 0;
     const double diagonalArmRaiseEnoughTime = 0;
     const double diagonalArmRetractEnoughTime = 0;
+    const double almostDoneTime = 0;
+
+    const double hookedCurrent = 0;
+
+    const double acceptablePitch = 0;
+    const double deltaPitchTolerance = 0;
+
+    const double diagonalArmExtendWaitTime = 0;
+    const double diagonalArmRaiseWaitTime = 0;
+
+    const double motorExtendedPose = 0;
+    const double motorTestExtendPose = 0;
+    const double motorRetractedPose = 0;
+
+    const double motorP = 0;
+    const double motorI = 0;
+    const double motorD = 0;
+
+    const double motorMaxOutput = 0.5;
 }
 
 
