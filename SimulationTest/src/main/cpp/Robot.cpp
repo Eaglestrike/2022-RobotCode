@@ -31,7 +31,7 @@ void Robot::TeleopPeriodic() {
   if (test.getState() == testClimbOneBar::State::IDLE) test.setState(testClimbOneBar::State::WAITING_FOR_EXTEND_BUTTON);
    if (joystick.GetRawButton(1)) test.setState(testClimbOneBar::State::EXTENDING);
   //  else if (joystick.GetRawButton(2)) test.setState(testClimbOneBar::State::WAITING_FOR_RETRACT_BUTTON);
-   else test.setState(testClimbOneBar::State::IDLE);
+   else test.setState(testClimbOneBar::State::WAITING_FOR_EXTEND_BUTTON);
     
   test.periodic();
 }

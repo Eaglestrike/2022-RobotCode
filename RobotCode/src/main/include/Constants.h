@@ -120,8 +120,20 @@ ShooterConstants{
 
     const double hoodMax = 5801; //confirmed
     const double hoodMin = 0; //confirmed
+    
+    //tolerances
+    const double turretPoseTolerance = 50;
+    const double deltaTurretPoseTolerance = 100;
 
-    const double angleOff = 300;
+    const double hoodPoseTolerance = 50;
+    const double deltaHoodPoseTolerance = 100;
+
+    const double flywheelSpeedTolerance = 1000; //can be changed
+    const double deltaFlywheelSpeedTolerance = 1000;
+
+    const double angleOff = 300; //what is this? if it's the same as the other thing you can merge them
+    const double xOffTolerance = 7;
+    
 
     const double zeroingcurrent = 2.5; //confirmed
 }
@@ -140,20 +152,20 @@ namespace
 ClimbConstants{
     const int gearboxPort1 = 30; //confirmed
     const int gearboxPort2 = 31; //confirmed
-    const int solenoid1Port = 1;
+    const int solenoid1Port = 1; 
     const int solenoid2Port = 2;
-    const int BrakeSolenoidPort = -1; //what is it?
+    const int BrakeSolenoidPort = 3; //what is it?
 
-    const double motorPoseTolerance = 50;
+    //none of the below are correct! they are in use purely for simulation atm
 
     //these names are kind of bad, i might change them later
-    const double idleEnoughTime = 0;
-    const double verticalArmExtendEnoughTime = 0;
-    const double verticalArmRetractEnoughTime = 0;
-    const double diagonalArmExtendEnoughTime = 0;
-    const double diagonalArmRaiseEnoughTime = 0;
-    const double diagonalArmRetractEnoughTime = 0;
-    const double almostDoneTime = 0;
+    const double idleEnoughTime = 1;
+    const double verticalArmExtendEnoughTime = 1;
+    const double verticalArmRetractEnoughTime = 1;
+    const double diagonalArmExtendEnoughTime = 1;
+    const double diagonalArmRaiseEnoughTime = 1;
+    const double diagonalArmRetractEnoughTime = 1;
+    const double almostDoneTime = 1;
 
     const double waitToRaiseVerticalTime = 0; //how long to wait from after retracting to raise diagonal arm to vertical
     const double timeToTestExtension = 0;
@@ -166,11 +178,14 @@ ClimbConstants{
     const double diagonalArmExtendWaitTime = 0;
     const double diagonalArmRaiseWaitTime = 0;
 
-    const double motorExtendedPose = 0;
-    const double motorTestExtendPose = 0;
+    const double motorPoseTolerance = 50;
+    const double deltaMotorPoseTolerance = 100;
+
+    const double motorExtendedPose = 10000;
+    const double motorTestExtendPose = 90000;
     const double motorRetractedPose = 0;
 
-    const double motorP = 0;
+    const double motorP = 0.001;
     const double motorI = 0;
     const double motorD = 0;
 

@@ -5,6 +5,8 @@
 
 //Constructor
 Climber::Climber(){
+    motorPIDController.SetTolerance(ClimbConstants::motorPoseTolerance);
+
     climbFullExtend.Set(false);
     climbMedExtend.Set(false);
 
@@ -160,7 +162,8 @@ bool Climber::hooked() {
 }
 
 bool Climber::motorDone(double pose) {
-    return abs(gearboxMaster.GetSelectedSensorPosition() - pose) > ClimbConstants::motorPoseTolerance;
+    return (motorPIDController.AtSetpoint()) && gearboxMaster.GetMotorOutputPercent() <= ClimbConstants::motorStoppedOutput;
+
 }
 
 //may have to un-function this if we want tolerances to be different, but this helps for readability & re-usability if not

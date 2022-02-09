@@ -40,14 +40,18 @@ bool testClimbOneBar::extending() {
 
     //evaluate if failed, good, or done
     //failes if: anything in brake, motors going wrong way, motors going too fast
+    std::cout << "testing...\r";
     if (climber.getBrake().Get() || 
     climber.getMotor().GetMotorOutputPercent() <= 0 || climber.getMotor().GetMotorOutputPercent() > 0.5) {
         std::cout << "\n";
-        std::cout << "test failed :(\r";
+        if (climber.getMotor().GetMotorOutputPercent() == 0) std::cout << "test failed: motor not moving\r";
+        if (climber.getMotor().GetMotorOutputPercent() < 0) std::cout << "test failed: motor going backwards\r";
+        if (climber.getMotor().GetMotorOutputPercent() > 0.5) std::cout << "test failed: motor power > 0.5\r";
         return false;
     }
 
-    if (abs(ClimbConstants::motorPoseTolerance - climber.getMotor().GetSelectedSensorPosition()) <= 50) {
+    if (abs(ClimbConstants::motorExtendedPose - climber.getMotor().GetSelectedSensorPosition()) <= ClimbConstants::motorPoseTolerance
+        && climber.getMotor().GetMotorOutputPercent() <= ClimbConstants::motorStoppedOutput) {
         std::cout << "\n";
         std::cout << "Testing state transition...\r";
         climber.SetState(Climber::State::VERTICAL_ARM_EXTEND);
@@ -58,7 +62,7 @@ bool testClimbOneBar::extending() {
         }
         else {
             std::cout << "\n";
-            std::cout << "test failed :(\r";
+            std::cout << "test failed: state isn't correct \r";
         }
     }
 

@@ -170,7 +170,9 @@ ClimbConstants{
     const double motorTestExtendPose = 90000;
     const double motorRetractedPose = 0;
 
-    const double motorP = 0;
+    const double motorStoppedOutput = 0.05;
+
+    const double motorP = 0.001;
     const double motorI = 0;
     const double motorD = 0;
 
