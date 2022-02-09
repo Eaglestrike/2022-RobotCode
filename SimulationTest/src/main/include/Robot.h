@@ -10,6 +10,8 @@
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/Joystick.h>
 #include <source/Shooter.h>
+#include <source/Climber.h>
+#include "simulation/testClimbOneBar.h"
 #include "simulation/PhysicsSim.h"
 
 
@@ -32,5 +34,8 @@ class Robot : public frc::TimedRobot {
 
 
  private:
-  Shooter shooter;
+  Climber climber;
+  frc::Joystick joystick{0};
+  testClimbOneBar test{climber};
+
 };

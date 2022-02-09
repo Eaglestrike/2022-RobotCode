@@ -9,8 +9,8 @@ PhysicsSim::~PhysicsSim() {
     _simProfiles.clear();
 }
 
-void PhysicsSim::AddTalonSRX(TalonSRX &talon, double const accelToFullTime, double const fullVel, bool const sensorPhase) {
-    TalonSRXSimProfile* simTalon = new TalonSRXSimProfile(talon, accelToFullTime, fullVel, sensorPhase);
+void PhysicsSim::AddTalonFX(TalonFX &talon, double const accelToFullTime, double const fullVel, bool const sensorPhase) {
+    TalonFXSimProfile* simTalon = new TalonFXSimProfile(talon, accelToFullTime, fullVel, sensorPhase);
     this->_simProfiles.insert(this->_simProfiles.end(), simTalon);
 }
 

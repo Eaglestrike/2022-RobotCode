@@ -67,7 +67,7 @@ Climber::State Climber::VerticalArmExtend(bool drivenForward){
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
     gearboxMaster.Set(ControlMode::PercentOutput, 
         std::min(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), ClimbConstants::motorExtendedPose), ClimbConstants::motorMaxOutput));
-    if (drivenForward && currTime <= ClimbConstants::verticalArmExtendEnoughTime) return VERTICAL_ARM_RETRACT;
+    if (drivenForward && currTime <= ClimbConstants::verticalArmExtendEnoughTime && motorDone(ClimbConstants::motorExtendedPose)) return VERTICAL_ARM_RETRACT; 
     else return VERTICAL_ARM_EXTEND;
 }
 
@@ -75,9 +75,15 @@ Climber::State Climber::VerticalArmRetract(double pitch, double delta_pitch){
     brake.Set(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
 
+    //make sure min of abs values!
     gearboxMaster.Set(ControlMode::PercentOutput, 
         std::min(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), ClimbConstants::motorRetractedPose), ClimbConstants::motorMaxOutput));
 
+    if (motorDone(ClimbConstants::motorRetractedPose) || currTime >= ClimbConstants::almostDoneTime) {
+        gearboxMaster.SetNeutralMode(NeutralMode::Brake);
+        brake.Set(true);
+    }
+    
     if (motorDone(ClimbConstants::motorRetractedPose) && currTime <= ClimbConstants::verticalArmRetractEnoughTime
         && pitchGood(pitch, delta_pitch)) return TEST_DIAGONAL_ARM_EXTEND;
     else return VERTICAL_ARM_RETRACT;
@@ -110,12 +116,13 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch){
             std::min(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), ClimbConstants::motorExtendedPose), ClimbConstants::motorMaxOutput));
     }
     
-    if (motorDone(ClimbConstants::motorExtendedPose) && pitchGood(pitch, delta_pitch && currTime <= ClimbConstants::diagonalArmExtendEnoughTime)) return DIAGONAL_ARM_RAISE;
+    if (motorDone(ClimbConstants::motorExtendedPose) && pitchGood(pitch, delta_pitch) && currTime <= ClimbConstants::diagonalArmExtendEnoughTime) return DIAGONAL_ARM_RAISE;
     else return DIAGONAL_ARM_EXTEND;
 
 }
 
 Climber::State Climber::DiagonalArmRaise(bool passDiagonalArmRaise){
+    //be in brake here?
     brake.Set(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
 
@@ -127,8 +134,6 @@ Climber::State Climber::DiagonalArmRaise(bool passDiagonalArmRaise){
 }
 
 Climber::State Climber::DiagonalArmRetract(bool doSecondClimb){
-    if (motorDone(ClimbConstants::motorRetractedPose) || currTime >= ClimbConstants::almostDoneTime) gearboxMaster.SetNeutralMode(NeutralMode::Brake);
-
     gearboxMaster.Set(ControlMode::PercentOutput, 
             std::min(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), ClimbConstants::motorRetractedPose), ClimbConstants::motorMaxOutput));
     if (stateJustChanged()) waitStartTime = currTime;
@@ -137,6 +142,10 @@ Climber::State Climber::DiagonalArmRetract(bool doSecondClimb){
         climbMedExtend.Set(false);
     }
 
+    if (motorDone(ClimbConstants::motorRetractedPose) || currTime >= ClimbConstants::almostDoneTime) {
+        gearboxMaster.SetNeutralMode(NeutralMode::Brake);
+        brake.Set(true);
+    }
 
     if (motorDone(ClimbConstants::motorRetractedPose) && doSecondClimb && currTime <= ClimbConstants::diagonalArmRetractEnoughTime) 
         return TEST_DIAGONAL_ARM_EXTEND;

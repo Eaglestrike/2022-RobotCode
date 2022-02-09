@@ -7,16 +7,16 @@
 class PhysicsSim
 {
     class SimProfile;
-    class TalonSRXSimProfile;
+    class TalonFXSimProfile;
     
 public:
     static PhysicsSim& GetInstance();
     ~PhysicsSim();
-    void AddTalonSRX(TalonSRX &talon, double const accelToFullTime, double const fullVel, bool const sensorPhase = false);
+    void AddTalonFX(TalonFX &talon, double const accelToFullTime, double const fullVel, bool const sensorPhase = false);
     void Run();
 
 private:
-    std::vector<SimProfile*> _simProfiles; //list of sim profiles (like simulated talonsrx)
+    std::vector<SimProfile*> _simProfiles; //list of sim profiles (like simulated talonfx)
 
     /* scales a random domain of [0, 2pi] to [min, max] while prioritizing the peaks */
     static double random(double min, double max);
@@ -36,10 +36,10 @@ private:
     };
 
 
-    class TalonSRXSimProfile : public SimProfile {
+    class TalonFXSimProfile : public SimProfile {
 
     private:
-        TalonSRX &_talon;
+        TalonFX &_talon;
         double const _accelToFullTime = 0;
         double const _fullVel = 0;
         bool const _sensorPhase = 0;
@@ -49,10 +49,10 @@ private:
 
      public:
 
-        TalonSRXSimProfile(TalonSRX &talon, double const accelToFullTime, double const fullVel, bool const sensorPhase);
+        TalonFXSimProfile(TalonFX &talon, double const accelToFullTime, double const fullVel, bool const sensorPhase);
 
 
-        ~TalonSRXSimProfile() override {}
+        ~TalonFXSimProfile() override {}
 
          void Run() override;
     };

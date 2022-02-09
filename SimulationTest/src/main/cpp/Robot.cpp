@@ -15,8 +15,7 @@ void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
 
 void Robot::SimulationInit() {
-//  PhysicsSim::GetInstance().AddTalonSRX(shooter.getFlywheel(), 0.75, 3400, false);
-//  PhysicsSim::GetInstance().AddTalonSRX(shooter.getTurret(), 0.75, 3400, false);
+  PhysicsSim::GetInstance().AddTalonFX(climber.getMotor(), 0.75, 3400, false);
 }
 
 void Robot::SimulationPeriodic() {
@@ -24,11 +23,18 @@ void Robot::SimulationPeriodic() {
 
 }
 
-void Robot::TeleopInit() {}
+void Robot::TeleopInit() {
+  test.setState(testClimbOneBar::State::IDLE);
+}
 
-frc::Joystick joy{0};
-
-void Robot::TeleopPeriodic() {}
+void Robot::TeleopPeriodic() {
+  if (test.getState() == testClimbOneBar::State::IDLE) test.setState(testClimbOneBar::State::WAITING_FOR_EXTEND_BUTTON);
+   if (joystick.GetRawButton(1)) test.setState(testClimbOneBar::State::EXTENDING);
+  //  else if (joystick.GetRawButton(2)) test.setState(testClimbOneBar::State::WAITING_FOR_RETRACT_BUTTON);
+   else test.setState(testClimbOneBar::State::IDLE);
+    
+  test.periodic();
+}
 
 void Robot::DisabledInit() {}
 

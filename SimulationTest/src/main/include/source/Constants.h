@@ -140,20 +140,18 @@ namespace
 ClimbConstants{
     const int gearboxPort1 = 30; //confirmed
     const int gearboxPort2 = 31; //confirmed
-    const int solenoid1Port = 1;
+    const int solenoid1Port = 1; 
     const int solenoid2Port = 2;
-    const int BrakeSolenoidPort = -1; //what is it?
-
-    const double motorPoseTolerance = 50;
+    const int BrakeSolenoidPort = 3; //what is it?
 
     //these names are kind of bad, i might change them later
-    const double idleEnoughTime = 0;
-    const double verticalArmExtendEnoughTime = 0;
-    const double verticalArmRetractEnoughTime = 0;
-    const double diagonalArmExtendEnoughTime = 0;
-    const double diagonalArmRaiseEnoughTime = 0;
-    const double diagonalArmRetractEnoughTime = 0;
-    const double almostDoneTime = 0;
+    const double idleEnoughTime = 1;
+    const double verticalArmExtendEnoughTime = 1;
+    const double verticalArmRetractEnoughTime = 1;
+    const double diagonalArmExtendEnoughTime = 1;
+    const double diagonalArmRaiseEnoughTime = 1;
+    const double diagonalArmRetractEnoughTime = 1;
+    const double almostDoneTime = 1;
 
     const double waitToRaiseVerticalTime = 0; //how long to wait from after retracting to raise diagonal arm to vertical
     const double timeToTestExtension = 0;
@@ -166,8 +164,10 @@ ClimbConstants{
     const double diagonalArmExtendWaitTime = 0;
     const double diagonalArmRaiseWaitTime = 0;
 
-    const double motorExtendedPose = 0;
-    const double motorTestExtendPose = 0;
+    const double motorPoseTolerance = 50;
+
+    const double motorExtendedPose = 10000;
+    const double motorTestExtendPose = 90000;
     const double motorRetractedPose = 0;
 
     const double motorP = 0;

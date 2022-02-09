@@ -38,6 +38,7 @@ class Climber{
         State DiagonalArmRetract(bool doSecondClimb);
 
         void SetState(State newState); //can set state manually
+        State& GetState() {return state;}
 
         void Calibrate();
 
@@ -51,6 +52,12 @@ class Climber{
         void testDiagonalArmRaise();
         void testBarTraversalFromRaised();
 
+        //getters and setters for simulation
+        WPI_TalonFX& getMotor() {return gearboxMaster;}
+        frc2::PIDController getPIDCntrl() {return motorPIDController;}
+        frc::Solenoid& getFullExtend() {return climbFullExtend;}
+        frc::Solenoid& getMedExtend() {return climbMedExtend;}
+        frc::Solenoid& getBrake() {return brake;}
 
     private:
         State state = IDLE;
@@ -72,12 +79,13 @@ class Climber{
          frc2::PIDController motorPIDController{ClimbConstants::motorP,
             ClimbConstants::motorI, ClimbConstants::motorD};
 
-        //Higher pneumatic
-        frc::Solenoid climbFullExtend{frc::PneumaticsModuleType::REVPH, 
-            ClimbConstants::solenoid1Port};
         //Lower pneumatic
         frc::Solenoid climbMedExtend{frc::PneumaticsModuleType::REVPH,
             ClimbConstants::solenoid2Port};
+        
+        //Higher pneumatic
+        frc::Solenoid climbFullExtend{frc::PneumaticsModuleType::REVPH, 
+            ClimbConstants::solenoid1Port};
 
         frc::Solenoid brake{frc::PneumaticsModuleType::REVPH, ClimbConstants::BrakeSolenoidPort};
 

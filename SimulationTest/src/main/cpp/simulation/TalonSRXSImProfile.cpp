@@ -3,15 +3,15 @@
 
 //taken from ctre
 
-PhysicsSim::TalonSRXSimProfile::TalonSRXSimProfile(TalonSRX &talon, double const accelToFullTime, double const fullVel, bool const sensorPhase)
+PhysicsSim::TalonFXSimProfile::TalonFXSimProfile(TalonFX &talon, double const accelToFullTime, double const fullVel, bool const sensorPhase)
              : SimProfile(), _talon(talon), _accelToFullTime(accelToFullTime), _fullVel(fullVel), _sensorPhase(sensorPhase) {}
 
-void PhysicsSim::TalonSRXSimProfile::Run() {
+void PhysicsSim::TalonFXSimProfile::Run() {
     double const period = GetPeriod();
     double const accelAmount = _fullVel / _accelToFullTime * period / 1000;
 
     double outPerc = _talon.GetMotorOutputPercent();
-    std::cout << "output: " << outPerc << "\n";
+ //  std::cout << "output: " << outPerc << "\n";
     if (_sensorPhase) {
         outPerc *= -1;
     }
@@ -27,10 +27,11 @@ void PhysicsSim::TalonSRXSimProfile::Run() {
 
     /// SET SIM PHYSICS INPUTS
 
-    std::cout << "setting physics inputs\n";
+ //   std::cout << "setting physics inputs\n";
 
-    _talon.GetSimCollection().AddQuadraturePosition(_vel * period / 100);
-    _talon.GetSimCollection().SetQuadratureVelocity(_vel);
+    _talon.GetSimCollection().AddIntegratedSensorPosition(_vel * period / 100);
+    _talon.GetSimCollection().SetIntegratedSensorVelocity(_vel);
+
 
     double supplyCurrent = fabs(outPerc) * 30 * random(0.95, 1.05);
     double statorCurrent = outPerc == 0 ? 0 : supplyCurrent / fabs(outPerc);
