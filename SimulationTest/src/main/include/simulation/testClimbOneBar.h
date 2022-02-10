@@ -7,28 +7,30 @@ class testClimbOneBar {
         enum State { 
             IDLE,
             WAITING_FOR_EXTEND_BUTTON,
-            EXTENDING,
-            WAITING_FOR_RETRACT_BUTTON,
-            RETRACTING
+            TESTING
         };
 
         testClimbOneBar(Climber& c);
         void initTestClimbOneBar();
         void periodic();
 
-        bool extending();
-        bool retracting();
+        bool test();
 
         void setState(State newState);
         State getState() {return state;}
 
     private:
 
+        bool extending();
+        bool retracting();
+
         Climber& climber;
 
         State prevState;
         State state;
 
-        int i = 0; //for command line animation
+        int passed;
+        int passedExtending;
+        int passedRetracting;
 
 };

@@ -156,7 +156,7 @@ ClimbConstants{
     const int solenoid2Port = 2;
     const int BrakeSolenoidPort = 3; //what is it?
 
-    //none of the below are correct! they are in use purely for simulation atm
+    //!!!!!!!! none of the below are correct! they are in use purely for simulation atm !!!!!!!!!
 
     //these names are kind of bad, i might change them later
     const double idleEnoughTime = 1;
@@ -172,20 +172,20 @@ ClimbConstants{
 
     const double hookedCurrent = 0;
 
-    const double acceptablePitch = 0;
-    const double deltaPitchTolerance = 0;
+    const double acceptablePitch = 5;
+    const double deltaPitchTolerance = 10;
 
     const double diagonalArmExtendWaitTime = 0;
     const double diagonalArmRaiseWaitTime = 0;
 
-    const double motorPoseTolerance = 50;
+    const double motorPoseTolerance = 100;
     const double deltaMotorPoseTolerance = 100;
 
     const double motorExtendedPose = 10000;
-    const double motorTestExtendPose = 90000;
+    const double motorTestExtendPose = 9000;
     const double motorRetractedPose = 0;
 
-    const double motorP = 0.001;
+    const double motorP = 0.0006;
     const double motorI = 0;
     const double motorD = 0;
 

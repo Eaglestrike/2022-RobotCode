@@ -68,7 +68,9 @@ Climber::State Climber::VerticalArmExtend(bool drivenForward){
     brake.Set(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
     gearboxMaster.Set(ControlMode::PercentOutput, 
-        std::min(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), ClimbConstants::motorExtendedPose), ClimbConstants::motorMaxOutput));
+        std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
+        ClimbConstants::motorExtendedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
+    
     if (drivenForward && currTime <= ClimbConstants::verticalArmExtendEnoughTime && motorDone(ClimbConstants::motorExtendedPose)) return VERTICAL_ARM_RETRACT; 
     else return VERTICAL_ARM_EXTEND;
 }
@@ -77,9 +79,11 @@ Climber::State Climber::VerticalArmRetract(double pitch, double delta_pitch){
     brake.Set(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
 
-    //make sure min of abs values!
     gearboxMaster.Set(ControlMode::PercentOutput, 
-        std::min(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), ClimbConstants::motorRetractedPose), ClimbConstants::motorMaxOutput));
+        std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
+        ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
+    std::cout << "motor output: " << std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
+        ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput) << "\n";
 
     if (motorDone(ClimbConstants::motorRetractedPose) || currTime >= ClimbConstants::almostDoneTime) {
         gearboxMaster.SetNeutralMode(NeutralMode::Brake);
@@ -96,8 +100,9 @@ Climber::State Climber::TestDiagonalArmExtend() {
     brake.Set(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
 
-    gearboxMaster.Set(ControlMode::PercentOutput, 
-       std::min(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), ClimbConstants::motorTestExtendPose), ClimbConstants::motorMaxOutput));
+   gearboxMaster.Set(ControlMode::PercentOutput, 
+        std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
+        ClimbConstants::motorTestExtendPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
 
     if (stateJustChanged()) waitStartTime = currTime;
 
@@ -114,8 +119,9 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch){
     climbMedExtend.Set(true);
     climbFullExtend.Set(true);
     if (waited(ClimbConstants::diagonalArmExtendWaitTime, waitStartTime)) {
-         gearboxMaster.Set(ControlMode::PercentOutput, 
-            std::min(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), ClimbConstants::motorExtendedPose), ClimbConstants::motorMaxOutput));
+        gearboxMaster.Set(ControlMode::PercentOutput, 
+            std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
+            ClimbConstants::motorExtendedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
     }
     
     if (motorDone(ClimbConstants::motorExtendedPose) && pitchGood(pitch, delta_pitch) && currTime <= ClimbConstants::diagonalArmExtendEnoughTime) return DIAGONAL_ARM_RAISE;
@@ -137,7 +143,8 @@ Climber::State Climber::DiagonalArmRaise(bool passDiagonalArmRaise){
 
 Climber::State Climber::DiagonalArmRetract(bool doSecondClimb){
     gearboxMaster.Set(ControlMode::PercentOutput, 
-            std::min(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), ClimbConstants::motorRetractedPose), ClimbConstants::motorMaxOutput));
+        std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
+        ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
     if (stateJustChanged()) waitStartTime = currTime;
     if (waited(ClimbConstants::waitToRaiseVerticalTime, waitStartTime)) {
         climbFullExtend.Set(false);
