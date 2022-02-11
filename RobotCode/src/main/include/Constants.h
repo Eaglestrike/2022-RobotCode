@@ -203,3 +203,10 @@ ChannelConstants{
 //1 is disk brake for climber gearbox
 // 2 is climb first stage
 // 3 is climb 2nd stage
+
+
+//todo: initialize
+namespace
+AutonConstants {
+    const int exitTarmacTicks = 0;
+}

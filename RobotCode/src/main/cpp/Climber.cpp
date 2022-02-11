@@ -21,7 +21,7 @@ Climber::Climber(){
 //Periodic Function
 
 void
-Climber::Periodic(double delta_pitch, double pitch, double time, bool passIdle, bool drivenForward, bool passDiagonalArmRaise, bool doSecondClimb){
+Climber::Periodic(double delta_pitch, double pitch, double time, bool passIdle, bool retryInitClimb, bool drivenForward, bool passDiagonalArmRaise, bool doSecondClimb){
     currTime = time;
     switch(state){
         case IDLE:
@@ -31,7 +31,7 @@ Climber::Periodic(double delta_pitch, double pitch, double time, bool passIdle, 
             SetState(VerticalArmExtend(drivenForward));
             break;
          case VERTICAL_ARM_RETRACT:
-            SetState(VerticalArmRetract(pitch, delta_pitch));
+            SetState(VerticalArmRetract(pitch, delta_pitch, retryInitClimb));
             break;
         case TEST_DIAGONAL_ARM_EXTEND:
             SetState(TestDiagonalArmExtend());
@@ -75,16 +75,16 @@ Climber::State Climber::VerticalArmExtend(bool drivenForward){
     else return VERTICAL_ARM_EXTEND;
 }
 
-Climber::State Climber::VerticalArmRetract(double pitch, double delta_pitch){
+Climber::State Climber::VerticalArmRetract(double pitch, double delta_pitch, bool retry){
+    if (retry) return VERTICAL_ARM_EXTEND;
+
     brake.Set(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
 
     gearboxMaster.Set(ControlMode::PercentOutput, 
         std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
         ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
-    std::cout << "motor output: " << std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
-        ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput) << "\n";
-
+    
     if (motorDone(ClimbConstants::motorRetractedPose) || currTime >= ClimbConstants::almostDoneTime) {
         gearboxMaster.SetNeutralMode(NeutralMode::Brake);
         brake.Set(true);

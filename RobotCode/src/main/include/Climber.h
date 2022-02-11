@@ -24,13 +24,13 @@ class Climber{
         };
 
         Climber();
-        void Periodic(double delta_pitch, double pitch, double time, bool passIdle, bool drivenForward, bool passDiagonalArmRaise, bool doSecondClimb); //executes state actions
+        void Periodic(double delta_pitch, double pitch, double time, bool passIdle, bool retryInitClimb, bool drivenForward, bool passDiagonalArmRaise, bool doSecondClimb); //executes state actions
 
         //returns next state of climber
         State Idle(bool passIdle);
         
         State VerticalArmExtend(bool drivenForward);
-        State VerticalArmRetract(double pitch, double delta_pitch);
+        State VerticalArmRetract(double pitch, double delta_pitch, bool retry);
 
         State TestDiagonalArmExtend();
         State DiagonalArmExtend(double pitch, double delta_pitch);

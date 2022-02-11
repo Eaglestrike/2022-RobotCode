@@ -29,5 +29,5 @@ class Intake{
         //frc::Solenoid pneumatics{frc::PneumaticsModuleType::REVPH, 
             //IntakeConstants::solenoidPort};
 
-        State state;
+        State state = IDLE;
 };

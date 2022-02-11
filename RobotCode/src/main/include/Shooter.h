@@ -54,7 +54,7 @@ class Shooter{
         frc2::PIDController m_hoodController{ShooterConstants::hoodP,
             ShooterConstants::hoodI, ShooterConstants::hoodD};
 
-        State m_state;
+        State m_state = IDLE;
 
         Limelight * m_limelight = new Limelight();
 

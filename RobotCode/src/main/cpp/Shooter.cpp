@@ -275,6 +275,7 @@ Shooter::setPID(){
 //Stop All shooter movements
 void
 Shooter::Stop(){
+    m_channel.Stop();
     m_turret.Set(ControlMode::PercentOutput, 0);
     m_flywheelSlave.Set(ControlMode::PercentOutput, 0);
     m_flywheelMaster.Set(ControlMode::PercentOutput, 0);
