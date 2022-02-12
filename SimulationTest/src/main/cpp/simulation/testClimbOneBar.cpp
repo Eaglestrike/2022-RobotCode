@@ -45,7 +45,7 @@ bool testClimbOneBar::test() {
 bool testClimbOneBar::extending() {
 
     climber.SetState(Climber::State::VERTICAL_ARM_EXTEND);
-    climber.Periodic(0, 0, 0, false, false, false, false);
+    climber.Periodic(0, 0, 0, false, false, false, false, false);
 
     //evaluate if failed, good, or done
     //failes if: anything in brake, motors going wrong way, motors going too fast
@@ -63,7 +63,7 @@ bool testClimbOneBar::extending() {
         && climber.getPIDCntrl().AtSetpoint()) {
         std::cout << "Testing state transition...\n";
         climber.SetState(Climber::State::VERTICAL_ARM_EXTEND);
-        climber.Periodic(0, 0, 0, false, true, false, false);
+        climber.Periodic(0, 0, 0, false, true, false, false, false);
         if (climber.GetState() == Climber::State::VERTICAL_ARM_RETRACT) {
             std::cout << "test passed :)\n";
             passedExtending = 2;
@@ -81,7 +81,7 @@ bool testClimbOneBar::retracting() {
     std::cout << "testing retracting...\n";
 
     climber.SetState(Climber::State::VERTICAL_ARM_EXTEND);
-    climber.Periodic(0, 0, 0, false, false, false, false); //can implement swing simulator later, but should be about no swing in this case anyway
+    climber.Periodic(0, 0, 0, false, false, false, false, false); //can implement swing simulator later, but should be about no swing in this case anyway
 
     //in real life the motor would have to work so hard to compress below 0 that it won't, it will oscilate in simulation
     if (climber.getBrake().Get() || 
@@ -103,7 +103,7 @@ bool testClimbOneBar::retracting() {
                 return false;
             }
             climber.SetState(Climber::State::VERTICAL_ARM_EXTEND);
-            climber.Periodic(0, 0, 0, false, false, false, false); //test all good
+            climber.Periodic(0, 0, 0, false, false, false, false, false); //test all good
             if (climber.GetState() != Climber::State::TEST_DIAGONAL_ARM_EXTEND) {
                 std::cout << "test failed: didn't enter test diagonal arm extend when all good\n";
                 passedRetracting = 1;
@@ -112,7 +112,7 @@ bool testClimbOneBar::retracting() {
             }
 
             climber.SetState(Climber::State::VERTICAL_ARM_EXTEND);
-            climber.Periodic(100, 100, 0, false, false, false, false); //test bad pitch
+            climber.Periodic(100, 100, 0, false, false, false, false, false); //test bad pitch
             if (climber.GetState() != Climber::State::VERTICAL_ARM_EXTEND) {
                 std::cout << "test failed: didn't stay in vertical arm extend with bad pitch\n";
                 passedRetracting = 1;
@@ -121,7 +121,7 @@ bool testClimbOneBar::retracting() {
             }
 
             climber.SetState(Climber::State::VERTICAL_ARM_EXTEND);
-            climber.Periodic(0, 0, 2, false, false, false, false); //test no time
+            climber.Periodic(0, 0, 2, false, false, false, false, false); //test no time
             if (climber.GetState() != Climber::State::VERTICAL_ARM_EXTEND) {
                 std::cout << "test failed: didn't remain with no time\n";
                 passedRetracting = 1;

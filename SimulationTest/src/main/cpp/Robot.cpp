@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fmt/core.h>
 
+#include "frc/Timer.h"
+
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
@@ -22,6 +24,7 @@ void Robot::SimulationPeriodic() {
   PhysicsSim::GetInstance().Run();
 
 }
+
 
 void Robot::TeleopInit() {
   test.setState(testClimbOneBar::State::IDLE);
