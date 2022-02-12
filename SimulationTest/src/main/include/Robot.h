@@ -12,6 +12,7 @@
 #include <source/Shooter.h>
 #include <source/Climber.h>
 #include "simulation/testClimbOneBar.h"
+#include "simulation/testWaited.h"
 #include "simulation/PhysicsSim.h"
 
 
@@ -36,6 +37,7 @@ class Robot : public frc::TimedRobot {
  private:
   Climber climber;
   frc::Joystick joystick{0};
-  testClimbOneBar test{climber};
-
+  // testClimbOneBar test{climber};
+  testWaited waitTest{climber};
+  // frc::Timer timer;
 };

@@ -27,16 +27,24 @@ void Robot::SimulationPeriodic() {
 
 
 void Robot::TeleopInit() {
-  test.setState(testClimbOneBar::State::IDLE);
+  // test.setState(testClimbOneBar::State::IDLE);
+  waitTest.setState(testWaited::State::IDLE);
 }
 
 void Robot::TeleopPeriodic() {
-  if (test.getState() == testClimbOneBar::State::IDLE) test.setState(testClimbOneBar::State::WAITING_FOR_EXTEND_BUTTON);
-   if (joystick.GetRawButton(1)) test.setState(testClimbOneBar::State::TESTING);
+  if (waitTest.getState() == testWaited::State::IDLE) waitTest.setState(testWaited::State::WAITING_FOR_EXTEND_BUTTON);
+   if (joystick.GetRawButton(1)) waitTest.setState(testWaited::State::TESTING);
   //  else if (joystick.GetRawButton(2)) test.setState(testClimbOneBar::State::WAITING_FOR_RETRACT_BUTTON);
-   else test.setState(testClimbOneBar::State::WAITING_FOR_EXTEND_BUTTON);
+   else waitTest.setState(testWaited::State::WAITING_FOR_EXTEND_BUTTON);
+
+  waitTest.periodic();
+  
+  // if (test.getState() == testClimbOneBar::State::IDLE) test.setState(testClimbOneBar::State::WAITING_FOR_EXTEND_BUTTON);
+  //  if (joystick.GetRawButton(1)) test.setState(testClimbOneBar::State::TESTING);
+  // //  else if (joystick.GetRawButton(2)) test.setState(testClimbOneBar::State::WAITING_FOR_RETRACT_BUTTON);
+  //  else test.setState(testClimbOneBar::State::WAITING_FOR_EXTEND_BUTTON);
     
-  test.periodic();
+  // test.periodic();
 }
 
 void Robot::DisabledInit() {}

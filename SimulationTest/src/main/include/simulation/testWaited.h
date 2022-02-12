@@ -3,7 +3,7 @@
 #include "frc/Timer.h"
  
 
-class testClimbOneBar {
+class testWaited {
     public: 
         enum State { 
             IDLE,
@@ -11,8 +11,8 @@ class testClimbOneBar {
             TESTING
         };
 
-        testClimbOneBar(Climber& c);
-        void initTestClimbOneBar();
+        testWaited(Climber& c);
+        void initTestWaited();
         void periodic();
 
         bool test();
