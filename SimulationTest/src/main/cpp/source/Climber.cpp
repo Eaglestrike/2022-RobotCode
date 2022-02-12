@@ -103,9 +103,18 @@ Climber::State Climber::TestDiagonalArmExtend() {
         std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
         ClimbConstants::motorTestExtendPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
 
-    if (stateJustChanged()) waitStartTime = currTime;
+    if (stateJustChanged()) {
+        waitStartTime = currTime;
+        std::cout << "stateJustChanged, setting waitStartTime - Climber::TestDiagonalArmExtend" << "\n";
+        std::cout << waitStartTime << "\n";
+    }
 
-    if (waited(ClimbConstants::timeToTestExtension, waitStartTime) && hooked()) return DIAGONAL_ARM_EXTEND; 
+    // std::cout << waited(ClimbConstants::timeToTestExtension, waitStartTime) << "\n"; // TESTING
+
+    if (!waited(ClimbConstants::timeToTestExtension, waitStartTime)) {
+        return TEST_DIAGONAL_ARM_EXTEND;
+    }
+    else if (hooked()) return DIAGONAL_ARM_EXTEND; 
     else return VERTICAL_ARM_RETRACT; 
 }
 
@@ -114,7 +123,9 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch){
     brake.Set(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
 
-    if (stateJustChanged()) waitStartTime = currTime; //so only at start of state. i might try to implement a better way to determine this
+    if (stateJustChanged()) {
+        waitStartTime = currTime;
+    } //so only at start of state. i might try to implement a better way to determine this
     climbMedExtend.Set(true);
     climbFullExtend.Set(true);
     if (waited(ClimbConstants::diagonalArmExtendWaitTime, waitStartTime)) {
@@ -163,7 +174,9 @@ Climber::State Climber::DiagonalArmRetract(bool doSecondClimb, double pitch, dou
 
 //have the static hooks engaged
 bool Climber::hooked() {
-    return (gearboxMaster.GetStatorCurrent() >= ClimbConstants::hookedCurrent);
+    // testing!!! (Change back later);
+    return true;
+    // return (gearboxMaster.GetStatorCurrent() >= ClimbConstants::hookedCurrent);
 }
 
 //is the motor at set point (kinda redundant now that I know about AtSetpoint(), may erase later)
@@ -189,7 +202,7 @@ Climber::SetState(State newState){
 
 //has the time passed
 bool Climber::waited(double time, double startTime) {
-    return (startTime + time) >= currTime;
+    return (startTime + time) <= currTime;
 }
 
 //are we in a new state (this is important for waited)
