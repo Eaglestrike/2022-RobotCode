@@ -24,7 +24,7 @@ class Climber{
         };
 
         Climber();
-        void Periodic(double delta_pitch, double pitch, double time, bool passIdle, bool retryInitClimb, bool drivenForward, bool passDiagonalArmRaise, bool doSecondClimb); //executes state actions
+        void Periodic(double delta_pitch, double pitch, double time, bool passIdle, bool drivenForward, bool retryFirstClimb, bool passDiagonalArmRaise, bool doSecondClimb); //executes state actions
 
         //returns next state of climber
         State Idle(bool passIdle);
@@ -35,9 +35,10 @@ class Climber{
         State TestDiagonalArmExtend();
         State DiagonalArmExtend(double pitch, double delta_pitch);
         State DiagonalArmRaise(bool passDiagonalArmRaise);
-        State DiagonalArmRetract(bool doSecondClimb);
+        State DiagonalArmRetract(bool doSecondClimb, double pitch, double delta_pitch);
 
         void SetState(State newState); //can set state manually
+        State& GetState() {return state;}
 
         void Calibrate();
 
@@ -49,7 +50,14 @@ class Climber{
         void testSeesIfHooked();
         void testDiagonalExtension();
         void testDiagonalArmRaise();
-        void testBarTraversalFromRaised();
+        void testBarTraversalFromRaised(); //should do correct function even if not actually hanging
+
+        //getters and setters for simulation
+        WPI_TalonFX& getMotor() {return gearboxMaster;}
+        frc2::PIDController getPIDCntrl() {return motorPIDController;}
+        frc::Solenoid& getFullExtend() {return climbFullExtend;}
+        frc::Solenoid& getMedExtend() {return climbMedExtend;}
+        frc::Solenoid& getBrake() {return brake;}
 
 
     private:

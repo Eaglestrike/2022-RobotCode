@@ -105,7 +105,10 @@ Climber::State Climber::TestDiagonalArmExtend() {
 
     if (stateJustChanged()) waitStartTime = currTime;
 
-    if (waited(ClimbConstants::timeToTestExtension, waitStartTime) && hooked()) return DIAGONAL_ARM_EXTEND; 
+     if (!waited(ClimbConstants::timeToTestExtension, waitStartTime)) {
+        return TEST_DIAGONAL_ARM_EXTEND;
+    }
+    else if (hooked()) return DIAGONAL_ARM_EXTEND; 
     else return VERTICAL_ARM_RETRACT; 
 }
 
@@ -189,7 +192,7 @@ Climber::SetState(State newState){
 
 //has the time passed
 bool Climber::waited(double time, double startTime) {
-    return (startTime + time) >= currTime;
+    return (startTime + time) <= currTime;
 }
 
 //are we in a new state (this is important for waited)
