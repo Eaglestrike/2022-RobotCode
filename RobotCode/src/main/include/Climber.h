@@ -66,11 +66,13 @@ class Climber{
 
         double currTime = 0;
         double waitStartTime = 0;
+        double pitchBad = false;
 
         bool hooked();
         bool waited(double time, double startTime);
         bool motorDone(double pose);
         bool pitchGood(double pitch, double delta_pitch);
+        bool pitchVeryBad(double pitch, double delta_pitch);
         bool stateJustChanged();
 
         WPI_TalonFX gearboxMaster{ClimbConstants::gearboxPort1};

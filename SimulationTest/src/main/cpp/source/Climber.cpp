@@ -117,6 +117,16 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch){
     brake.Set(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
 
+    if (pitchVeryBad(pitch, delta_pitch)) pitchBad = true;
+    if (pitchGood(pitch, delta_pitch)) pitchBad = false;
+
+    if (pitchBad) {
+        climbMedExtend.Set(false);
+        climbFullExtend.Set(false);
+        waitStartTime = currTime; //so that we start over again when we try to re-extend solenoids
+        return DIAGONAL_ARM_EXTEND;
+    }
+
     if (stateJustChanged()) waitStartTime = currTime; //so only at start of state. i might try to implement a better way to determine this
     climbMedExtend.Set(true);
     climbFullExtend.Set(true);
@@ -178,7 +188,12 @@ bool Climber::motorDone(double pose) {
 //has the climber swinging stabilized enough to continue
 //may have to un-function this if we want tolerances to be different for different states, but this helps for readability & re-usability if not
 bool Climber::pitchGood(double pitch, double delta_pitch) {
-    return (pitch < ClimbConstants::acceptablePitch && abs(delta_pitch) < ClimbConstants::deltaPitchTolerance);
+    return (abs(pitch) < ClimbConstants::acceptablePitch && abs(delta_pitch) < ClimbConstants::deltaPitchTolerance);
+}
+
+//this is if the pitch is so bad we are going to fall off as diagonal arm extends and we need to bring it back in
+bool Climber::pitchVeryBad(double pitch, double delta_pitch) {
+    return (abs(pitch) > ClimbConstants::veryBadPitch || abs(delta_pitch) > ClimbConstants::veryBadDeltaPitch);
 }
 
 
