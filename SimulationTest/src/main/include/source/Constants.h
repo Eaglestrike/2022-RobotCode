@@ -172,10 +172,10 @@ ClimbConstants{
 
     const double hookedCurrent = 0;
 
-    const double acceptablePitch = 5;
+    const double acceptablePitch = 10;
     const double deltaPitchTolerance = 10;
-    const double veryBadPitch = 15;
-    const double veryBadDeltaPitch = 20;
+    const double veryBadPitch = 80;
+    const double veryBadDeltaPitch = 30;
 
     const double diagonalArmExtendWaitTime = 0;
     const double diagonalArmRaiseWaitTime = 0;

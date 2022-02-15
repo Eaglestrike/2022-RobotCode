@@ -120,6 +120,9 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch){
     if (pitchVeryBad(pitch, delta_pitch)) pitchBad = true;
     if (pitchGood(pitch, delta_pitch)) pitchBad = false;
 
+    //this is up for change - I mostly just wanted a way to try and save the arm or maybe save the robot from falling
+    //if, for example, other robots are bumping into us. I could also add a thing where the arm will retract if a 
+    //specific button is pushed
     if (pitchBad) {
         climbMedExtend.Set(true);
         climbFullExtend.Set(true);
@@ -150,6 +153,7 @@ Climber::State Climber::DiagonalArmRaise(bool passDiagonalArmRaise){
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
 
     if (stateJustChanged()) waitStartTime = currTime;
+    climbMedExtend.Set(false);
     climbFullExtend.Set(true);
     if (waited(ClimbConstants::diagonalArmRaiseWaitTime, waitStartTime) && passDiagonalArmRaise && currTime <= ClimbConstants::diagonalArmRaiseEnoughTime) 
         return DIAGONAL_ARM_RETRACT; 

@@ -9,6 +9,7 @@
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/Joystick.h>
+#include <frc/XboxController.h>
 #include <source/Shooter.h>
 #include <source/Climber.h>
 #include "simulation/testClimbOneBar.h"
@@ -35,7 +36,10 @@ class Robot : public frc::TimedRobot {
 
  private:
   Climber climber;
-  frc::Joystick joystick{0};
-  testClimbOneBar test{climber};
+  // frc::Joystick joystick{0};
+  // testClimbOneBar test{climber};
+  frc::Joystick l_joy{OIConstants::l_joy_port};
+  frc::Joystick r_joy{OIConstants::r_joy_port};
+  frc::XboxController xbox{OIConstants::O_joy_port};
 
 };

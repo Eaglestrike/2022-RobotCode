@@ -45,6 +45,13 @@ class Climber{
 
         //the below public functions are for testing
         void InitializeTests();
+        void Stop();
+        void extendArmUntilStopped(bool inverted);
+        void retractArm();
+        void setArmLowered();
+        void setArmRaised();
+        void setArmVertical();
+
         void testRaiseVerticalArm();
         void testRetractVerticalArm();
         void testSeesIfHooked();
