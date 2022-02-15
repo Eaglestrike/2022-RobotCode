@@ -123,6 +123,9 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch){
     if (pitchBad) {
         climbMedExtend.Set(false);
         climbFullExtend.Set(false);
+        gearboxMaster.Set(ControlMode::PercentOutput, 
+            std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
+            ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
         waitStartTime = currTime; //so that we start over again when we try to re-extend solenoids
         return DIAGONAL_ARM_EXTEND;
     }
