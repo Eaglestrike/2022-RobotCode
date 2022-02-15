@@ -7,8 +7,8 @@
 Climber::Climber(){
     motorPIDController.SetTolerance(ClimbConstants::motorPoseTolerance, ClimbConstants::deltaMotorPoseTolerance);
 
-    climbFullExtend.Set(false);
-    climbMedExtend.Set(false);
+    climbFullExtend.Set(true);
+    climbMedExtend.Set(true);
 
     gearboxSlave.Follow(gearboxMaster);
     gearboxMaster.SetNeutralMode(NeutralMode::Brake);
@@ -53,8 +53,8 @@ Climber::Periodic(double delta_pitch, double pitch, double time, bool passIdle, 
 //states (https://docs.google.com/document/d/1I5caybg-bhfEYwxfIL1PCXAbqdznW7Qo1R-ZHObqCiY/edit?usp=sharing)
 
 Climber::State Climber::Idle(bool passIdle){
-    climbFullExtend.Set(false);
-    climbMedExtend.Set(false);
+    climbFullExtend.Set(true);
+    climbMedExtend.Set(true);
     gearboxMaster.SetNeutralMode(NeutralMode::Brake);
     brake.Set(true);
 
@@ -121,8 +121,8 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch){
     if (pitchGood(pitch, delta_pitch)) pitchBad = false;
 
     if (pitchBad) {
-        climbMedExtend.Set(false);
-        climbFullExtend.Set(false);
+        climbMedExtend.Set(true);
+        climbFullExtend.Set(true);
         gearboxMaster.Set(ControlMode::PercentOutput, 
             std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
             ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
@@ -131,8 +131,8 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch){
     }
 
     if (stateJustChanged()) waitStartTime = currTime; //so only at start of state. i might try to implement a better way to determine this
-    climbMedExtend.Set(true);
-    climbFullExtend.Set(true);
+    climbMedExtend.Set(false);
+    climbFullExtend.Set(false);
     if (waited(ClimbConstants::diagonalArmExtendWaitTime, waitStartTime)) {
         gearboxMaster.Set(ControlMode::PercentOutput, 
             std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
@@ -150,7 +150,7 @@ Climber::State Climber::DiagonalArmRaise(bool passDiagonalArmRaise){
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
 
     if (stateJustChanged()) waitStartTime = currTime;
-    climbFullExtend.Set(false);
+    climbFullExtend.Set(true);
     if (waited(ClimbConstants::diagonalArmRaiseWaitTime, waitStartTime) && passDiagonalArmRaise && currTime <= ClimbConstants::diagonalArmRaiseEnoughTime) 
         return DIAGONAL_ARM_RETRACT; 
     else return DIAGONAL_ARM_RAISE;
@@ -162,8 +162,8 @@ Climber::State Climber::DiagonalArmRetract(bool doSecondClimb, double pitch, dou
         ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
     if (stateJustChanged()) waitStartTime = currTime;
     if (waited(ClimbConstants::waitToRaiseVerticalTime, waitStartTime)) {
-        climbFullExtend.Set(false);
-        climbMedExtend.Set(false);
+        climbFullExtend.Set(true);
+        climbMedExtend.Set(true);
     }
 
     if (motorDone(ClimbConstants::motorRetractedPose) || currTime >= ClimbConstants::almostDoneTime) {
