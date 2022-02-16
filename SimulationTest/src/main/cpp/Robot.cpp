@@ -17,11 +17,11 @@ void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
 
 void Robot::SimulationInit() {
-//  PhysicsSim::GetInstance().AddTalonFX(climber.getMotor(), 0.75, 3400, false);
+  //PhysicsSim::GetInstance().AddTalonFX(climber.getMotor(), 0.75, 3400, false);
 }
 
 void Robot::SimulationPeriodic() {
- // PhysicsSim::GetInstance().Run();
+  //PhysicsSim::GetInstance().Run();
 
 }
 

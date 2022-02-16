@@ -14,6 +14,10 @@ void PhysicsSim::AddTalonFX(TalonFX &talon, double const accelToFullTime, double
     this->_simProfiles.insert(this->_simProfiles.end(), simTalon);
 }
 
+void PhysicsSim::setFirstTalonCurrent(double current) {
+    this->_simProfiles[0]->setTalonCurrent(current);
+}
+
 void PhysicsSim::Run() {
     for (auto simProfile : _simProfiles) {
         simProfile->Run();
