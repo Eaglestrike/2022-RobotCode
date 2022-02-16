@@ -19,4 +19,4 @@ class testDiagonalExtendPitch
         bool passedInitExtend = false;
         bool passedRetract = false;
         bool passedReextend = false;
-}
+};

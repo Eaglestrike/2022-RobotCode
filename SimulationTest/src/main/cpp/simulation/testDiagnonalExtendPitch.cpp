@@ -36,7 +36,7 @@ void testDiagonalExtendPitch::periodic() //Yes I should've used a state machine 
     }
     else
     {
-        cout << "Test passed" << endl;
+        std::cout << "Test passed" << std::endl;
     }
 }
 
@@ -54,10 +54,10 @@ bool testDiagonalExtendPitch::test()
     //This code is so repetative it hurts me but it was easy and I don't think making a simulation more efficient is worth the effort
     if(badPitch)
     {
-        if(!climber.getFullExtend() || !climber.getMedExtend())
+        if(!climber.getFullExtend().Get() || !climber.getMedExtend().Get())
         {
             passedRetract = false;
-            std::cout << "Climber still extended with bad pitch - Full Extend: " << std::boolalpha << climber.getFullExtend() << " Med Extend: " << climber.getMedExtend() << std::endl;
+            std::cout << "Climber still extended with bad pitch - Full Extend: " << std::boolalpha << climber.getFullExtend().Get() << " Med Extend: " << climber.getMedExtend().Get() << std::endl;
         }
         else
         {
@@ -66,10 +66,10 @@ bool testDiagonalExtendPitch::test()
     }
     else if(passedRetract)
     {
-        if(climber.getFullExtend() || climber.getMedExtend())
+        if(climber.getFullExtend().Get() || climber.getMedExtend().Get())
         {
             passedReextend = false;
-            std::cout << "Climber not re-extended - Full Extend: " << std::boolalpha << climber.getFullExtend() << " Med Extend: " << climber.getMedExtend() << std::endl;
+            std::cout << "Climber not re-extended - Full Extend: " << std::boolalpha << climber.getFullExtend().Get() << " Med Extend: " << climber.getMedExtend().Get() << std::endl;
         }
         else
         {
@@ -78,10 +78,10 @@ bool testDiagonalExtendPitch::test()
     }
     else
     {
-        if(climber.getFullExtend() || climber.getMedExtend())
+        if(climber.getFullExtend().Get() || climber.getMedExtend().Get())
         {
             passedInitExtend = false;
-            std::cout << "Climber not initially extended - Full Extend: " << std::boolalpha << climber.getFullExtend() << " Med Extend: " << climber.getMedExtend() << std::endl;
+            std::cout << "Climber not initially extended - Full Extend: " << std::boolalpha << climber.getFullExtend().Get() << " Med Extend: " << climber.getMedExtend().Get() << std::endl;
         }
         else
         {
