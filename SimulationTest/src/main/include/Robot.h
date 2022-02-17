@@ -13,6 +13,7 @@
 #include <source/Shooter.h>
 #include <source/Climber.h>
 #include "simulation/testClimbOneBar.h"
+#include "simulation/testDiagonalExtendPitch.h"
 #include "simulation/PhysicsSim.h"
 
 
