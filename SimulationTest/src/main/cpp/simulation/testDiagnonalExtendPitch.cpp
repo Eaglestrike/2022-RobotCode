@@ -21,6 +21,8 @@ void testDiagonalExtendPitch::periodic() //Yes I should've used a state machine 
     
     //I also didn't do anything with motors, since I think that's the least of our problems if we're swinging to such a bad pitch, but such code
     //can be added here relatively easily
+    climber.Periodic(0.0, 0.0, 0.0, false, false, false, false, false);
+
     if(passedInitExtend && !passedRetract)
     {
         makePitchBad(true);
@@ -61,6 +63,7 @@ bool testDiagonalExtendPitch::test()
         }
         else
         {
+            std::cout << "Passed Retract" << std::endl;
             passedRetract = true;
         }
     }
@@ -73,6 +76,7 @@ bool testDiagonalExtendPitch::test()
         }
         else
         {
+            std::cout << "Passed Re-Extend" << std::endl;
             passedReextend = true;
         }
     }
@@ -85,6 +89,7 @@ bool testDiagonalExtendPitch::test()
         }
         else
         {
+            std::cout << "Passed Initial Extend" << std::endl;
             passedInitExtend = true;
         }
     }
