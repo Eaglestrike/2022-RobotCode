@@ -2,9 +2,6 @@
 # If you remove items from this file, intellisense might break.
 
 
-Autonomous.cpp
-Autonomous.h
-
 ### C++ ###
 # Prerequisites
 *.d
