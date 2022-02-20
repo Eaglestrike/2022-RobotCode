@@ -12,6 +12,7 @@ Climber::Climber(){
 
     gearboxSlave.Follow(gearboxMaster);
     gearboxMaster.SetNeutralMode(NeutralMode::Brake);
+    gearboxMaster.SetInverted(true);
     gearboxMaster.SetSelectedSensorPosition(0);   
 
     brake.Set(true); 

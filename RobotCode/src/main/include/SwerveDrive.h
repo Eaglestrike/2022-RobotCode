@@ -29,6 +29,10 @@ class SwerveDrive{
         void GenerateTrajectory_1();
         void GeneratePath();
 
+        bool AtTrajPoint(double rot);
+        void ClearTraj() {m_trajectory_1.clearTrajectory();}
+        void AddTrajPt(Trajectory::Waypoint pt);
+
         void debug();
 
 

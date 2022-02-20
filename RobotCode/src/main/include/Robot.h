@@ -15,6 +15,7 @@
 #include "Intake.h"
 #include "Climber.h"
 #include "Shooter.h"
+#include "Autonomous.h"
 
 
 frc::Joystick l_joy{OIConstants::l_joy_port};
@@ -45,6 +46,7 @@ class Robot : public frc::TimedRobot {
   SwerveDrive& getSwerve() {return m_swerve;}
   Intake& getIntake() {return m_intake;}
   Shooter& getShooter() {return m_shooter;}
+  AHRS& getNavx() {return *navx;}
   Climber& getClimber() {return m_climber;}
 
  private:
@@ -60,4 +62,5 @@ class Robot : public frc::TimedRobot {
   const std::string kAutoNameDefault = "Default";
   const std::string kAutoNameCustom = "My Auto";
   std::string m_autoSelected;
+
 };

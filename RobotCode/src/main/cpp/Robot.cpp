@@ -27,7 +27,12 @@ Robot::AutonomousInit() {}
 
 
 void 
-Robot::AutonomousPeriodic() {}
+Robot::AutonomousPeriodic() {
+
+  m_shooter.Periodic();
+  m_intake.Periodic();
+  m_swerve.UpdateOdometry(navx->GetYaw());
+}
 
 
 void

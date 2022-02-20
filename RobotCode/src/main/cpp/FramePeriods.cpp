@@ -27,6 +27,11 @@ void FramePeriods::setFramePeriods(WPI_TalonFX& talon) {
         err.NewError(talon.SetStatusFramePeriod(StatusFrameEnhanced::Status_12_Feedback1, lt));
      //   err.NewError(talon.SetStatusFramePeriod(StatusFrameEnhanced::Status_13_Base_PIDF0, st)); //idk if we actually use
         err.NewError(talon.SetStatusFramePeriod(StatusFrameEnhanced::Status_14_Turn_PIDF1, lt));
+
+        //don't think we use 4 or 5, but i'm keeping control frame 3 (general) the default time
+        err.NewError(talon.SetControlFramePeriod(ControlFrame::Control_4_Advanced, lt));
+        err.NewError(talon.SetControlFramePeriod(ControlFrame::Control_6_MotProfAddTrajPoint, lt));
+
         if (err.GetFirstNonZeroError() == ErrorCode::OK) return;
     }
     
