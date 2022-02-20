@@ -86,6 +86,17 @@ SwerveDrive::TrajectoryFollow(double rot, bool vel){
     Drive(strafe, forward, angle + calcYawStraight(m_trajectory_1.getRotation(index), rot), rot, true);
 }
 
+void SwerveDrive::AddTrajPt(Trajectory::Waypoint pt) {
+    m_trajectory_1.addWaypoint(pt);
+}
+
+bool SwerveDrive::AtTrajPoint(double rot) {
+size_t index = m_trajectory_1.getIndex();
+ return ( (abs(GetYPosition() - m_trajectory_1.getY(index)) < 0.2)
+        && (abs(GetXPostion() - m_trajectory_1.getX(index)) < 0.2)
+        && (abs(rot - m_trajectory_1.getRotation(index))) < 3);
+}
+
 
 //Function for generating trajectory_1
 void
@@ -208,5 +219,5 @@ void
 SwerveDrive::debug(){
     //frc::SmartDashboard::PutNumber("backrightVelocity", m_backRight.getVelocity());
     //m_trajectory_1.getX(0);
-    m_backLeft.Debug();
+    //m_backLeft.Debug();
 }

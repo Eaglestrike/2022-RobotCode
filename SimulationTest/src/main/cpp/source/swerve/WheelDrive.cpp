@@ -28,7 +28,7 @@ WheelDrive::drive(double speed, double angle){
     
     double turnOutput = std::clamp(pidController.Calculate(value, angle), -0.5, 0.5);
     
-    m_speedOut = (m_reverse)? -1*0.7*speed: 0.7*speed;
+    m_speedOut = (m_reverse)? -1*0.87*speed: 0.87*speed;
     
     speedMotor.Set(m_speedOut);
     angleMotor.Set(turnOutput);
@@ -59,6 +59,7 @@ WheelDrive::setPID(){
     double dGain_a = frc::SmartDashboard::GetNumber("D angle", 0.0);
     frc::SmartDashboard::PutNumber("D angle", dGain_a);
     initializeController.SetPID(pGain_a, iGain_a, dGain_a);
+    pidController.SetPID(pGain_a, iGain_a, dGain_a);
 }
 
 

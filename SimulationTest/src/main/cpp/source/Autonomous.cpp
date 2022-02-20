@@ -1,5 +1,6 @@
 #include "Autonomous.h"
 #include "Constants.h"
+#include "AHRS.h"
 #include "Trajectory.h"
 
 AutoMode::AutoMode(Shooter& s, Intake& i, AHRS& a, SwerveDrive& sd) : shooter(s), intake(i), navx(a), swerve(sd) {
@@ -78,7 +79,7 @@ AutoMode::State ThreeBallAuto::Drive(double time) {
     }
     swerve.TrajectoryFollow(navx.GetYaw(), false);
 
-    if (swerve.AtTrajPoint(navx.GetYaw()) || time > times[index]) index++; //similarly may have to change
+//   if (swerve.AtTrajPoint(navx.GetYaw()) || time > times[index]) index++; //similarly may have to change
     return actions[index];
 
 }

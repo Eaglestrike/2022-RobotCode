@@ -88,5 +88,7 @@ bool testDiagonalExtendPitch::test()
             passedInitExtend = true;
         }
     }
+
+    return false; //Susan: I put this here bc compiler complaining about no return
     
 }
