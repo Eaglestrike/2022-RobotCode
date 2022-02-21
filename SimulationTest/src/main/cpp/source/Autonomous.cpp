@@ -4,7 +4,7 @@
 #include "Trajectory.h"
 
 AutoMode::AutoMode(Shooter& s, Intake& i, AHRS& a, SwerveDrive& sd) : shooter(s), intake(i), navx(a), swerve(sd) {
-   // ResetAuto();
+    ResetAuto();
 }
 
 AutoMode::~AutoMode() {}

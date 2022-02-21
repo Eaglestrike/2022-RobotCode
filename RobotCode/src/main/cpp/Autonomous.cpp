@@ -20,7 +20,7 @@ ThreeBallAuto::ThreeBallAuto(Shooter& s, Intake& i, AHRS& a, SwerveDrive& sd) : 
     actions = {IDLE, DRIVE, INTAKE, DRIVE, SHOOT, DRIVE, INTAKE, DRIVE, SHOOT};
     times = {15, 15, 15, 15, 15, 15, 15, 15, 15}; //todo: set
     trajpts = {Trajectory::Waypoint{-2, -37.4, 0, 180}, Trajectory::Waypoint{-304.65, -19.76, 0, 287.7}, 
-                Trajectory::Waypoint{-190, -50, 0, 287.7}};
+                Trajectory::Waypoint{-190, -50, 0, 287.7}}; //these are currently in inches, may need to convert
 }
 
 

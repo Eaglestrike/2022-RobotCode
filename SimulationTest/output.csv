@@ -1,9 +1,0 @@
-position output
-
-********** Robot program startup complete **********
-CTR: CAN frame not received/too-stale.
-	Talon FX 30 GetMotorOutputPercent
-[phoenix] Library initialization is complete.
-	
-[phoenix-diagnostics] Server 1.9.0 (Jan  4 2022,20:31:08) running on port: 1250
-	

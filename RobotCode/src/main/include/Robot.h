@@ -43,12 +43,6 @@ class Robot : public frc::TimedRobot {
   void TestInit() override;
   void TestPeriodic() override;
 
-  SwerveDrive& getSwerve() {return m_swerve;}
-  Intake& getIntake() {return m_intake;}
-  Shooter& getShooter() {return m_shooter;}
-  AHRS& getNavx() {return *navx;}
-  Climber& getClimber() {return m_climber;}
-
  private:
 
   SwerveDrive m_swerve;

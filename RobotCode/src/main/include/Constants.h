@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 
 namespace
@@ -9,6 +10,10 @@ GeneralConstants{
     const double goalHeight = 2.641;
     const double cameraHeight = 0.4572;
     const double cameraPitch = 50;
+
+    //comment in/out or find a way to select with sdb
+    const std::string matchColor = "RED";
+   // const std::string matchColor = "BLUE";
 }
 
 

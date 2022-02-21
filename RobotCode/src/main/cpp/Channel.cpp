@@ -4,6 +4,8 @@
 //Constructor is empty for now
 Channel::Channel(){
     m_channel.SetNeutralMode(NeutralMode::Brake);
+    colorMatcher.AddColorMatch(red); //red
+    colorMatcher.AddColorMatch(blue); //blue
 }
 
 

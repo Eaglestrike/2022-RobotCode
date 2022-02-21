@@ -4,6 +4,9 @@
 Intake::Intake(){
     intakeMotor.SetNeutralMode(NeutralMode::Coast);
     intakeMotor.SetSafetyEnabled(false);
+
+    colorMatcher.AddColorMatch(red); //red
+    colorMatcher.AddColorMatch(blue); //blue
 }
 
 
@@ -36,9 +39,15 @@ Intake::Deploy(){
 }
 
 
+
 //Run the Intake
 void
 Intake::Run(){
+    double confidence = 0.0; //it complains if I don't do this
+    if ((GeneralConstants::matchColor == "BLUE" && colorMatcher.MatchClosestColor(colorSensor.GetColor(), confidence) == red)
+        || (GeneralConstants::matchColor == "RED" && colorMatcher.MatchClosestColor(colorSensor.GetColor(), confidence) == blue)) {
+            intakeMotor.Set(ControlMode::PercentOutput, 0.45); //or could just stop?
+        }
     intakeMotor.Set(ControlMode::PercentOutput, -0.45);
 }
 
