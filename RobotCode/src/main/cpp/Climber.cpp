@@ -162,6 +162,9 @@ Climber::State Climber::DiagonalArmRaise(bool passDiagonalArmRaise){
 }
 
 Climber::State Climber::DiagonalArmRetract(bool doSecondClimb, double pitch, double delta_pitch){
+    brake.Set(false);
+    gearboxMaster.SetNeutralMode(NeutralMode::Coast);
+    
     gearboxMaster.Set(ControlMode::PercentOutput, 
         std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
         ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));

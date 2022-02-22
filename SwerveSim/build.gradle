@@ -77,23 +77,23 @@ model {
             wpi.cpp.deps.wpilib(it)
         }
     }
-    // testSuites {
-    //     frcUserProgramTest(GoogleTestTestSuiteSpec) {
-    //         testing $.components.frcUserProgram
+    testSuites { //getting rid of this casue i don't neet it for rn and i'm sick of wpilib's bs
+        // frcUserProgramTest(GoogleTestTestSuiteSpec) {
+        //     testing $.components.frcUserProgram
 
-    //         sources.cpp {
-    //             source {
-    //                 srcDir 'src/test/cpp'
-    //                 include '**/*.cpp'
-    //             }
-    //         }
+        //     sources.cpp {
+        //         source {
+        //             srcDir 'src/test/cpp'
+        //             include '**/*.cpp'
+        //         }
+        //     }
 
-    //         // Enable run tasks for this component
-    //         wpi.cpp.enableExternalTasks(it)
+        //     // Enable run tasks for this component
+        //     wpi.cpp.enableExternalTasks(it)
 
-    //         wpi.cpp.vendor.cpp(it)
-    //         wpi.cpp.deps.wpilib(it)
-    //         wpi.cpp.deps.googleTest(it)
-    //     }
-    // }
+        //     wpi.cpp.vendor.cpp(it)
+        //     wpi.cpp.deps.wpilib(it)
+        //     wpi.cpp.deps.googleTest(it)
+        // }
+    }
 }
