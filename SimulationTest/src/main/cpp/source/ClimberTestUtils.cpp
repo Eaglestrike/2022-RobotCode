@@ -13,10 +13,12 @@ void Climber::InitializeTests() {
 
 void Climber::Stop() {
     gearboxMaster.Set(ControlMode::PercentOutput, 0);
-
+    gearboxMaster.SetNeutralMode(NeutralMode::Brake);
+    //could turn on pneumatic brake?
 }
 
 void Climber::extendArmUntilStopped(bool inverted) {
+    gearboxMaster.SetNeutralMode(NeutralMode::Coast);
     if (inverted) gearboxMaster.Set(ControlMode::PercentOutput, -0.25);
     else gearboxMaster.Set(ControlMode::PercentOutput, 0.25);
     std::cout << "motor positon: " << gearboxMaster.GetSelectedSensorPosition() << "\n";
@@ -25,6 +27,7 @@ void Climber::extendArmUntilStopped(bool inverted) {
 }
 
 void Climber::retractArm() {
+    gearboxMaster.SetNeutralMode(NeutralMode::Coast);
     while (gearboxMaster.GetSelectedSensorPosition() > ClimbConstants::motorRetractedPose) {
         gearboxMaster.Set(ControlMode::PercentOutput, -0.25);
     }
@@ -51,7 +54,7 @@ void Climber::setArmVertical() {
 
 void Climber::testRaiseVerticalArm() {
    // SetState(VERTICAL_ARM_EXTEND);
-     
+    
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
     gearboxMaster.Set(ControlMode::PercentOutput, 
         std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
@@ -74,13 +77,29 @@ void Climber::testSeesIfHooked() {
 }
 
 void Climber::testDiagonalExtension() {
-    SetState(DIAGONAL_ARM_EXTEND);
+    //SetState(DIAGONAL_ARM_EXTEND);
+    climbMedExtend.Set(false);
+    climbFullExtend.Set(false);
+    //won't do any wait for now, see how it goes
+    gearboxMaster.SetNeutralMode(NeutralMode::Coast);
+    gearboxMaster.Set(ControlMode::PercentOutput, 
+           std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
+           ClimbConstants::motorExtendedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
 }
         
 void Climber::testDiagonalArmRaise() {
-    SetState(DIAGONAL_ARM_RAISE);
+    //SetState(DIAGONAL_ARM_RAISE);
+    climbMedExtend.Set(false);
+    climbFullExtend.Set(true);
 }
         
 void Climber::testBarTraversalFromRaised() {
-    SetState(DIAGONAL_ARM_RETRACT);
+    //SetState(DIAGONAL_ARM_RETRACT);
+    gearboxMaster.SetNeutralMode(NeutralMode::Coast);
+    gearboxMaster.Set(ControlMode::PercentOutput, 
+        std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
+        ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
+    //won't do this yet, may add wait function
+    //climbFullExtend.Set(true);
+    //climbMedExtend.Set(true);
 }

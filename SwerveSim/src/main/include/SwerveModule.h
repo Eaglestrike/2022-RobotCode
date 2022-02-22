@@ -36,10 +36,10 @@ class SwerveModule : public frc2::SubsystemBase {
         bool mInverted;
 
         //pid stuff
-        static double kF;
-        static double kP;
-        static double kI;
-        static double kD;
+        double kF;
+        double kP;
+        double kI;
+        double kD;
         int kI_Zone = 900;
         int kMaxIAccum = 1000000;
         int kErrorBand = 50;
@@ -53,7 +53,7 @@ class SwerveModule : public frc2::SubsystemBase {
         int moduleNum;
 
         const static long STALL_TIMEOUT = 2000;
-        long mStallTimeBegin = LLONG_MAX;
+        long mStallTimeBegin = LLONG_MAX; 
 
         double mTurnOutput;
         double mDriveOutput;
@@ -63,6 +63,9 @@ class SwerveModule : public frc2::SubsystemBase {
         //frc::ProfiledPIDController</*reee idk the distancceee*/> mTurningPID{ModuleConstants::kpTurningController, 0, 0, /*trapezoid thing idk how to instentiate*/};
         //frc::SimpleMotorFeedforward</*reee distance*/> mDriveFeedFwd{0, 0, 0}; //todo tune
         //frc::SimpleMotorFeedforward</*reee distance*/> mTurnFeedFwd{0, 0, 0}; //todo tune
+        frc::ProfiledPIDController<units::meters> mTuningPID{ModuleConstants::kpTurningController, 0, 0, 
+            frc::TrapezoidProfile<units::meters>::Constraints(frc::TrapezoidProfile<units::meters>::Velocity_t{ModuleConstants::kMaxModuleAngularSpeedRadsPerSec}, 
+            frc::TrapezoidProfile<units::meters>::Acceleration_t{ModuleConstants::kMaxModuleAngularAccelRadsPerSecSquared})};
 
         //he defines some sim stuff that i'm not gonna do just yet
 

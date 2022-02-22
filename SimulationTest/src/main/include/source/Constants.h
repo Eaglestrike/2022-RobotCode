@@ -159,23 +159,23 @@ ClimbConstants{
     //!!!!!!!! none of the below are correct! they are in use purely for simulation atm !!!!!!!!!
 
     //these names are kind of bad, i might change them later
-    const double idleEnoughTime = 1;
-    const double verticalArmExtendEnoughTime = 1;
-    const double verticalArmRetractEnoughTime = 1;
-    const double diagonalArmExtendEnoughTime = 1;
-    const double diagonalArmRaiseEnoughTime = 1;
-    const double diagonalArmRetractEnoughTime = 1;
-    const double almostDoneTime = 1;
+    const double idleEnoughTime = 10000;
+    const double verticalArmExtendEnoughTime = 10000;
+    const double verticalArmRetractEnoughTime = 10000;
+    const double diagonalArmExtendEnoughTime = 10000;
+    const double diagonalArmRaiseEnoughTime = 10000;
+    const double diagonalArmRetractEnoughTime = 10000;
+    const double almostDoneTime = 10000;
 
     const double waitToRaiseVerticalTime = 0; //how long to wait from after retracting to raise diagonal arm to vertical
-    const double timeToTestExtension = 0;
+    const double timeToTestExtension = 2;
 
     const double hookedCurrent = 0;
 
-    const double acceptablePitch = 5;
-    const double deltaPitchTolerance = 10;
-    const double veryBadPitch = 15;
-    const double veryBadDeltaPitch = 20;
+    const double acceptablePitch = 1000;
+    const double deltaPitchTolerance = 1000;
+    const double veryBadPitch = 1000;
+    const double veryBadDeltaPitch = 1000;
 
     const double diagonalArmExtendWaitTime = 0;
     const double diagonalArmRaiseWaitTime = 0;
@@ -191,7 +191,7 @@ ClimbConstants{
     const double motorI = 0;
     const double motorD = 0;
 
-    const double motorMaxOutput = 0.5;
+    const double motorMaxOutput = 1;
 }
 
 

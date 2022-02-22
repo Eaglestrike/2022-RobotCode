@@ -54,10 +54,19 @@ void SwerveModule::setDesiredState(frc::SwerveModuleState state) {
 
     //calculate drive output from drive PID
     mDriveOutput = mDrivePID.Calculate(getVelocity(), outputState.speed.value());
-    double turnFeedforward; //use trapezoid thing to calculate
     double driveFeedforward; //use trapezoid thing to calculate
+    mTurnOutput; //use trapexoid thing to calculate
 
     mDrivingMotor.Set(ControlMode::PercentOutput, mDriveOutput+driveFeedforward);
     mTurningMotor.Set(ControlMode::PercentOutput, mTurnOutput);
 
+}
+
+void SwerveModule::setPercentOutput(double output) {
+    mDrivingMotor.Set(ControlMode::PercentOutput, output);
+}
+
+void SwerveModule::setBrakeMode(bool on) {
+    mDrivingMotor.Set(on ? NeutralMode::Brake : NeutralMode::Coast);
+    mTurningMotor.SetNeutralMode(NeutralMode::Brake);
 }

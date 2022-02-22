@@ -44,6 +44,8 @@ class Climber{
 
 
         //the below public functions are for testing
+        void setTime(units::second_t time) {currTime = time.value();}
+
         void InitializeTests();
         void Stop();
         void extendArmUntilStopped(bool inverted);
