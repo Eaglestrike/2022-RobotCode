@@ -19,6 +19,8 @@
     "*.inc": "cpp",
     "*.tcc": "cpp",
     "array": "cpp",
-    "string_view": "cpp"
+    "string_view": "cpp",
+    "initializer_list": "cpp",
+    "functional": "cpp"
   }
 }

@@ -128,9 +128,6 @@ namespace AutoConstants {
     const double kpYController = 1;
     const double kpThetaController = 3.5; //NOOOOO IT DOXED THE GREEK CHARACTERSS >:(
 
-    //not sure how to tranlate cause c++ requires a distance template and idk what that's supposed to be
-    // public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-    //             new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond * 10,
-    //                     kMaxAngularSpeedRadiansPerSecondSquared * 10);
-
+    frc::TrapezoidProfile<units::radians>::Constraints kThetaControllerConstraints{frc::TrapezoidProfile<units::radians>::Velocity_t{ModuleConstants::kMaxModuleAngularSpeedRadsPerSec*10}, 
+            frc::TrapezoidProfile<units::radians>::Acceleration_t{ModuleConstants::kMaxModuleAngularAccelRadsPerSecSquared*10}};
 }
