@@ -121,15 +121,10 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch){
     if (pitchVeryBad(pitch, delta_pitch)) pitchBad = true;
     if (pitchGood(pitch, delta_pitch)) pitchBad = false;
 
-    //this is up for change - I mostly just wanted a way to try and save the arm or maybe save the robot from falling
-    //if, for example, other robots are bumping into us. I could also add a thing where the arm will retract if a 
-    //specific button is pushed
+    //if pitch very bad, halt extension
     if (pitchBad) {
-        climbMedExtend.Set(true);
-        climbFullExtend.Set(true);
-        gearboxMaster.Set(ControlMode::PercentOutput, 
-            std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
-            ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
+        gearboxMaster.Set(ControlMode::PercentOutput, 0);
+        gearboxMaster.SetNeutralMode(NeutralMode::Brake);
         waitStartTime = currTime; //so that we start over again when we try to re-extend solenoids
         return DIAGONAL_ARM_EXTEND;
     }

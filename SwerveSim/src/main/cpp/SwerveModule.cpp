@@ -29,7 +29,8 @@ moduleNum(mn), mTurningMotor(turnMotID), mDrivingMotor(driveMotID), mZeroOffset(
     mTurningMotor.SetNeutralMode(NeutralMode::Brake);
     mDrivingMotor.SetNeutralMode(NeutralMode::Brake);
 
-    //mTurningPID.EnableContinuousInput(-PI, PI);
+    //LITERALLY IF I HAVE TO DEAL WITH ONE MORE UNIT I AM GOING TO YEET MY COMPUTER INTO THE SUN OH MY GOOOOOOOOOODDDDD
+    mTurningPID.EnableContinuousInput(units::radian_t{-PI}, units::radian_t{PI});
 
     //can set up other simulation stuff
 }
@@ -54,8 +55,9 @@ void SwerveModule::setDesiredState(frc::SwerveModuleState state) {
 
     //calculate drive output from drive PID
     mDriveOutput = mDrivePID.Calculate(getVelocity(), outputState.speed.value());
-    double driveFeedforward; //use trapezoid thing to calculate
-    mTurnOutput; //use trapexoid thing to calculate
+    double driveFeedforward; mDriveFeedFwd.Calculate(state.speed);
+    mTurnOutput = mTurningPID.Calculate(units::radian_t{getTurningRadians()}, outputState.angle.Radians());
+    //double turnFeedForward = mTurnFeedFwd.Calculate(mTurningPID.GetSetpoint()); //this gives me an error for some reason, but for now I won't question it because this variable is never used
 
     mDrivingMotor.Set(ControlMode::PercentOutput, mDriveOutput+driveFeedforward);
     mTurningMotor.Set(ControlMode::PercentOutput, mTurnOutput);

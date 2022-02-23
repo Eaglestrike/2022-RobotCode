@@ -12,26 +12,26 @@ class SwerveDrive : public frc2::SubsystemBase {
         SwerveDrive();
         const static double kMaxAngularSpeed = DriveConstants::kMaxChassisRotationSpeed;
         //navx utils
-        AHRS getNavx() {return mNavX;}
-        double getGyroRate() {return mNavX.getRate();}
+        AHRS& getNavx() {return mNavX;}
+        double getGyroRate() {return mNavX.GetRate();}
         frc::Rotation2d getRotation() {return frc::Rotation2d{units::degree_t{getHeading()}};}
-        double getTurnRate() { return mNavX.getRate(); }
-        double getHeading() { return std::fmod(-mNavX.getAngle(), 360); }
+        double getTurnRate() { return mNavX.GetRate(); }
+        double getHeading() { return std::fmod(-mNavX.GetAngle(), 360); }
         void resetEncoders();
         void ZeroHeading() {mNavX.Reset();}
        
         //drive/swerve utils
-        SwerveModule getSwerveModule(int i) { return mSwerveModules[i]; }
+        SwerveModule& getSwerveModule(int i) { return mSwerveModules[i]; }
         frc::Pose2d getPose() { return odometry.GetPose(); }
 
         void drive(double xSpeed, double ySpeed, double rot, bool fieldRelative);
-        void setSwerveDriveBrakeMode(boolean on);
+        void setSwerveDriveBrakeMode(bool on);
         void setModuleStates(frc::SwerveModuleState desiredStates[4]);
         void updateOdometry();
         void resetOdometry(frc::Pose2d pose, frc::Rotation2d rotation);
         //don't really feel like updating sdb rn
         void periodic();
-        frc::Pose2d[] getModulePoses();
+        frc::Pose2d * getModulePoses();
         //could do sim perioic, sample traj
         
         //traj utils
@@ -45,7 +45,7 @@ class SwerveDrive : public frc2::SubsystemBase {
         double throttle = 0.8; //is this correct?
         double turningThrottle = 0.5;
 
-        frc::SwerveDriveOdometry odometry{DriveConstants::kDriveKinematics, getRotation()};
+        frc::SwerveDriveOdometry<4> odometry{DriveConstants::kDriveKinematics, getRotation()};
 
         double trajectoryTime;
         frc::Trajectory currTraj;
