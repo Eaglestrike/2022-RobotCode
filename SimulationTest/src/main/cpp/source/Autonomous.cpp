@@ -77,7 +77,7 @@ AutoMode::State ThreeBallAuto::Drive(double time) {
         swerve.ClearTraj();
         swerve.AddTrajPt(trajpts[index]); //may have to change if we want like a curved path (could have 2d array)
     }
-    swerve.TrajectoryFollow(navx.GetYaw(), false);
+   // swerve.TrajectoryFollow(navx.GetYaw(), false);
 
 //   if (swerve.AtTrajPoint(navx.GetYaw()) || time > times[index]) index++; //similarly may have to change
     return actions[index];
