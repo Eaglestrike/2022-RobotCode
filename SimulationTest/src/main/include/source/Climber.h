@@ -46,6 +46,11 @@ class Climber{
         //the below public functions are for testing
         void setTime(units::second_t time) {currTime = time.value();}
 
+        bool getFullExtendPneumatic() {return climbFullExtend.Get();}
+        bool getMedExtendPneumatic() {return climbMedExtend.Get();}
+        double getMasterMotorOutput() {return gearboxMaster.GetMotorOutputPercent(); }
+        double getSlaveMotorOutput() {return gearboxSlave.GetMotorOutputPercent(); }
+
         void InitializeTests();
         void Stop();
         void extendArmUntilStopped(bool inverted);

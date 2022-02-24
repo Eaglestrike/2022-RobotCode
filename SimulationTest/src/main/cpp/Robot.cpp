@@ -8,7 +8,11 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
-void Robot::RobotInit() {}
+void Robot::RobotInit() {
+  frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", m_climber.getFullExtendPneumatic());
+  frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
+  frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMasterMotorOutput());
+}
 
 void Robot::RobotPeriodic() {}
 
@@ -28,6 +32,9 @@ void Robot::SimulationPeriodic() {
 
 void Robot::TeleopInit() {
   //climber.SetState(Climber::State::IDLE); //comment in when running climber periodic
+  frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", m_climber.getFullExtendPneumatic());
+  frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
+  frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMasterMotorOutput());
 }
 
 
@@ -53,6 +60,11 @@ void Robot::TestPeriodic() {
 
 //put this here so we don't have to look at it 
 void Robot::climbTestPeriodic() {
+  frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", m_climber.getFullExtendPneumatic());
+  frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
+  frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMasterMotorOutput());
+
+
   m_climber.setTime(timer.Get());
    /** #1: test arm can extend, get extended position
    * Start from fully retracted position (or how the climber will be during most of teleop)
