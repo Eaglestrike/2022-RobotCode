@@ -14,13 +14,22 @@ void Climber::InitializeTests() {
 void Climber::Stop() {
     gearboxMaster.Set(ControlMode::PercentOutput, 0);
     gearboxMaster.SetNeutralMode(NeutralMode::Brake);
+    // climbMedExtend.Set(false);
+    // climbFullExtend.Set(false);
+    //std::cout << "stop\n";
     //could turn on pneumatic brake?
 }
 
 void Climber::extendArmUntilStopped(bool inverted) {
-    gearboxMaster.SetNeutralMode(NeutralMode::Coast);
-    if (inverted) gearboxMaster.Set(ControlMode::PercentOutput, -0.25);
-    else gearboxMaster.Set(ControlMode::PercentOutput, 0.25);
+    // gearboxSlave.SetNeutralMode(NeutralMode::Coast);
+    // gearboxMaster.SetNeutralMode(NeutralMode::Coast);
+    // if (inverted) gearboxMaster.Set(ControlMode::PercentOutput, -0.25);
+    // else gearboxMaster.Set(ControlMode::PercentOutput, 0.25);
+    if (gearboxMaster.GetSelectedSensorPosition() > ClimbConstants::motorExtendedPose) {
+        if (inverted) gearboxMaster.Set(ControlMode::PercentOutput, -0.25);
+        else gearboxMaster.Set(ControlMode::PercentOutput, 0.25);
+    }
+    else (gearboxMaster.SetNeutralMode(NeutralMode::Brake));
     std::cout << "motor positon: " << gearboxMaster.GetSelectedSensorPosition() << "\n";
     //std::cout << "current: " << gearboxMaster.GetStatorCurrent() << "\n";
     if (gearboxMaster.GetStatorCurrent() > 200) std::cout << "high current, probably wrong direction\n";
@@ -28,14 +37,14 @@ void Climber::extendArmUntilStopped(bool inverted) {
 
 void Climber::retractArm() {
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
-    while (gearboxMaster.GetSelectedSensorPosition() > ClimbConstants::motorRetractedPose) {
-        gearboxMaster.Set(ControlMode::PercentOutput, -0.25);
+    if (/*gearboxMaster.GetSelectedSensorPosition() < ClimbConstants::motorRetractedPose*/true) {
+        gearboxMaster.Set(ControlMode::PercentOutput, 0.25);
     }
 }
 
 void Climber::setArmLowered() {
-    climbMedExtend.Set(true);
-    climbFullExtend.Set(true);
+    climbMedExtend.Set(false);
+    climbFullExtend.Set(false);
 }
 
 void Climber::setArmRaised() {
@@ -44,8 +53,8 @@ void Climber::setArmRaised() {
 }
 
 void Climber::setArmVertical() {
-    climbMedExtend.Set(false);
-    climbFullExtend.Set(false);
+    climbMedExtend.Set(true);
+    climbFullExtend.Set(true);
 }
 
 
@@ -59,13 +68,14 @@ void Climber::testRaiseVerticalArm() {
     gearboxMaster.Set(ControlMode::PercentOutput, 
         std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
         ClimbConstants::motorExtendedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
+    //gearboxMaster.Set(ControlMode::PercentOutput, motorProfiledPID.Calculate(136167_m));
     
 }
 
 void Climber::testRetractVerticalArm() {
   //  SetState(VERTICAL_ARM_RETRACT);
      
-    gearboxMaster.SetNeutralMode(NeutralMode::Coast);
+    gearboxMaster.SetNeutralMode(NeutralMode::Coast);   
     gearboxMaster.Set(ControlMode::PercentOutput, 
         std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
         ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));

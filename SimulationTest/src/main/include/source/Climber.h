@@ -4,7 +4,13 @@
 #include <iostream>
 #include <ctre/Phoenix.h>
 #include <frc/Solenoid.h>
+#include <frc/controller/ProfiledPIDController.h>
+#include <frc/trajectory/TrapezoidProfile.h>
 #include <frc/controller/PIDController.h>
+#include <units/acceleration.h>
+#include <units/length.h>
+#include <units/time.h>
+#include <units/velocity.h>
 
 class Climber{
     public:
@@ -69,6 +75,7 @@ class Climber{
         //getters and setters for simulation
         WPI_TalonFX& getMotor() {return gearboxMaster;}
         frc2::PIDController getPIDCntrl() {return motorPIDController;}
+        frc::ProfiledPIDController<units::meters> getProfiledPID() {return motorProfiledPID; }
         frc::Solenoid& getFullExtend() {return climbFullExtend;}
         frc::Solenoid& getMedExtend() {return climbMedExtend;}
         frc::Solenoid& getBrake() {return brake;}
@@ -88,6 +95,7 @@ class Climber{
         bool pitchGood(double pitch, double delta_pitch);
         bool pitchVeryBad(double pitch, double delta_pitch);
         bool stateJustChanged();
+        units::length::meter_t meterPose();
 
         WPI_TalonFX gearboxMaster{ClimbConstants::gearboxPort1};
         WPI_TalonFX gearboxSlave{ClimbConstants::gearboxPort2};
@@ -95,6 +103,8 @@ class Climber{
         //want to be fairly slow...
          frc2::PIDController motorPIDController{ClimbConstants::motorP,
             ClimbConstants::motorI, ClimbConstants::motorD};
+        frc::TrapezoidProfile<units::meters>::Constraints constraints{ClimbConstants::motorMaxVel, ClimbConstants::motorMaxAcc};
+        frc::ProfiledPIDController<units::meters> motorProfiledPID{ClimbConstants::motorP, ClimbConstants::motorI, ClimbConstants::motorD, constraints};
 
         //Higher pneumatic
         frc::Solenoid climbFullExtend{frc::PneumaticsModuleType::REVPH, 

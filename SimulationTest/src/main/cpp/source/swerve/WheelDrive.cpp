@@ -1,10 +1,11 @@
 #include <WheelDrive.h>
+#include <iostream>
 
 
 //Constructor for Swerve Module Object
 WheelDrive::WheelDrive(int angleMotorPort, int speedMotorPort,
     int encoderPortA, int encoderPortB, int pwmPort)
-    : angleMotor(angleMotorPort), speedMotor(speedMotorPort),
+    : angleMotor(angleMotorPort, "Drivebase"), speedMotor(speedMotorPort, "Drivebase"),
     encoder(encoderPortA, encoderPortB), absEncoder(pwmPort){
     pidController.EnableContinuousInput(-180, 180);
     initializeController.EnableContinuousInput(0,1);
@@ -30,6 +31,8 @@ WheelDrive::drive(double speed, double angle){
     
     m_speedOut = (m_reverse)? -1*0.87*speed: 0.87*speed;
     
+    std::cout << "setting: " << m_speedOut << "\n";
+
     speedMotor.Set(m_speedOut);
     angleMotor.Set(turnOutput);
 }

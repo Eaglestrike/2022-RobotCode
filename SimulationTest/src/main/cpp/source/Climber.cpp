@@ -5,14 +5,16 @@
 
 //Constructor
 Climber::Climber(){
-    motorPIDController.SetTolerance(ClimbConstants::motorPoseTolerance, ClimbConstants::deltaMotorPoseTolerance);
+    motorPIDController.SetTolerance(ClimbConstants::motorPoseTolerance.value(), ClimbConstants::deltaMotorPoseTolerance.value());
+    //motorProfiledPID.SetTolerance(ClimbConstants::motorPoseTolerance, ClimbConstants::deltaMotorPoseTolerance);
 
     climbFullExtend.Set(true);
-    climbMedExtend.Set(true);
+    climbMedExtend.Set(false);
 
+    gearboxSlave.SetInverted(true);
     gearboxSlave.Follow(gearboxMaster);
-    gearboxMaster.SetNeutralMode(NeutralMode::Brake);
     gearboxMaster.SetInverted(true);
+    gearboxMaster.SetNeutralMode(NeutralMode::Brake);
     gearboxMaster.SetSelectedSensorPosition(0);   
 
     brake.Set(true); 
@@ -70,7 +72,7 @@ Climber::State Climber::VerticalArmExtend(bool drivenForward){
     gearboxMaster.Set(ControlMode::PercentOutput, 
         std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
         ClimbConstants::motorExtendedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
-    
+
     if (drivenForward && currTime <= ClimbConstants::verticalArmExtendEnoughTime && motorDone(ClimbConstants::motorExtendedPose)) return VERTICAL_ARM_RETRACT; 
     else return VERTICAL_ARM_EXTEND;
 }
@@ -219,6 +221,12 @@ bool Climber::waited(double time, double startTime) {
 //are we in a new state (this is important for waited)
 bool Climber::stateJustChanged() {
     return state != prevState;
+}
+
+units::length::meter_t Climber::meterPose() {
+    //4096 ticks per rot. has to turn 10.39 rot befor actual spool turns once. spool circumference is 0.1 m
+    //return units::meter_t{gearboxMaster.GetSelectedSensorPosition() / 4096 / 10.39 * 0.1};
+    return units::meter_t{gearboxMaster.GetSelectedSensorPosition()};
 }
 
 //Calibration function for whatever

@@ -1,4 +1,8 @@
 #pragma once
+#include <units/acceleration.h>
+#include <units/length.h>
+#include <units/time.h>
+#include <units/velocity.h>
 
 
 namespace
@@ -152,9 +156,9 @@ namespace
 ClimbConstants{
     const int gearboxPort1 = 30; //confirmed
     const int gearboxPort2 = 31; //confirmed
-    const int solenoid1Port = 1; 
+    const int solenoid1Port = 3; 
     const int solenoid2Port = 2;
-    const int BrakeSolenoidPort = 3; //what is it?
+    const int BrakeSolenoidPort = 1; //what is it?
 
     //!!!!!!!! none of the below are correct! they are in use purely for simulation atm !!!!!!!!!
 
@@ -180,16 +184,19 @@ ClimbConstants{
     const double diagonalArmExtendWaitTime = 0;
     const double diagonalArmRaiseWaitTime = 0;
 
-    const double motorPoseTolerance = 100;
-    const double deltaMotorPoseTolerance = 100;
-
-    const double motorExtendedPose = 10000;
+    const double motorExtendedPose = -136167;
     const double motorTestExtendPose = 9000;
-    const double motorRetractedPose = 0;
+    const double motorRetractedPose = -200;
 
-    const double motorP = 0.0006;
-    const double motorI = 0;
+    const double motorP = 0.00001;
+    const double motorI = 0.000007;
     const double motorD = 0;
+
+    const units::unit_t<units::length::meter, double, units::linear_scale> motorPoseTolerance = 0.05_m;
+    const units::unit_t<units::velocity::meters_per_second, double, units::linear_scale> deltaMotorPoseTolerance = 0.01_mps;
+
+    const units::unit_t<units::velocity::meters_per_second, double, units::linear_scale> motorMaxVel = 1.75_mps;
+    const units::unit_t<units::acceleration::meters_per_second_squared, double, units::linear_scale> motorMaxAcc = 0.75_mps_sq;
 
     const double motorMaxOutput = 1;
 }

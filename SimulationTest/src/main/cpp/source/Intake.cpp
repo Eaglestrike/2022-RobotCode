@@ -4,6 +4,7 @@
 Intake::Intake(){
     intakeMotor.SetNeutralMode(NeutralMode::Coast);
     intakeMotor.SetSafetyEnabled(false);
+    pneumatic.Set(true);
 }
 
 
