@@ -18,17 +18,8 @@
 #include "Autonomous.h"
 #include "testClimbOneBar.h"
 #include "Limelight.h"
+#include <frc/Timer.h>
 
-
-frc::Joystick l_joy{OIConstants::l_joy_port};
-frc::Joystick r_joy{OIConstants::r_joy_port};
-frc::XboxController xbox{OIConstants::O_joy_port};
-//frc::Compressor m_compressor{frc::PneumaticsModuleType::REVPH};
-
-double m_time = 0;
-double m_timeStep = GeneralConstants::timeStep;
-
-AHRS *navx;
 
 class Robot : public frc::TimedRobot {
  public:
@@ -63,12 +54,23 @@ class Robot : public frc::TimedRobot {
   const std::string kAutoNameDefault = "Default";
   const std::string kAutoNameCustom = "My Auto";
   std::string m_autoSelected;
-
-  frc::Timer timer;
+  
   Limelight limelight;
   testClimbOneBar test{m_climber};
 
   AHRS *navx;
   SwerveDrive m_swerve;
+
+
+  frc::Joystick l_joy{OIConstants::l_joy_port};
+  frc::Joystick r_joy{OIConstants::r_joy_port};
+  frc::XboxController xbox{OIConstants::O_joy_port};
+  //frc::Compressor m_compressor{frc::PneumaticsModuleType::REVPH};
+
+  frc::Timer timer;
+
+  double m_time = 0;
+  double m_timeStep = GeneralConstants::timeStep;
+
 
 };

@@ -31,57 +31,61 @@ DriveConstants{
     const double Width = 29;
     const double Length = 29;
 
-    //Absolute Encoder Offset Values - SwerveDrive.h
-    const double FLOFF = 0.43;
-    const double FROFF = 0.695;
-    const double BLOFF = 0.78;
-    const double BROFF = 0.19;
+    //Absolute Encoder offsets
+    const double FLOFF = -108.5;
+    const double FROFF = 157.0;
+    const double BLOFF = 7.91;
+    const double BROFF = -18.98;
 
     //Ports for Back Right Swerve Module - SwerveDrive.h
     const int BRanglePort = 18;
     const int BRspeedPort = 17;
-    const int BRencoderPortA = 6;
-    const int BRencoderPortB = 7;
-    const int BRencoderPWM = 13;
+    const int BRencoder = 8;
+    //const int BRencoderPortA = 6;
+    //const int BRencoderPortB = 7;
+    //const int BRencoderPWM = 13;
 
     //Ports for Back Left Swerve Module - SwerveDrive.h
     const int BLanglePort = 16;
     const int BLspeedPort = 15;
-    const int BLencoderPortA = 4;
-    const int BLencoderPortB = 5;
-    const int BLencoderPWM = 12;
+    const int BLencoder = 42;
+    //const int BLencoderPortA = 4;
+    //const int BLencoderPortB = 5;
+    //const int BLencoderPWM = 12;
 
     //Ports for Front Right Swerve Module - SwerveDrive.h
     const int FRanglePort = 14;
     const int FRspeedPort = 13;
-    const int FRencoderPortA = 2;
-    const int FRencoderPortB = 3;
-    const int FRencoderPWM = 11;
+    const int FRencoder = 62;
+    //const int FRencoderPortA = 2;
+    //const int FRencoderPortB = 3;
+    //const int FRencoderPWM = 11;
 
     //Ports for Front Left Swerve Module - SwerveDrive.h
     const int FLanglePort = 12;
     const int FLspeedPort = 11;
-    const int FLencoderPortA = 0;
-    const int FLencoderPortB = 1;
-    const int FLencoderPWM = 10;
+    const int FLencoder = 10;
+    //const int FLencoderPortA = 0;
+    //const int FLencoderPortB = 1;
+    //const int FLencoderPWM = 10;
 
     //Wheeldrive 
     constexpr double MAX_VOLTS = 1.0;
     const double speedGearRatio = 1/6.12;
     const double angleGearRatio = 1/12.8;
-    const double P = 0.012;
-    const double I = 0.008;
-    const double D = 0.0001;
-    const double Pinit = 4.8;
-    const double Iinit = 1.2;
-    const double Dinit = 0.02;
+    const double P = 0.006;
+    const double I = 0.001;
+    const double D = 0.0002;
+    const double Pinit = 0.008;
+    const double Iinit = 0.001;
+    const double Dinit = 0.0001;
 
     //Swerve Controller
-    const double fwdstrP = 0.45;
+    const double fwdstrP = 0.58;
     const double fwdstrI = 0.0;
     const double fwdstrD = 0.0;
-    const double rotP = 0.0006;
-    const double rotI = 0.00004;
+    const double rotP = 0.0011;
+    const double rotI = 0.00006;
     const double rotD = 0.0;
 }
 
@@ -185,18 +189,15 @@ ClimbConstants{
     const double diagonalArmRaiseWaitTime = 0;
 
     const double motorExtendedPose = -136167;
-    const double motorTestExtendPose = 9000;
+    const double motorTestExtendPose = -100000;
     const double motorRetractedPose = -200;
 
     const double motorP = 0.00001;
     const double motorI = 0.000007;
     const double motorD = 0;
 
-    const units::unit_t<units::length::meter, double, units::linear_scale> motorPoseTolerance = 0.05_m;
-    const units::unit_t<units::velocity::meters_per_second, double, units::linear_scale> deltaMotorPoseTolerance = 0.01_mps;
-
-    const units::unit_t<units::velocity::meters_per_second, double, units::linear_scale> motorMaxVel = 1.75_mps;
-    const units::unit_t<units::acceleration::meters_per_second_squared, double, units::linear_scale> motorMaxAcc = 0.75_mps_sq;
+    const double motorPoseTolerance = 100;
+    const double deltaMotorPoseTolerance = 50;
 
     const double motorMaxOutput = 1;
 }

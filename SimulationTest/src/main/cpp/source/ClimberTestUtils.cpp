@@ -63,7 +63,9 @@ void Climber::setArmVertical() {
 
 void Climber::testRaiseVerticalArm() {
    // SetState(VERTICAL_ARM_EXTEND);
-    
+   climbMedExtend.Set(true);
+   climbFullExtend.Set(true);
+   std::cout << "here\n";    
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
     gearboxMaster.Set(ControlMode::PercentOutput, 
         std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 

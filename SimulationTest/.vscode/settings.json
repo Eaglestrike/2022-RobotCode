@@ -83,6 +83,7 @@
     "bitset": "cpp",
     "cfenv": "cpp",
     "typeindex": "cpp",
-    "valarray": "cpp"
+    "valarray": "cpp",
+    "*.inc": "cpp"
   }
 }

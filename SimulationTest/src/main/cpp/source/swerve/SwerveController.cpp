@@ -7,21 +7,21 @@ SwerveController::SwerveController(){}
 //Calculate forward PID output
 double 
 SwerveController::calculateForward(double goal){
-    return m_forwardcontroller.Calculate(m_forward, goal);
+    return std::clamp(m_forwardcontroller.Calculate(m_forward, goal), -0.6, 0.6);
 }
 
 
 //Calculate strafe PID output
 double 
 SwerveController::calculateStrafe(double goal){
-    return m_strafecontroller.Calculate(m_strafe, goal);
+    return std::clamp(-m_strafecontroller.Calculate(m_strafe, goal), -0.6, 0.6);
 }
 
 
 //Calculate rotation PID output
 double 
 SwerveController::calculateRotation(double goal){
-    return m_rotationcontroller.Calculate(m_rotation, goal);
+    return std::clamp(m_rotationcontroller.Calculate(m_rotation, goal), -0.5, 0.5);
 }
 
 

@@ -14,17 +14,19 @@
 
 class WheelDrive{
     public:
-        WheelDrive(int angleMotorPort, int speedMotorPort, 
-            int encoderPortA, int encoderPortB, int pwmPort);
-        void drive(double speed, double angle);
+        // WheelDrive(int angleMotorPort, int speedMotorPort, 
+        //     int encoderPortA, int encoderPortB, int pwmPort);
+        WheelDrive(int angleMotorPort, int speedMotorPort,
+            int encoderPort);
+        void drive(double speed, double angle, double offSet);
         void setPID();
         double normalizeEncoderValue();
         double getVelocity();
-        double getAngle();
+        double getAngle(double offset);
         void resetEncoder();
         void initialization(double Offset);
         void Debug();
-        double GetabsAngle();
+        void Stop();
     
     private:
         static constexpr double MAX_VOLTS = DriveConstants::MAX_VOLTS;
@@ -40,10 +42,8 @@ class WheelDrive{
 
         WPI_TalonFX angleMotor;
         WPI_TalonFX speedMotor;
-        
-        frc::Encoder encoder;
 
-        frc::DutyCycleEncoder absEncoder;
+        WPI_CANCoder m_canCoder;
         
         frc2::PIDController pidController{DriveConstants::P , DriveConstants::I, DriveConstants::D};
         frc2::PIDController initializeController{DriveConstants::Pinit,

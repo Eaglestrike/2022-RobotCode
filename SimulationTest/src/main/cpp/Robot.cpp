@@ -9,17 +9,19 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 void Robot::RobotInit() {
+  timer.Reset();
   limelight.setLEDMode("OFF");
   frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", m_climber.getFullExtendPneumatic());
   frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
   frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMasterMotorOutput());
+  frc::SmartDashboard::PutNumber("Gearbox master position: ", m_climber.getMotor().GetSelectedSensorPosition());
 
-   m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
+  m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
   m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
   frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
   try{
     navx = new AHRS(frc::SPI::Port::kMXP);
-  } catch(const std::exception& e){
+  } catch(const std::exception& e) {
     std::cout << e.what() <<std::endl;
   }
 
@@ -27,7 +29,8 @@ void Robot::RobotInit() {
 
 void Robot::RobotPeriodic() {}
 
-void Robot::AutonomousInit() {}
+void Robot::AutonomousInit() {
+}
 
 void Robot::AutonomousPeriodic() {}
 
@@ -45,6 +48,7 @@ void Robot::SimulationPeriodic() {
 
 
 void Robot::TeleopInit() {
+  timer.Reset();
   limelight.setLEDMode("OFF");
   i = 0;
   timer.Reset();
@@ -52,6 +56,7 @@ void Robot::TeleopInit() {
   frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", m_climber.getFullExtendPneumatic());
   frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
   frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMasterMotorOutput());
+  frc::SmartDashboard::PutNumber("Gearbox master position: ", m_climber.getMotor().GetSelectedSensorPosition());
   //m_climber.getMotor().SetNeutralMode(NeutralMode::Coast);
 }
 
@@ -78,6 +83,8 @@ void Robot::TeleopPeriodicInit() {
 
 /*** Before running these tests, motor and pneumatic ports must be confirmed***/
 
+double prevPitch = 0;
+
 void Robot::TeleopPeriodic() {
   //i++;
   //std::cout << "time: " << i * 0.02 << "\n";
@@ -87,13 +94,20 @@ void Robot::TeleopPeriodic() {
   m_swerve.Drive(-x1, -y1, -x2, navx->GetYaw(), true);
   m_swerve.UpdateOdometry(navx->GetYaw());
 
-
   climbTestPeriodic();
+
+  // m_climber.Periodic(navx->GetPitch()-prevPitch, navx->GetPitch(), timer.Get().value(), 
+  // xbox.GetRawButton(1),  xbox.GetRawButton(2),  xbox.GetRawButton(3),  xbox.GetRawButton(4),  xbox.GetRawButton(8));
+  prevPitch = navx->GetPitch();
 }
 
-void Robot::DisabledInit() {}
+void Robot::DisabledInit() {
+  m_climber.getMotor().SetNeutralMode(NeutralMode::Brake);
+}
 
-void Robot::DisabledPeriodic() {}
+void Robot::DisabledPeriodic() {
+  m_climber.getMotor().SetNeutralMode(NeutralMode::Brake);
+}
 
 void Robot::TestInit() {
   timer.Reset();
