@@ -35,8 +35,8 @@ void PhysicsSim::TalonFXSimProfile::Run() {
 
     double supplyCurrent = fabs(outPerc) * 30 * random(0.95, 1.05);
     double statorCurrent = outPerc == 0 ? 0 : supplyCurrent / fabs(outPerc);
-    _talon.GetSimCollection().SetSupplyCurrent(supplyCurrent);
-    _talon.GetSimCollection().SetStatorCurrent(statorCurrent);
+    _talon.GetSimCollection().SetSupplyCurrent(300);
+    _talon.GetSimCollection().SetStatorCurrent(300);
 
     _talon.GetSimCollection().SetBusVoltage(12 - outPerc * outPerc * 3/4 * random(0.95, 1.05));
 }

@@ -74,6 +74,8 @@ bool testClimbOneBar::extending() {
         }
     }
 
+    
+
     return true;
 }
 
