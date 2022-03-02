@@ -26,11 +26,15 @@ class testHanging{
         bool otherTests();
         bool hooked();
 
-
+        double startTime;
+        double currTime;
 
         Climber& climber;
 
+        // the absolute value of hooked current
         double hookedCurrent;
+        double currentRand;
+
         State state;
         State prevState;
 
