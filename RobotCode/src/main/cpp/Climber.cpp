@@ -7,11 +7,12 @@
 Climber::Climber(){
     motorPIDController.SetTolerance(ClimbConstants::motorPoseTolerance, ClimbConstants::deltaMotorPoseTolerance);
 
-    climbFullExtend.Set(false);
-    climbMedExtend.Set(false);
+    climbFullExtend.Set(true);
+    climbMedExtend.Set(true);
 
     gearboxSlave.Follow(gearboxMaster);
     gearboxMaster.SetNeutralMode(NeutralMode::Brake);
+    gearboxMaster.SetInverted(true);
     gearboxMaster.SetSelectedSensorPosition(0);   
 
     brake.Set(true); 
@@ -21,17 +22,17 @@ Climber::Climber(){
 //Periodic Function
 
 void
-Climber::Periodic(double delta_pitch, double pitch, double time, bool passIdle, bool drivenForward, bool passDiagonalArmRaise, bool doSecondClimb){
+Climber::Periodic(double delta_pitch, double pitch, double time, bool passIdle, bool drivenForward, bool retryFirstClimb, bool passDiagonalArmRaise, bool doSecondClimb){
     currTime = time;
     switch(state){
-        case IDLE:
+        case IDLE: //needs human input to start climb
             SetState(Idle(passIdle)); 
             break;
-        case VERTICAL_ARM_EXTEND: //needs human input to move on
+        case VERTICAL_ARM_EXTEND: //needs human input to move to retracting
             SetState(VerticalArmExtend(drivenForward));
             break;
          case VERTICAL_ARM_RETRACT:
-            SetState(VerticalArmRetract(pitch, delta_pitch));
+            SetState(VerticalArmRetract(pitch, delta_pitch, retryFirstClimb));
             break;
         case TEST_DIAGONAL_ARM_EXTEND:
             SetState(TestDiagonalArmExtend());
@@ -42,20 +43,19 @@ Climber::Periodic(double delta_pitch, double pitch, double time, bool passIdle, 
          case DIAGONAL_ARM_RAISE:  //needs human input to move on
             SetState(DiagonalArmRaise(passDiagonalArmRaise));
             break;
-         case DIAGONAL_ARM_RETRACT: 
-            SetState(DiagonalArmRetract(doSecondClimb));
+         case DIAGONAL_ARM_RETRACT: //needs human input to do second climb
+            SetState(DiagonalArmRetract(doSecondClimb, pitch, delta_pitch));
             break;
         default:
             break;
     }
 }
 
-//BE CAREFUL ABOUT CHANGING ORDER OF LINES!!! MAY AFFECT TIME SENSITIVE WAITS!!!
-
+//states (https://docs.google.com/document/d/1I5caybg-bhfEYwxfIL1PCXAbqdznW7Qo1R-ZHObqCiY/edit?usp=sharing)
 
 Climber::State Climber::Idle(bool passIdle){
-    climbFullExtend.Set(false);
-    climbMedExtend.Set(false);
+    climbFullExtend.Set(true);
+    climbMedExtend.Set(true);
     gearboxMaster.SetNeutralMode(NeutralMode::Brake);
     brake.Set(true);
 
@@ -75,16 +75,16 @@ Climber::State Climber::VerticalArmExtend(bool drivenForward){
     else return VERTICAL_ARM_EXTEND;
 }
 
-Climber::State Climber::VerticalArmRetract(double pitch, double delta_pitch){
+Climber::State Climber::VerticalArmRetract(double pitch, double delta_pitch, bool retry){
+    if (retry) return VERTICAL_ARM_EXTEND;
+
     brake.Set(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
 
     gearboxMaster.Set(ControlMode::PercentOutput, 
         std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
         ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
-    std::cout << "motor output: " << std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
-        ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput) << "\n";
-
+    
     if (motorDone(ClimbConstants::motorRetractedPose) || currTime >= ClimbConstants::almostDoneTime) {
         gearboxMaster.SetNeutralMode(NeutralMode::Brake);
         brake.Set(true);
@@ -106,8 +106,11 @@ Climber::State Climber::TestDiagonalArmExtend() {
 
     if (stateJustChanged()) waitStartTime = currTime;
 
-    if (waited(ClimbConstants::timeToTestExtension, waitStartTime) && hooked()) { std::cout << "hooked\n"; return DIAGONAL_ARM_EXTEND; }
-    else { std::cout << "too early or not hooked\n"; return VERTICAL_ARM_RETRACT; }
+     if (!waited(ClimbConstants::timeToTestExtension, waitStartTime)) {
+        return TEST_DIAGONAL_ARM_EXTEND;
+    }
+    else if (hooked()) return DIAGONAL_ARM_EXTEND; 
+    else return VERTICAL_ARM_RETRACT; 
 }
 
 
@@ -115,9 +118,25 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch){
     brake.Set(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
 
+    if (pitchVeryBad(pitch, delta_pitch)) pitchBad = true;
+    if (pitchGood(pitch, delta_pitch)) pitchBad = false;
+
+    //this is up for change - I mostly just wanted a way to try and save the arm or maybe save the robot from falling
+    //if, for example, other robots are bumping into us. I could also add a thing where the arm will retract if a 
+    //specific button is pushed
+    if (pitchBad) {
+        climbMedExtend.Set(true);
+        climbFullExtend.Set(true);
+        gearboxMaster.Set(ControlMode::PercentOutput, 
+            std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
+            ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
+        waitStartTime = currTime; //so that we start over again when we try to re-extend solenoids
+        return DIAGONAL_ARM_EXTEND;
+    }
+
     if (stateJustChanged()) waitStartTime = currTime; //so only at start of state. i might try to implement a better way to determine this
-    climbMedExtend.Set(true);
-    climbFullExtend.Set(true);
+    climbMedExtend.Set(false);
+    climbFullExtend.Set(false);
     if (waited(ClimbConstants::diagonalArmExtendWaitTime, waitStartTime)) {
         gearboxMaster.Set(ControlMode::PercentOutput, 
             std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
@@ -130,25 +149,29 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch){
 }
 
 Climber::State Climber::DiagonalArmRaise(bool passDiagonalArmRaise){
-    //be in brake here?
+    //perhaps be in brake here?
     brake.Set(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
 
     if (stateJustChanged()) waitStartTime = currTime;
-    climbFullExtend.Set(false);
+    climbMedExtend.Set(false);
+    climbFullExtend.Set(true);
     if (waited(ClimbConstants::diagonalArmRaiseWaitTime, waitStartTime) && passDiagonalArmRaise && currTime <= ClimbConstants::diagonalArmRaiseEnoughTime) 
         return DIAGONAL_ARM_RETRACT; 
     else return DIAGONAL_ARM_RAISE;
 }
 
-Climber::State Climber::DiagonalArmRetract(bool doSecondClimb){
+Climber::State Climber::DiagonalArmRetract(bool doSecondClimb, double pitch, double delta_pitch){
+    brake.Set(false);
+    gearboxMaster.SetNeutralMode(NeutralMode::Coast);
+    
     gearboxMaster.Set(ControlMode::PercentOutput, 
         std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
         ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
     if (stateJustChanged()) waitStartTime = currTime;
     if (waited(ClimbConstants::waitToRaiseVerticalTime, waitStartTime)) {
-        climbFullExtend.Set(false);
-        climbMedExtend.Set(false);
+        climbFullExtend.Set(true);
+        climbMedExtend.Set(true);
     }
 
     if (motorDone(ClimbConstants::motorRetractedPose) || currTime >= ClimbConstants::almostDoneTime) {
@@ -156,42 +179,49 @@ Climber::State Climber::DiagonalArmRetract(bool doSecondClimb){
         brake.Set(true);
     }
 
-    if (motorDone(ClimbConstants::motorRetractedPose) && doSecondClimb && currTime <= ClimbConstants::diagonalArmRetractEnoughTime) 
+    if (motorDone(ClimbConstants::motorRetractedPose) && pitchGood(pitch, delta_pitch) && doSecondClimb && currTime <= ClimbConstants::diagonalArmRetractEnoughTime) 
         return TEST_DIAGONAL_ARM_EXTEND;
     else return DIAGONAL_ARM_RETRACT;
 }  
 
-//add safety state that slowly lowers robot if engaged on non-static hooks?
 
-
+//have the static hooks engaged
 bool Climber::hooked() {
     return (gearboxMaster.GetStatorCurrent() >= ClimbConstants::hookedCurrent);
 }
 
-//kinda redundant now that i figured out a better way to do this, may erase at some point
+//is the motor at set point (kinda redundant now that I know about AtSetpoint(), may erase later)
 bool Climber::motorDone(double pose) {
     return (motorPIDController.AtSetpoint());
 
 }
 
-//may have to un-function this if we want tolerances to be different, but this helps for readability & re-usability if not
+//has the climber swinging stabilized enough to continue
+//may have to un-function this if we want tolerances to be different for different states, but this helps for readability & re-usability if not
 bool Climber::pitchGood(double pitch, double delta_pitch) {
-    return (pitch < ClimbConstants::acceptablePitch && abs(delta_pitch) < ClimbConstants::deltaPitchTolerance);
+    return (abs(pitch) < ClimbConstants::acceptablePitch && abs(delta_pitch) < ClimbConstants::deltaPitchTolerance);
+}
+
+//this is if the pitch is so bad we are going to fall off as diagonal arm extends and we need to bring it back in
+bool Climber::pitchVeryBad(double pitch, double delta_pitch) {
+    return (abs(pitch) > ClimbConstants::veryBadPitch || abs(delta_pitch) > ClimbConstants::veryBadDeltaPitch);
 }
 
 
 
-//set new state function
+//set new state function, update prev state (this is important for waited)
 void
 Climber::SetState(State newState){
     prevState = state;
     state = newState;
 }
 
+//has the time passed
 bool Climber::waited(double time, double startTime) {
-    return (startTime + time) >= currTime;
+    return (startTime + time) <= currTime;
 }
 
+//are we in a new state (this is important for waited)
 bool Climber::stateJustChanged() {
     return state != prevState;
 }

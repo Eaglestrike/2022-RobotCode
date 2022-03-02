@@ -9,6 +9,8 @@
 #include "Channel.h"
 #include <vector>
 #include <unordered_map>
+#include <rev/ColorSensorV3.h>
+#include "rev/ColorMatch.h"
 
 
 class Shooter{
@@ -47,6 +49,11 @@ class Shooter{
         frc::DigitalInput m_turretLimitSwitch{ShooterConstants::turretLimitSwitch};
         frc::DigitalInput m_photogate{ShooterConstants::photogate};
 
+        rev::ColorSensorV3 colorSensor{frc::I2C::Port::kMXP}; //the more useless one
+        rev::ColorMatch colorMatcher;
+        frc::Color red{0.561, 0.232, 0.114}; //red
+        frc::Color blue{0.143, 0.427, 0.429}; //blue
+
         frc2::PIDController m_turretController{ShooterConstants::turretP,
             ShooterConstants::turretI, ShooterConstants::turretD};
         frc2::PIDController m_flywheelController{ShooterConstants::flywheelP,
@@ -54,7 +61,7 @@ class Shooter{
         frc2::PIDController m_hoodController{ShooterConstants::hoodP,
             ShooterConstants::hoodI, ShooterConstants::hoodD};
 
-        State m_state;
+        State m_state = IDLE;
 
         Limelight * m_limelight = new Limelight();
 

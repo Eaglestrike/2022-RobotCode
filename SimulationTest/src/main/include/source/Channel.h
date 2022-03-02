@@ -21,5 +21,5 @@ class Channel{
     private:
         WPI_TalonFX m_channel{ChannelConstants::channelMotorPort};
 
-        State state;
+        State state = IDLE;
 };

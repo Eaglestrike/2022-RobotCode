@@ -3,6 +3,8 @@
 #include "Constants.h"
 #include <ctre/Phoenix.h>
 #include <frc/DigitalInput.h>
+#include <rev/ColorMatch.h>
+#include <rev/ColorSensorV3.h>
 
 
 class Channel{
@@ -21,5 +23,5 @@ class Channel{
     private:
         WPI_TalonFX m_channel{ChannelConstants::channelMotorPort};
 
-        State state;
+        State state = IDLE;
 };

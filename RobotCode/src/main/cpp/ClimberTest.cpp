@@ -13,10 +13,22 @@ void Climber::InitializeTests() {
 
 void Climber::testRaiseVerticalArm() {
     SetState(VERTICAL_ARM_EXTEND);
+    /* 
+    gearboxMaster.SetNeutralMode(NeutralMode::Coast);
+    gearboxMaster.Set(ControlMode::PercentOutput, 
+        std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
+        ClimbConstants::motorExtendedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
+    */
 }
 
 void Climber::testRetractVerticalArm() {
     SetState(VERTICAL_ARM_RETRACT);
+    /* 
+    gearboxMaster.SetNeutralMode(NeutralMode::Coast);
+    gearboxMaster.Set(ControlMode::PercentOutput, 
+        std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
+        ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
+    */
 }
 
 void Climber::testSeesIfHooked() {

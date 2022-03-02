@@ -1,7 +1,21 @@
 {
   "NTProvider": {
     "types": {
-      "/FMSInfo": "FMSInfo"
+      "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Ungrouped/DigitalInput[0]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[10]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[11]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[12]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[13]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[1]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[2]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[3]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[4]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[5]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[6]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[7]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[8]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[9]": "Digital Input"
     }
   }
 }

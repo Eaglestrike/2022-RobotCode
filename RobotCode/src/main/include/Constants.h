@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 
 namespace
@@ -9,6 +10,10 @@ GeneralConstants{
     const double goalHeight = 2.641;
     const double cameraHeight = 0.4572;
     const double cameraPitch = 50;
+
+    //comment in/out or find a way to select with sdb
+    const std::string matchColor = "RED";
+   // const std::string matchColor = "BLUE";
 }
 
 
@@ -174,6 +179,8 @@ ClimbConstants{
 
     const double acceptablePitch = 5;
     const double deltaPitchTolerance = 10;
+    const double veryBadPitch = 15;
+    const double veryBadDeltaPitch = 20;
 
     const double diagonalArmExtendWaitTime = 0;
     const double diagonalArmRaiseWaitTime = 0;
@@ -203,3 +210,10 @@ ChannelConstants{
 //1 is disk brake for climber gearbox
 // 2 is climb first stage
 // 3 is climb 2nd stage
+
+
+//todo: initialize
+namespace
+AutonConstants {
+    const int exitTarmacTicks = 0;
+}

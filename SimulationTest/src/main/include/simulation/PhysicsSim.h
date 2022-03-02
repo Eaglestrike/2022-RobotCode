@@ -15,6 +15,8 @@ public:
     void AddTalonFX(TalonFX &talon, double const accelToFullTime, double const fullVel, bool const sensorPhase = false);
     void Run();
 
+   void setFirstTalonCurrent(double current); //yes i am being cheap
+
 private:
     std::vector<SimProfile*> _simProfiles; //list of sim profiles (like simulated talonfx)
 
@@ -30,6 +32,8 @@ private:
     public:
         virtual void Run() {}
         virtual ~SimProfile() {}
+
+        virtual void setTalonCurrent(double current) {}
 
     protected:
         double GetPeriod();
@@ -51,9 +55,10 @@ private:
 
         TalonFXSimProfile(TalonFX &talon, double const accelToFullTime, double const fullVel, bool const sensorPhase);
 
-
         ~TalonFXSimProfile() override {}
 
          void Run() override;
+
+         void setTalonCurrent(double current) override;
     };
 };

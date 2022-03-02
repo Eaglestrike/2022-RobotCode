@@ -6,6 +6,11 @@
 PhysicsSim::TalonFXSimProfile::TalonFXSimProfile(TalonFX &talon, double const accelToFullTime, double const fullVel, bool const sensorPhase)
              : SimProfile(), _talon(talon), _accelToFullTime(accelToFullTime), _fullVel(fullVel), _sensorPhase(sensorPhase) {}
 
+void PhysicsSim::TalonFXSimProfile::setTalonCurrent(double current) {
+    _talon.GetSimCollection().SetSupplyCurrent(current);
+    _talon.GetSimCollection().SetStatorCurrent(current);
+}
+
 void PhysicsSim::TalonFXSimProfile::Run() {
     double const period = GetPeriod();
     double const accelAmount = _fullVel / _accelToFullTime * period / 1000;

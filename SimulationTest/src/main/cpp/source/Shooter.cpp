@@ -25,7 +25,11 @@ Shooter::Shooter(){
     //m_limelight->setLEDMode("OFF");
     m_hoodZero = false;
     m_turretZero = false;
-}
+
+    m_turretController.SetTolerance(ShooterConstants::turretPoseTolerance, ShooterConstants::deltaTurretPoseTolerance);
+    m_hoodController.SetTolerance(ShooterConstants::hoodPoseTolerance, ShooterConstants::deltaHoodPoseTolerance);
+    m_flywheelController.SetTolerance(ShooterConstants::flywheelSpeedTolerance, ShooterConstants::deltaFlywheelSpeedTolerance);
+}   
 
 
 //Periodic Function
@@ -126,7 +130,7 @@ Shooter::Aim(){
 }
 
 
-//Interpolate shooter point values
+//binary search on shooter point values
 bool
 Shooter::withinRange(std::vector<double> array, double p, double p1, double p2){
     int left =0;
@@ -213,9 +217,14 @@ Shooter::setState(State newState){
 }
 
 
-//Check if the turret is aimed
+//Check if the turret is aimed and ready to shoot
 bool
 Shooter::Aimed(){
+    // return (abs(m_limelight->getXOff()) <= ShooterConstants::xOffTolerance 
+    //     && m_turretController.AtSetpoint() && m_flywheelController.AtSetpoint() && m_hoodController.AtSetpoint());
+    // ^^^ the real one ^^^
+
+
     //Adjust all of the offset values
     // if(m_limelight->getXOff() <= ShooterConstants::angleOff
     //     && m_flywheelMaster.GetSelectedSensorVelocity() <= 1000
@@ -266,6 +275,7 @@ Shooter::setPID(){
 //Stop All shooter movements
 void
 Shooter::Stop(){
+    m_channel.Stop();
     m_turret.Set(ControlMode::PercentOutput, 0);
     m_flywheelSlave.Set(ControlMode::PercentOutput, 0);
     m_flywheelMaster.Set(ControlMode::PercentOutput, 0);

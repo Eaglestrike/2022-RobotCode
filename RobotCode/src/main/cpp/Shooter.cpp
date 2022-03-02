@@ -3,6 +3,9 @@
 
 
 Shooter::Shooter(){
+    colorMatcher.AddColorMatch(red); //red
+    colorMatcher.AddColorMatch(blue); //blue
+
     //m_turret.SetNeutralMode(NeutralMode::Brake);
     //m_hood.SetNeutralMode(NeutralMode::Brake);
     m_flywheelMaster.SetNeutralMode(NeutralMode::Coast);
@@ -158,6 +161,12 @@ Shooter::withinRange(std::vector<double> array, double p, double p1, double p2){
 //Shoot Function 
 void
 Shooter::Shoot(){
+    double confidence = 0.0;
+    if ((GeneralConstants::matchColor == "BLUE" && colorMatcher.MatchClosestColor(colorSensor.GetColor(), confidence) == red)
+        || (GeneralConstants::matchColor == "RED" && colorMatcher.MatchClosestColor(colorSensor.GetColor(), confidence) == blue)) {
+            m_flywheelMaster.Set(ControlMode::PercentOutput, 0.2); //so ball can get out but won't get shot
+        }
+
     if(Aimed()){
         m_channel.setState(Channel::State::RUN);
         Load();
@@ -275,6 +284,7 @@ Shooter::setPID(){
 //Stop All shooter movements
 void
 Shooter::Stop(){
+    m_channel.Stop();
     m_turret.Set(ControlMode::PercentOutput, 0);
     m_flywheelSlave.Set(ControlMode::PercentOutput, 0);
     m_flywheelMaster.Set(ControlMode::PercentOutput, 0);

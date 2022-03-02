@@ -26,8 +26,8 @@ class Intake{
     private:
         WPI_TalonFX intakeMotor{IntakeConstants::intakeMotorPort};
 
-        //frc::Solenoid pneumatics{frc::PneumaticsModuleType::REVPH, 
-            //IntakeConstants::solenoidPort};
+        frc::Solenoid pneumatic{frc::PneumaticsModuleType::REVPH, 
+            IntakeConstants::solenoidPort};
 
-        State state;
+        State state = IDLE;
 };
