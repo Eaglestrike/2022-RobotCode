@@ -19,7 +19,7 @@ void Robot::RobotInit() {
   m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
   m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
   frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
-  try{
+   try{
     navx = new AHRS(frc::SPI::Port::kMXP);
   } catch(const std::exception& e) {
     std::cout << e.what() <<std::endl;
@@ -38,26 +38,27 @@ int i;
 
 void Robot::SimulationInit() {
   i = 0;
-  PhysicsSim::GetInstance().AddTalonFX(m_climber.getMotor(), 0.75, 3400, false);
+  //PhysicsSim::GetInstance().AddTalonFX(m_climber.getMotor(), 0.75, 3400, false);
 }
 
 void Robot::SimulationPeriodic() {
-  PhysicsSim::GetInstance().Run();
+  //PhysicsSim::GetInstance().Run();
 
 }
 
 
 void Robot::TeleopInit() {
+  //m_climber.SetState(Climber::State::IDLE);
   timer.Reset();
   limelight.setLEDMode("OFF");
   i = 0;
   timer.Reset();
-  //climber.SetState(Climber::State::IDLE); //comment in when running climber periodic
+  m_climber.SetState(Climber::State::IDLE); //comment in when running climber periodic
   frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", m_climber.getFullExtendPneumatic());
   frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
-  frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMasterMotorOutput());
+  frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMotor().GetMotorOutputPercent());
   frc::SmartDashboard::PutNumber("Gearbox master position: ", m_climber.getMotor().GetSelectedSensorPosition());
-  //m_climber.getMotor().SetNeutralMode(NeutralMode::Coast);
+  m_climber.getMotor().SetNeutralMode(NeutralMode::Coast);
 }
 
 void Robot::TeleopPeriodicInit() {
@@ -86,27 +87,53 @@ void Robot::TeleopPeriodicInit() {
 double prevPitch = 0;
 
 void Robot::TeleopPeriodic() {
+  limelight.setLEDMode("OFF");
+  intake.Retract();
+
+  frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", m_climber.getFullExtendPneumatic());
+  frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
+  frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMasterMotorOutput());
+  frc::SmartDashboard::PutNumber("Gearbox master position: ", m_climber.getMotor().GetSelectedSensorPosition());
+
+  frc::SmartDashboard::PutNumber("Pitch", navx->GetPitch());
+  frc::SmartDashboard::PutNumber("Delta pitch", navx->GetPitch()-prevPitch);
+
+  frc::SmartDashboard::PutNumber("time", timer.GetMatchTime().value());
+
+  if (xbox.GetRawButtonPressed(2)) m_climber.ToggleStopped(); 
+
   //i++;
   //std::cout << "time: " << i * 0.02 << "\n";
   //m_climber.setTime(units::second_t{i * 0.02});
-  //test.periodic();
-  TeleopPeriodicInit();
-  m_swerve.Drive(-x1, -y1, -x2, navx->GetYaw(), true);
-  m_swerve.UpdateOdometry(navx->GetYaw());
+  // //test.periodic();
+   TeleopPeriodicInit();
+   m_swerve.Drive(-x1, -y1, -x2, navx->GetYaw(), true);
+   m_swerve.UpdateOdometry(navx->GetYaw());
 
-  climbTestPeriodic();
+   if (abs(xbox.GetRightY()) > 0.05) {
+    if (xbox.GetRightY() > 0) m_climber.getMotor().Set(ControlMode::PercentOutput, 0.25);
+    if (xbox.GetRightY() < 0) m_climber.getMotor().Set(ControlMode::PercentOutput, -0.25);
+    return;
+  }
 
-  // m_climber.Periodic(navx->GetPitch()-prevPitch, navx->GetPitch(), timer.Get().value(), 
-  // xbox.GetRawButton(1),  xbox.GetRawButton(2),  xbox.GetRawButton(3),  xbox.GetRawButton(4),  xbox.GetRawButton(8));
+ // climbTestPeriodic();
+  //so A to continue
+  //B to stop/start
+  //X to retry init climb
+  //Y to continue to traversal bar
+   m_climber.Periodic(navx->GetPitch()-prevPitch, navx->GetPitch(), timer.GetMatchTime().value(), 
+   xbox.GetRawButton(1),  xbox.GetRawButton(1),  xbox.GetRawButton(3),  xbox.GetRawButton(1),  xbox.GetRawButton(4));
   prevPitch = navx->GetPitch();
 }
 
 void Robot::DisabledInit() {
   m_climber.getMotor().SetNeutralMode(NeutralMode::Brake);
+  m_climber.Stop();
 }
 
 void Robot::DisabledPeriodic() {
-  m_climber.getMotor().SetNeutralMode(NeutralMode::Brake);
+ m_climber.getMotor().SetNeutralMode(NeutralMode::Brake);
+  m_climber.Stop();
 }
 
 void Robot::TestInit() {
@@ -126,8 +153,13 @@ void Robot::climbTestPeriodic() {
   frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
   frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMasterMotorOutput());
   frc::SmartDashboard::PutNumber("Gearbox master position: ", m_climber.getMotor().GetSelectedSensorPosition());
+  frc::SmartDashboard::PutNumber("Gearbox master current", m_climber.getMotor().GetStatorCurrent());
+
+  frc::SmartDashboard::PutNumber("time", timer.GetMatchTime().value());  
 
   m_climber.setTime(timer.Get());
+
+
    /** #1: test arm can extend, get extended position
    * Start from fully retracted position (or how the climber will be during most of teleop)
    * Press button until arm is fully extended, record fully extended position as ClimbConstants::motorExtendedPose
@@ -167,7 +199,7 @@ void Robot::climbTestPeriodic() {
   //   m_climber.setArmLowered();
   // }
 
-  //part 2: testing climb walk through
+  // //part 2: testing climb walk through
 
    /** #6: test if motor can go to set extended pose
    * Start from fully retracted position (or how the climber will be during most of teleop)
@@ -196,8 +228,10 @@ void Robot::climbTestPeriodic() {
     m_climber.testDiagonalArmRaise();
   }
   else if (xbox.GetRawButton(8)) { //tiny button next to X
-  m_climber.retractArm();
-    //m_climber.testBarTraversalFromRaised();
+    m_climber.testBarTraversalFromRaised();
+  }
+  else if (xbox.GetRawButton(7)) { //the other one
+    m_climber.retractArm();
   }
 
   else {

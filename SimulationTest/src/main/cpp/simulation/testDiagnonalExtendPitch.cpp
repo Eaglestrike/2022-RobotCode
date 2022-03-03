@@ -8,7 +8,7 @@ testDiagonalExtendPitch::testDiagonalExtendPitch(Climber& climber) : climber{cli
 void testDiagonalExtendPitch::init()
 {
     climber.SetState(Climber::State::DIAGONAL_ARM_EXTEND);
-    climber.Periodic(0.0, 0.0, 0.0, false, false, false, false, false);
+    climber.Periodic(0.0, 0.0, 0.0, false, false, false, false, false, false);
     //climber.getFullExtend().Set(true);
     //climber.getMedExtend().Set(true);  
 
@@ -46,7 +46,7 @@ void testDiagonalExtendPitch::makePitchBad(bool badPitch)
     double pitch = (badPitch) ? ClimbConstants::veryBadPitch + 5 : ClimbConstants::veryBadPitch - 5;
     double deltaPitch = (badPitch) ? ClimbConstants::veryBadDeltaPitch + 5 : ClimbConstants::veryBadDeltaPitch - 5;
 
-    climber.Periodic(deltaPitch, pitch, 0.0, false, false, false, false, false);
+    climber.Periodic(deltaPitch, pitch, 0.0, false, false, false, false, false, false);
 }
 
 bool testDiagonalExtendPitch::test()

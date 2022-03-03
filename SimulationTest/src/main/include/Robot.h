@@ -60,7 +60,7 @@ class Robot : public frc::TimedRobot {
 
   AHRS *navx;
   SwerveDrive m_swerve;
-
+  Intake intake;
 
   frc::Joystick l_joy{OIConstants::l_joy_port};
   frc::Joystick r_joy{OIConstants::r_joy_port};

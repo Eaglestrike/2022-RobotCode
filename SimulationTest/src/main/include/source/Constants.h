@@ -167,37 +167,38 @@ ClimbConstants{
     //!!!!!!!! none of the below are correct! they are in use purely for simulation atm !!!!!!!!!
 
     //these names are kind of bad, i might change them later
-    const double idleEnoughTime = 10000;
-    const double verticalArmExtendEnoughTime = 10000;
-    const double verticalArmRetractEnoughTime = 10000;
-    const double diagonalArmExtendEnoughTime = 10000;
-    const double diagonalArmRaiseEnoughTime = 10000;
-    const double diagonalArmRetractEnoughTime = 10000;
-    const double almostDoneTime = 10000;
+    //all these values are bogus for now
+    const double idleEnoughTime = 10000000000;
+    const double verticalArmExtendEnoughTime = 10000000000;
+    const double verticalArmRetractEnoughTime = 10000000000;
+    const double diagonalArmExtendEnoughTime = 10000000000;
+    const double diagonalArmRaiseEnoughTime = 10000000000;
+    const double diagonalArmRetractEnoughTime = 10000000000;
+    const double almostDoneTime = 10000000000;
 
-    const double waitToRaiseVerticalTime = 0; //how long to wait from after retracting to raise diagonal arm to vertical
-    const double timeToTestExtension = 0;
+    const double timeToTestExtension = 1.5;
 
-    const double hookedCurrent = 0;
+    const double hookedCurrent = 70;
 
-    const double acceptablePitch = 1000;
-    const double deltaPitchTolerance = 1000;
-    const double veryBadPitch = 1000;
-    const double veryBadDeltaPitch = 1000;
+    //bogus values
+    const double acceptablePitch = 10000000000;
+    const double deltaPitchTolerance = 10000000000;
+    const double veryBadPitch = 10000000000;
+    const double veryBadDeltaPitch = 10000000000;
 
     const double diagonalArmExtendWaitTime = 0;
-    const double diagonalArmRaiseWaitTime = 0;
+    const double diagonalArmRaiseWaitTime = 1;
 
-    const double motorExtendedPose = -136167;
+    const double motorExtendedPose = -126167;
     const double motorTestExtendPose = -100000;
-    const double motorRetractedPose = -200;
+    const double motorRetractedPose = -50;
 
-    const double motorP = 0.00001;
+    const double motorP = 0.000009;
     const double motorI = 0.000007;
     const double motorD = 0;
 
-    const double motorPoseTolerance = 100;
-    const double deltaMotorPoseTolerance = 50;
+    const double motorPoseTolerance = 10000;
+    const double deltaMotorPoseTolerance = 500;
 
     const double motorMaxOutput = 1;
 }

@@ -16,7 +16,7 @@ void PhysicsSim::TalonFXSimProfile::Run() {
     double const accelAmount = _fullVel / _accelToFullTime * period / 1000;
 
     double outPerc = _talon.GetMotorOutputPercent();
- //  std::cout << "output: " << outPerc << "\n";
+   //std::cout << "output: " << outPerc << "\n";
     if (_sensorPhase) {
         outPerc *= -1;
     }

@@ -91,7 +91,7 @@ void Climber::testSeesIfHooked() {
 void Climber::testDiagonalExtension() {
     //SetState(DIAGONAL_ARM_EXTEND);
     climbMedExtend.Set(false);
-    climbFullExtend.Set(false);
+    climbFullExtend.Set(true);
     //won't do any wait for now, see how it goes
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
     gearboxMaster.Set(ControlMode::PercentOutput, 
@@ -101,7 +101,7 @@ void Climber::testDiagonalExtension() {
         
 void Climber::testDiagonalArmRaise() {
     //SetState(DIAGONAL_ARM_RAISE);
-    climbMedExtend.Set(false);
+    climbMedExtend.Set(true);
     climbFullExtend.Set(true);
 }
         

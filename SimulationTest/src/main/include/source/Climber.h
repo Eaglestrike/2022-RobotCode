@@ -31,7 +31,8 @@ class Climber{
         };
 
         Climber();
-        void Periodic(double delta_pitch, double pitch, double time, bool passIdle, bool drivenForward, bool retryFirstClimb, bool passDiagonalArmRaise, bool doSecondClimb); //executes state actions
+        void Periodic(double delta_pitch, double pitch, double time, bool passIdle, bool drivenForward, bool retryFirstClimb, bool passDiagonalArmRaise, 
+            bool doSecondClimb); //executes state actions
 
         //returns next state of climber
         State Idle(bool passIdle);
@@ -48,7 +49,7 @@ class Climber{
         State& GetState() {return state;}
 
         void Calibrate();
-
+        void ToggleStopped() {stopped = !stopped;}
 
         //the below public functions are for testing
         void setTime(units::second_t time) {currTime = time.value();}
@@ -85,6 +86,8 @@ class Climber{
     private:
         State state = IDLE;
         State prevState = IDLE; //for state just changed
+
+        bool stopped = false;
 
         double currTime = 0;
         double waitStartTime = 0;

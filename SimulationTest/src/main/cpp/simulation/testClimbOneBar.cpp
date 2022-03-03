@@ -46,7 +46,7 @@ bool testClimbOneBar::test() {
 bool testClimbOneBar::extending() {
 
     climber.SetState(Climber::State::VERTICAL_ARM_EXTEND);
-    climber.Periodic(0, 0, 0, false, false, false, false, false);
+    climber.Periodic(0, 0, 0, false, false, false, false, false, false);
 
 //     //evaluate if failed, good, or done
 //     //failes if: anything in brake, motors going wrong way, motors going too fast
