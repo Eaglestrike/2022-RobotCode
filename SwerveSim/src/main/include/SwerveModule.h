@@ -36,10 +36,10 @@ class SwerveModule : public frc2::SubsystemBase {
         bool mInverted;
 
         //pid stuff
-        static double kF;
-        static double kP;
-        static double kI;
-        static double kD;
+        double kF;
+        double kP;
+        double kI;
+        double kD;
         int kI_Zone = 900;
         int kMaxIAccum = 1000000;
         int kErrorBand = 50;
@@ -53,16 +53,25 @@ class SwerveModule : public frc2::SubsystemBase {
         int moduleNum;
 
         const static long STALL_TIMEOUT = 2000;
-        long mStallTimeBegin = LLONG_MAX;
+        long mStallTimeBegin = LLONG_MAX; 
 
         double mTurnOutput;
         double mDriveOutput;
 
-        //pid controllers
-        frc::PIDController mDrivePID{ModuleConstants::kPDrivingController, 0, 0};        
-        //frc::ProfiledPIDController</*reee idk the distancceee*/> mTurningPID{ModuleConstants::kpTurningController, 0, 0, /*trapezoid thing idk how to instentiate*/};
-        //frc::SimpleMotorFeedforward</*reee distance*/> mDriveFeedFwd{0, 0, 0}; //todo tune
-        //frc::SimpleMotorFeedforward</*reee distance*/> mTurnFeedFwd{0, 0, 0}; //todo tune
+        //pid controllers. also literally wtf is with this rachet units library like omg. these all better be correct
+        frc::PIDController mDrivePID{ModuleConstants::kPDrivingController, 0, 0}; 
+        
+        frc::ProfiledPIDController<units::radians> mTurningPID{ModuleConstants::kpTurningController, 0, 0, 
+            frc::TrapezoidProfile<units::radians>::Constraints(frc::TrapezoidProfile<units::radians>::Velocity_t{ModuleConstants::kMaxModuleAngularSpeedRadsPerSec}, 
+            frc::TrapezoidProfile<units::radians>::Acceleration_t{ModuleConstants::kMaxModuleAngularAccelRadsPerSecSquared})};
+        
+        frc::SimpleMotorFeedforward<units::meters> mDriveFeedFwd{units::volt_t{0}, units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{0}, 
+        units::unit_t<frc::SimpleMotorFeedforward<units::meters>::ka_unit>{0}}; //todo tune 
+        
+        frc::SimpleMotorFeedforward<units::radians> mTurnFeedFwd{units::volt_t{0}, units::unit_t<frc::SimpleMotorFeedforward<units::radians>::kv_unit>{0}, 
+        units::unit_t<frc::SimpleMotorFeedforward<units::radians>::ka_unit>{0}}; //todo tune
+
+ 
 
         //he defines some sim stuff that i'm not gonna do just yet
 

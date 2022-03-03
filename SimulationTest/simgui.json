@@ -15,7 +15,17 @@
       "/LiveWindow/Ungrouped/DigitalInput[6]": "Digital Input",
       "/LiveWindow/Ungrouped/DigitalInput[7]": "Digital Input",
       "/LiveWindow/Ungrouped/DigitalInput[8]": "Digital Input",
+<<<<<<< HEAD
       "/LiveWindow/Ungrouped/DigitalInput[9]": "Digital Input"
+=======
+      "/LiveWindow/Ungrouped/DigitalInput[9]": "Digital Input",
+      "/SmartDashboard/Auto Modes": "String Chooser"
+    }
+  },
+  "NetworkTables": {
+    "SmartDashboard": {
+      "open": true
+>>>>>>> 153137d7462779dbe95f5a48ef39b3f82962bbdb
     }
   }
 }

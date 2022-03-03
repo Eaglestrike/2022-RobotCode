@@ -1,5 +1,5 @@
 #include "SwerveDrive.h"
-
+#include <iostream>
 //Constructor
 SwerveDrive::SwerveDrive(){}
 
@@ -34,25 +34,35 @@ SwerveDrive::Drive(double x1, double y1, double x2, double rot, bool fieldOrient
     double frontRightAngle = atan2(b, d) *180/ M_PI;
     double frontLeftAngle = atan2(b, c) *180/ M_PI;
 
-    frc::SmartDashboard::PutNumber("Rotation",rot);
+    if(x2 == 0 && x1 == 0 && y1 == 0){
+        m_backRight.Stop();
+        m_backLeft.Stop();
+        m_frontRight.Stop();
+        m_frontLeft.Stop();
+        return;
+    }
 
-    m_backRight.drive(-backRightSpeed, backRightAngle);
-    m_backLeft.drive(-backLeftSpeed, backLeftAngle);
-    m_frontRight.drive(-frontRightSpeed, frontRightAngle);
-    m_frontLeft.drive(-frontLeftSpeed, frontLeftAngle);
+    m_backRight.drive(-backRightSpeed, backRightAngle,
+        DriveConstants::BROFF);
+    m_backLeft.drive(backLeftSpeed, backLeftAngle,
+        DriveConstants::BLOFF);
+    m_frontRight.drive(-frontRightSpeed, frontRightAngle,
+        DriveConstants::FROFF);
+    m_frontLeft.drive(frontLeftSpeed, frontLeftAngle, 
+        DriveConstants::FLOFF);
 }
 
 
 //Updates the Odometry
 void
 SwerveDrive::UpdateOdometry(double theta){
-    double BR_A = m_backRight.getAngle();
+    double BR_A = m_backRight.getAngle(DriveConstants::BROFF);
     double BR_V = m_backRight.getVelocity();
-    double BL_A = m_backLeft.getAngle();
+    double BL_A = m_backLeft.getAngle(DriveConstants::BLOFF);
     double BL_V = m_backLeft.getVelocity();
-    double FR_A = m_frontRight.getAngle();
+    double FR_A = m_frontRight.getAngle(DriveConstants::FROFF);
     double FR_V = m_frontRight.getVelocity();
-    double FL_A = m_frontLeft.getAngle();
+    double FL_A = m_frontLeft.getAngle(DriveConstants::FLOFF);
     double FL_V = m_frontLeft.getVelocity();
     m_odometry.updateOdometry(BR_A, BR_V, BL_A, BL_V, FR_A, FR_V,
         FL_A, FL_V, theta);
@@ -60,41 +70,43 @@ SwerveDrive::UpdateOdometry(double theta){
 
 
 //Trajectory Following for Swerve
+//Cannot turn and move at the same time
+//If you want to turn make Waypoint as 0,0,0, theta
 void
-SwerveDrive::TrajectoryFollow(double rot, bool vel){
-
+SwerveDrive::TrajectoryFollow(double rot, int waypointIndex){
     size_t index = m_trajectory_1.getIndex();
-    if( (abs(GetYPosition() - m_trajectory_1.getY(index)) < 0.2)
-        && (abs(GetXPostion() - m_trajectory_1.getX(index)) < 0.2)
-        && (abs(rot - m_trajectory_1.getRotation(index))) < 3){
-        m_trajectory_1.Progress();
+    m_swerveController.updatePosition(GetYPosition(), GetXPostion(), rot);
+
+    bool YError = (abs(GetYPosition() - m_trajectory_1.getY(index)) < 0.3);
+    bool XError = (abs(GetXPostion() - m_trajectory_1.getX(index)) < 0.3);
+    bool RotError = (abs(rot - m_trajectory_1.getRotation(index)) < 3);
+
+    if(m_trajectory_1.getX(index) == 0 &&
+        m_trajectory_1.getY(index) == 0 &&
+        m_trajectory_1.getRotation(index) != 0){
+        if(RotError && index < waypointIndex){
+            m_trajectory_1.Progress();
+            gyro->Reset();
+        }
+        Drive(0, 0, calcYawStraight(m_trajectory_1.getRotation(index), rot), rot, true);
+        return;
     }
 
     frc::SmartDashboard::PutNumber("YError", abs(GetYPosition() - m_trajectory_1.getY(index)));
     frc::SmartDashboard::PutNumber("XError", abs(GetXPostion() - m_trajectory_1.getX(index)));
     frc::SmartDashboard::PutNumber("RotError", (abs(rot - m_trajectory_1.getRotation(index))));
 
-    m_swerveController.updatePosition(GetYPosition(), GetXPostion(), rot);
     double forward = m_swerveController.calculateForward(m_trajectory_1.getY(index));
     double strafe = m_swerveController.calculateStrafe(m_trajectory_1.getX(index));
-    double angle = m_swerveController.calculateRotation(m_trajectory_1.getRotation(index));
-    
-    // frc::SmartDashboard::PutNumber("fwdOut", forward);
-    // frc::SmartDashboard::PutNumber("strOut", strafe);
-    // frc::SmartDashboard::PutNumber("rotOut", angle);
-    // frc::SmartDashboard::PutNumber("index", index);
-    Drive(strafe, forward, angle + calcYawStraight(m_trajectory_1.getRotation(index), rot), rot, true);
-}
 
-void SwerveDrive::AddTrajPt(Trajectory::Waypoint pt) {
-    m_trajectory_1.addWaypoint(pt);
-}
+    if( YError && XError && RotError && index < waypointIndex){
+        m_trajectory_1.Progress();
+    }
 
-bool SwerveDrive::AtTrajPoint(double rot) {
-size_t index = m_trajectory_1.getIndex();
- return ( (abs(GetYPosition() - m_trajectory_1.getY(index)) < 0.2)
-        && (abs(GetXPostion() - m_trajectory_1.getX(index)) < 0.2)
-        && (abs(rot - m_trajectory_1.getRotation(index))) < 3);
+    frc::SmartDashboard::PutNumber("strafe", strafe);
+
+    UpdateOdometry(rot);
+    Drive(strafe, forward, calcYawStraight(m_trajectory_1.getRotation(index), rot), rot, true);
 }
 
 
@@ -102,30 +114,25 @@ size_t index = m_trajectory_1.getIndex();
 void
 SwerveDrive::GenerateTrajectory_1(){
     m_trajectory_1.clearTrajectory();
-    Trajectory::Waypoint p1(8, 4, 0, 0);
-    Trajectory::Waypoint p2(1, 4, 0, 90);
-    Trajectory::Waypoint p3(8, 3, 0, -90);
-    Trajectory::Waypoint p4(0, 0, 0, 0);
+
+    Trajectory::Waypoint p1(1.9, 0, 0, 0);
+    Trajectory::Waypoint p2(0, 0, 0, -110);
+    Trajectory::Waypoint p3(0.9, 1.4, 0, 0);
+    //Trajectory::Waypoint p4(0, 0, 0, 40);
 
     m_trajectory_1.addWaypoint(p1);
     m_trajectory_1.addWaypoint(p2);
     m_trajectory_1.addWaypoint(p3);
-    m_trajectory_1.addWaypoint(p4);
+    //m_trajectory_1.addWaypoint(p4);
 }
 
 
 void
-SwerveDrive::GeneratePath(){
+SwerveDrive::GenerateTrajectory_2(){
     m_trajectory_2.clearTrajectory();
-    Trajectory::Waypoint p1(0, 1, 2, 0);
-    Trajectory::Waypoint p2(1, 3, 3, 0);
-    Trajectory::Waypoint p3(3, 6, 5, 0);
-    Trajectory::Waypoint p4(8, 5, 0, 0);
+    // Trajectory::Waypoint p1(0, 0, 0, 90);
 
-    m_trajectory_2.addWaypoint(p1);
-    m_trajectory_2.addWaypoint(p2);
-    m_trajectory_2.addWaypoint(p3);
-    m_trajectory_2.addWaypoint(p4);    
+    // m_trajectory_2.addWaypoint(p1);  
 }
 
 
@@ -159,7 +166,7 @@ SwerveDrive::GetXSpeed(){
 double 
 SwerveDrive::calcYawStraight(double targetAngle, double currentAngle){
     double error = targetAngle - currentAngle;
-    return 0.01*error;
+    return 0.013*error;
 }
 
 
@@ -216,8 +223,6 @@ SwerveDrive::ResetEncoders(){
 
 //Helper Function
 void 
-SwerveDrive::debug(){
-    //frc::SmartDashboard::PutNumber("backrightVelocity", m_backRight.getVelocity());
-    //m_trajectory_1.getX(0);
-    //m_backLeft.Debug();
+SwerveDrive::debug(AHRS &navx){
+    gyro = &navx;
 }

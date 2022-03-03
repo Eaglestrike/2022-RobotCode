@@ -32,7 +32,7 @@ Odometry::updateOdometry(double BR_A, double BR_V,
     double ROT = (ROT1 + ROT2) / 2;
 
     m_FWD = ((ROT * (m_L/2) + A) + (-ROT * (m_L/2) + B)) / 2;
-    m_STR = ((ROT * (m_W/2) + C) + (-ROT * (m_W/2) + D)) / 2;
+    m_STR = -((ROT * (m_W/2) + C) + (-ROT * (m_W/2) + D)) / 2;
 
     m_FWD_new = m_FWD * cos(theta * PI/180) + m_STR * sin(theta * PI/180);
     m_STR_new = m_STR * cos(theta * PI/180) - m_FWD * sin(theta * PI/180);
@@ -42,7 +42,6 @@ Odometry::updateOdometry(double BR_A, double BR_V,
     //From Velocity to Position
     m_prevtimeStep = m_timeStep;
     m_timeStep += timeInterval;
-    //frc::SmartDashboard::PutNumber("Time", m_timeStep);
     m_x = m_x + m_FWD_new * (m_timeStep - m_prevtimeStep) * 58.04;
     m_y = m_y + m_STR_new * (m_timeStep - m_prevtimeStep) * 58.04;
 }

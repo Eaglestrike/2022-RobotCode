@@ -4,6 +4,7 @@
 Intake::Intake(){
     intakeMotor.SetNeutralMode(NeutralMode::Coast);
     intakeMotor.SetSafetyEnabled(false);
+    pneumatic.Set(true);
 }
 
 
@@ -47,7 +48,7 @@ Intake::Run(){
 void
 Intake::Retract(){
     //might not retract the intake
-    //pneumatics.Set(false);
+    pneumatic.Set(false);
     intakeMotor.Set(ControlMode::PercentOutput, 0.0);
 }
 
