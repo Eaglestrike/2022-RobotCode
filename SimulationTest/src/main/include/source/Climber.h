@@ -58,7 +58,7 @@ class Climber{
         void testDiagonalExtension();
         void testDiagonalArmRaise();
         void testBarTraversalFromRaised(); //should do correct function even if not actually hanging
-
+        bool stateJustChanged();
         //getters and setters for simulation
         WPI_TalonFX& getMotor() {return gearboxMaster;}
         frc2::PIDController getPIDCntrl() {return motorPIDController;}
@@ -80,7 +80,6 @@ class Climber{
         bool motorDone(double pose);
         bool pitchGood(double pitch, double delta_pitch);
         bool pitchVeryBad(double pitch, double delta_pitch);
-        bool stateJustChanged();
 
         WPI_TalonFX gearboxMaster{ClimbConstants::gearboxPort1};
         WPI_TalonFX gearboxSlave{ClimbConstants::gearboxPort2};

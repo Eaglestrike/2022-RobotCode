@@ -2,7 +2,6 @@
 #include "Robot.h"
 #include <iostream>
 #include <fmt/core.h>
-
 #include "frc/Timer.h"
 
 
@@ -34,7 +33,7 @@ void Robot::TeleopInit() {
 /*** Before running these tests, motor and pneumatic ports must be confirmed***/
 
 void Robot::TeleopPeriodic() {
-
+  tpset.init(); 
 }
 
 void Robot::DisabledInit() {}

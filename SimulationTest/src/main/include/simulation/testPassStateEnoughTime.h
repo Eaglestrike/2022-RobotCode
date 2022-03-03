@@ -21,8 +21,8 @@ class testPassStateEnoughTime
         };
         testPassStateEnoughTime(Climber& climber); 
         void init(); 
-        void periodic(); 
-        bool test(); 
+        void periodic(int time); 
+        void test(State state); 
         void setState(State newState);
         State getState() {return state;}
 
