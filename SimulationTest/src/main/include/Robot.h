@@ -16,9 +16,13 @@
 #include "Climber.h"
 #include "Shooter.h"
 #include "Autonomous.h"
+<<<<<<< HEAD
+#include "testPassStateEnoughTime.h"
+=======
 #include "testClimbOneBar.h"
 #include "Limelight.h"
 #include <frc/Timer.h>
+>>>>>>> 153137d7462779dbe95f5a48ef39b3f82962bbdb
 
 
 class Robot : public frc::TimedRobot {
@@ -72,5 +76,7 @@ class Robot : public frc::TimedRobot {
   double m_time = 0;
   double m_timeStep = GeneralConstants::timeStep;
 
+
+  testPassStateEnoughTime tpset{m_climber};
 
 };
