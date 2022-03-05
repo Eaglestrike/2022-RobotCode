@@ -85,6 +85,10 @@ class Climber{
 
 
     private:
+
+        bool TRYING_PERCENT_OUT = true;
+
+
         State state = IDLE;
         State prevState = IDLE; //for state just changed
 
@@ -100,6 +104,10 @@ class Climber{
         bool motorDone(double pose);
         bool pitchGood(double pitch, double delta_pitch);
         bool pitchVeryBad(double pitch, double delta_pitch);
+
+        void pnemuaticsDown();
+        void pneumaticsMed();
+        void pneumaticsVert();
 
         bool stateJustChanged();
         units::length::meter_t meterPose();

@@ -160,8 +160,8 @@ namespace
 ClimbConstants{
     const int gearboxPort1 = 30; //confirmed
     const int gearboxPort2 = 31; //confirmed
-    const int solenoid1Port = 3; 
-    const int solenoid2Port = 2;
+    const int solenoid1Port = 3; //all down true
+    const int solenoid2Port = 2; //all down false
     const int BrakeSolenoidPort = 1; //what is it?
 
     //!!!!!!!! none of the below are correct! they are in use purely for simulation atm !!!!!!!!!

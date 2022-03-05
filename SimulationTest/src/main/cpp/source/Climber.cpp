@@ -6,22 +6,14 @@
 //Constructor
 Climber::Climber(){
     motorPIDController.SetTolerance(ClimbConstants::motorPoseTolerance, 1000000000000000); 
-    //motorProfiledPID.SetTolerance(ClimbConstants::motorPoseTolerance, ClimbConstants::deltaMotorPoseTolerance);
 
-    climbFullExtend.Set(true);
-    climbMedExtend.Set(false);
+    pneumaticsMed();
 
     gearboxSlave.SetInverted(false);
     gearboxSlave.Follow(gearboxMaster);
     gearboxMaster.SetInverted(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Brake);
     gearboxMaster.SetSelectedSensorPosition(0);   
-
-    //  const double motorP = 0.000005;
-    // const double motorI = 0.000007;
-    // const double motorD = 0;
-
-    //gearboxMaster.Config_kP(0, 0.01);
 
     brake.Set(true); 
 }
@@ -37,9 +29,10 @@ Climber::Periodic(double delta_pitch, double pitch, double time, bool passIdle, 
         return;
     }
     currTime = time;
-    frc::SmartDashboard::PutNumber("Velocuy", gearboxMaster.GetSelectedSensorVelocity());
+
     frc::SmartDashboard::PutBoolean("waiting", false);
     frc::SmartDashboard::PutBoolean("motor done", motorDone(ClimbConstants::motorExtendedPose));
+
     switch(state){
         case IDLE: //needs human input to start climb
             frc::SmartDashboard::PutString("Climber state", "IDLE");
@@ -77,8 +70,7 @@ Climber::Periodic(double delta_pitch, double pitch, double time, bool passIdle, 
 //states (https://docs.google.com/document/d/1I5caybg-bhfEYwxfIL1PCXAbqdznW7Qo1R-ZHObqCiY/edit?usp=sharing)
 
 Climber::State Climber::Idle(bool passIdle){
-    climbFullExtend.Set(false);
-    climbMedExtend.Set(false);
+    pnemuaticsDown();
     gearboxMaster.SetNeutralMode(NeutralMode::Brake);
     brake.Set(true);
 
@@ -93,13 +85,17 @@ Climber::State Climber::Idle(bool passIdle){
 
 Climber::State Climber::VerticalArmExtend(bool drivenForward){
     brake.Set(false);
-    climbFullExtend.Set(true);
-    climbMedExtend.Set(true);
+    pneumaticsVert();
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
     if (!motorDone(ClimbConstants::motorExtendedPose)) {
-        gearboxMaster.Set(ControlMode::PercentOutput, 
-        std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
-        ClimbConstants::motorExtendedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
+        if (TRYING_PERCENT_OUT) {
+            gearboxMaster.Set(ControlMode::PercentOutput, -0.5);
+        } else {
+            gearboxMaster.Set(ControlMode::PercentOutput, 
+            std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
+            ClimbConstants::motorExtendedPose), -0.7, 0.7));
+        }
+        
     }
     if (motorDone(ClimbConstants::motorExtendedPose)) {
         gearboxMaster.Set(ControlMode::PercentOutput, 0);
@@ -122,12 +118,9 @@ Climber::State Climber::VerticalArmRetract(double pitch, double delta_pitch, boo
 
     brake.Set(false);
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
-
-    gearboxMaster.Set(ControlMode::PercentOutput, 
-        std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
-        ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
+    gearboxMaster.Set(ControlMode::PercentOutput, motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition()));
     
-    if (/*motorDone(ClimbConstants::motorRetractedPose) ||*/ currTime <= ClimbConstants::almostDoneTime) {
+    if (currTime >= ClimbConstants::almostDoneTime) {
         gearboxMaster.SetNeutralMode(NeutralMode::Brake);
         brake.Set(true);
     }
@@ -159,9 +152,7 @@ Climber::State Climber::TestDiagonalArmExtend() {
     if (!waited(ClimbConstants::timeToTestExtension, waitStartTime) || gearboxMaster.GetSelectedSensorPosition() > ClimbConstants::motorTestExtendPose) {
         return TEST_DIAGONAL_ARM_EXTEND;
     }
-    else if (hooked()) { 
-        std::cout << "moving on to diagonal arm extend\n"; return DIAGONAL_ARM_EXTEND;
-    }
+    else if (hooked()) { std::cout << "moving on to diagonal arm extend\n"; return DIAGONAL_ARM_EXTEND; }
     else { std::cout << "returning to vertical arm retract\n"; return VERTICAL_ARM_RETRACT; }
 }
 
@@ -176,8 +167,6 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch, bool
     //if pitch very bad, halt extension
     if (pitchBad) {
         std::cout << "pitch very bad\n";
-        // gearboxMaster.Set(ControlMode::PercentOutput, 0);
-        // gearboxMaster.SetNeutralMode(NeutralMode::Brake);
         stopped = true; //this way driver can re-start if for some reason climber doesn't
         waitStartTime = currTime; //so that we start over again when we try to re-extend solenoids
         return DIAGONAL_ARM_EXTEND;
@@ -185,20 +174,19 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch, bool
 
     if (stateJustChanged()) waitStartTime = currTime;
 
-    if (!goingTraversal) {
-        climbMedExtend.Set(false);
-        climbFullExtend.Set(true);
+    if (!goingTraversal || (goingTraversal && motorDone(ClimbConstants::motorTestExtendPose))) {
+        pneumaticsMed();
     }
-    if (goingTraversal && waited(ClimbConstants::diagonalArmRaiseWaitTime, waitStartTime)) {
-        climbMedExtend.Set(false);
-        climbFullExtend.Set(true);
-    }
-
+    
     if (waited(ClimbConstants::diagonalArmExtendWaitTime, waitStartTime) && !motorDone(ClimbConstants::motorExtendedPose)) {
-        //std::cout << "extending motors in diagonal arm extend\n";
-        gearboxMaster.Set(ControlMode::PercentOutput, 
+        if (TRYING_PERCENT_OUT) {
+            gearboxMaster.Set(ControlMode::PercentOutput, -0.5);
+        } else {
+            gearboxMaster.Set(ControlMode::PercentOutput, 
             std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
-            ClimbConstants::motorExtendedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
+            ClimbConstants::motorExtendedPose), -0.7, 0.7));
+        }
+        
     }
     if (motorDone(ClimbConstants::motorExtendedPose)) {
         gearboxMaster.Set(ControlMode::PercentOutput, 0);
@@ -212,9 +200,9 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch, bool
     // frc::SmartDashboard::PutBoolean("curr time", currTime);
     
     if (motorDone(ClimbConstants::motorExtendedPose) && pitchGood(pitch, delta_pitch) && (!goingTraversal || passDiagonalArmRaise) && currTime <= ClimbConstants::diagonalArmExtendEnoughTime) {
-       if (!goingTraversal) {std::cout << "moving on to diagonal arm raise\n"; return DIAGONAL_ARM_RAISE;}
-        if (goingTraversal) {std::cout << "2nd climb, moving on to diagonal arm retract\n"; return DIAGONAL_ARM_RETRACT;}  }
-    else return DIAGONAL_ARM_EXTEND;
+        if (!goingTraversal) {std::cout << "moving on to diagonal arm raise\n"; return DIAGONAL_ARM_RAISE;}
+        if (goingTraversal) {std::cout << "2nd climb, moving on to diagonal arm retract\n"; return DIAGONAL_ARM_RETRACT;}  
+    } else return DIAGONAL_ARM_EXTEND;
     return IDLE;
 }
 
@@ -225,8 +213,7 @@ Climber::State Climber::DiagonalArmRaise(bool passDiagonalArmRaise){
   
     if (stateJustChanged()) waitStartTime = currTime;
     if (waited(ClimbConstants::diagonalArmRaiseWaitTime, waitStartTime)) {
-        climbMedExtend.Set(true);
-        climbFullExtend.Set(true);
+        pneumaticsVert();
     }
 
     //for debugging
@@ -236,8 +223,8 @@ Climber::State Climber::DiagonalArmRaise(bool passDiagonalArmRaise){
 
     if (waited(ClimbConstants::diagonalArmRaiseWaitTime, waitStartTime) && (passDiagonalArmRaise || goingTraversal) && currTime <= ClimbConstants::diagonalArmRaiseEnoughTime) 
         { if (!goingTraversal) {std::cout << "moving on to diagonal arm retract\n"; return DIAGONAL_ARM_RETRACT;}
-        if (goingTraversal) {std::cout << "2nd climb, moving on to diagonal arm extend\n"; return DIAGONAL_ARM_EXTEND;}  }
-    else return DIAGONAL_ARM_RAISE;
+        if (goingTraversal) {std::cout << "2nd climb, moving on to diagonal arm extend\n"; return DIAGONAL_ARM_EXTEND;}  
+    } else return DIAGONAL_ARM_RAISE;
     return IDLE;
 }
 
@@ -257,10 +244,8 @@ Climber::State Climber::DiagonalArmRetract(bool doSecondClimb, double pitch, dou
         gearboxMaster.SetNeutralMode(NeutralMode::Brake);
     }
 
-
     if (!goingTraversal || motorDone(ClimbConstants::motorRetractedPose)) {
-        climbFullExtend.Set(true);
-        climbMedExtend.Set(true);
+        pneumaticsVert();
     }
 
     if (/*motorDone(ClimbConstants::motorRetractedPose) ||*/ currTime >= ClimbConstants::almostDoneTime) {
@@ -328,6 +313,21 @@ units::length::meter_t Climber::meterPose() {
     //4096 ticks per rot. has to turn 10.39 rot befor actual spool turns once. spool circumference is 0.1 m
     //return units::meter_t{gearboxMaster.GetSelectedSensorPosition() / 4096 / 10.39 * 0.1};
     return units::meter_t{gearboxMaster.GetSelectedSensorPosition()};
+}
+
+void Climber::pnemuaticsDown() {
+    climbFullExtend.Set(true);
+    climbMedExtend.Set(false);
+}
+
+void Climber::pneumaticsMed() {
+    climbFullExtend.Set(false);
+    climbMedExtend.Set(false);
+}
+
+void Climber::pneumaticsVert() {
+    climbFullExtend.Set(false);
+    climbMedExtend.Set(true);
 }
 
 //Calibration function for whatever
