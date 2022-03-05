@@ -84,9 +84,7 @@ void Robot::TeleopPeriodicInit() {
 double prevPitch = 0;
 
 void Robot::TeleopPeriodic() {
-<<<<<<< HEAD
-  tpset.init(); 
-=======
+
   limelight.setLEDMode("OFF");
   intake.Retract();
 
@@ -128,7 +126,7 @@ void Robot::TeleopPeriodic() {
    m_climber.Periodic(navx->GetPitch()-prevPitch, navx->GetPitch(), timer.GetFPGATimestamp().value(), 
    xbox.GetRawButton(1),  xbox.GetRawButton(1),  xbox.GetRawButton(3),  xbox.GetRawButton(1),  xbox.GetRawButton(4));
   prevPitch = navx->GetPitch();
->>>>>>> 153137d7462779dbe95f5a48ef39b3f82962bbdb
+
 }
 
 void Robot::DisabledInit() {

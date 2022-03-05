@@ -16,13 +16,9 @@
 #include "Climber.h"
 #include "Shooter.h"
 #include "Autonomous.h"
-<<<<<<< HEAD
-#include "testPassStateEnoughTime.h"
-=======
 #include "testClimbOneBar.h"
 #include "Limelight.h"
 #include <frc/Timer.h>
->>>>>>> 153137d7462779dbe95f5a48ef39b3f82962bbdb
 
 
 class Robot : public frc::TimedRobot {
@@ -47,8 +43,8 @@ class Robot : public frc::TimedRobot {
 
  private:
 
-  //SwerveDrive m_swerve;
-  // Intake m_intake;
+  SwerveDrive m_swerve;
+  Intake intake;
   // Shooter m_shooter;
   Climber m_climber;
 
@@ -63,8 +59,7 @@ class Robot : public frc::TimedRobot {
   //testClimbOneBar test{m_climber};
 
   AHRS *navx;
-  SwerveDrive m_swerve;
-  Intake intake;
+
 
   frc::Joystick l_joy{OIConstants::l_joy_port};
   frc::Joystick r_joy{OIConstants::r_joy_port};
@@ -77,6 +72,6 @@ class Robot : public frc::TimedRobot {
   double m_timeStep = GeneralConstants::timeStep;
 
 
-  testPassStateEnoughTime tpset{m_climber};
+  //testPassStateEnoughTime tpset{m_climber};
 
 };

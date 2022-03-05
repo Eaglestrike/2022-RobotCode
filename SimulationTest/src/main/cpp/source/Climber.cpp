@@ -215,7 +215,7 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch, bool
        if (!goingTraversal) {std::cout << "moving on to diagonal arm raise\n"; return DIAGONAL_ARM_RAISE;}
         if (goingTraversal) {std::cout << "2nd climb, moving on to diagonal arm retract\n"; return DIAGONAL_ARM_RETRACT;}  }
     else return DIAGONAL_ARM_EXTEND;
-
+    return IDLE;
 }
 
 Climber::State Climber::DiagonalArmRaise(bool passDiagonalArmRaise){
@@ -238,6 +238,7 @@ Climber::State Climber::DiagonalArmRaise(bool passDiagonalArmRaise){
         { if (!goingTraversal) {std::cout << "moving on to diagonal arm retract\n"; return DIAGONAL_ARM_RETRACT;}
         if (goingTraversal) {std::cout << "2nd climb, moving on to diagonal arm extend\n"; return DIAGONAL_ARM_EXTEND;}  }
     else return DIAGONAL_ARM_RAISE;
+    return IDLE;
 }
 
 Climber::State Climber::DiagonalArmRetract(bool doSecondClimb, double pitch, double delta_pitch){
