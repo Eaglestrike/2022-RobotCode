@@ -34,24 +34,22 @@ void Robot::AutonomousInit() {
 
 void Robot::AutonomousPeriodic() {}
 
-int i;
-
 void Robot::SimulationInit() {
-  i = 0;
-  //PhysicsSim::GetInstance().AddTalonFX(m_climber.getMotor(), 0.75, 3400, false);
+  PhysicsSim::GetInstance().AddTalonFX(m_climber.getMotor(), 0.75, 3400, false);
 }
 
 void Robot::SimulationPeriodic() {
-  //PhysicsSim::GetInstance().Run();
+  PhysicsSim::GetInstance().Run();
 
 }
 
 
 void Robot::TeleopInit() {
   //m_climber.SetState(Climber::State::IDLE);
+  //std::cout << "here\n";
+  m_climber.Stop();
   timer.Reset();
   limelight.setLEDMode("OFF");
-  i = 0;
   timer.Reset();
   m_climber.SetState(Climber::State::IDLE); //comment in when running climber periodic
   frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", m_climber.getFullExtendPneumatic());
@@ -94,13 +92,15 @@ void Robot::TeleopPeriodic() {
   frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
   frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMasterMotorOutput());
   frc::SmartDashboard::PutNumber("Gearbox master position: ", m_climber.getMotor().GetSelectedSensorPosition());
-
+  frc::SmartDashboard::PutNumber("Motor current", m_climber.getMotor().GetStatorCurrent());
   frc::SmartDashboard::PutNumber("Pitch", navx->GetPitch());
   frc::SmartDashboard::PutNumber("Delta pitch", navx->GetPitch()-prevPitch);
+  frc::SmartDashboard::PutNumber("fpga time", timer.GetFPGATimestamp().value());
+  // frc::SmartDashboard::PutNumber("get time", timer.Get().value());
 
   frc::SmartDashboard::PutNumber("time", timer.GetMatchTime().value());
 
-  if (xbox.GetRawButtonPressed(2)) m_climber.ToggleStopped(); 
+  if (xbox.GetRawButtonPressed(6) || xbox.GetRawButtonPressed(2)) m_climber.ToggleStopped(); 
 
   //i++;
   //std::cout << "time: " << i * 0.02 << "\n";
@@ -110,7 +110,9 @@ void Robot::TeleopPeriodic() {
    m_swerve.Drive(-x1, -y1, -x2, navx->GetYaw(), true);
    m_swerve.UpdateOdometry(navx->GetYaw());
 
-   if (abs(xbox.GetRightY()) > 0.05) {
+   if (abs(xbox.GetRightY()) > 0.1 && !m_climber.getStopped()) {
+     frc::SmartDashboard::PutNumber("joystick out", xbox.GetRightY());
+     //std::cout << "going\n";
     if (xbox.GetRightY() > 0) m_climber.getMotor().Set(ControlMode::PercentOutput, 0.25);
     if (xbox.GetRightY() < 0) m_climber.getMotor().Set(ControlMode::PercentOutput, -0.25);
     return;
@@ -118,10 +120,10 @@ void Robot::TeleopPeriodic() {
 
  // climbTestPeriodic();
   //so A to continue
-  //B to stop/start
+  //right bumper to stop/start
   //X to retry init climb
   //Y to continue to traversal bar
-   m_climber.Periodic(navx->GetPitch()-prevPitch, navx->GetPitch(), timer.GetMatchTime().value(), 
+   m_climber.Periodic(navx->GetPitch()-prevPitch, navx->GetPitch(), timer.GetFPGATimestamp().value(), 
    xbox.GetRawButton(1),  xbox.GetRawButton(1),  xbox.GetRawButton(3),  xbox.GetRawButton(1),  xbox.GetRawButton(4));
   prevPitch = navx->GetPitch();
 }
@@ -155,7 +157,7 @@ void Robot::climbTestPeriodic() {
   frc::SmartDashboard::PutNumber("Gearbox master position: ", m_climber.getMotor().GetSelectedSensorPosition());
   frc::SmartDashboard::PutNumber("Gearbox master current", m_climber.getMotor().GetStatorCurrent());
 
-  frc::SmartDashboard::PutNumber("time", timer.GetMatchTime().value());  
+  // frc::SmartDashboard::PutNumber("time", timer.GetMatchTime().value());  
 
   m_climber.setTime(timer.Get());
 

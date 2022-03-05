@@ -24,7 +24,7 @@ class Intake{
         void calibrate();
 
     private:
-        WPI_TalonFX intakeMotor{IntakeConstants::intakeMotorPort};
+        WPI_TalonFX intakeMotor{IntakeConstants::intakeMotorPort, "Drivebase"};
 
         frc::Solenoid pneumatic{frc::PneumaticsModuleType::REVPH, 
             IntakeConstants::solenoidPort};

@@ -176,28 +176,28 @@ ClimbConstants{
     const double diagonalArmRetractEnoughTime = 10000000000;
     const double almostDoneTime = 10000000000;
 
-    const double timeToTestExtension = 1.5;
+    const double timeToTestExtension = 2;
 
     const double hookedCurrent = 70;
 
     //bogus values
-    const double acceptablePitch = 10000000000;
-    const double deltaPitchTolerance = 10000000000;
+    const double acceptablePitch = 50;
+    const double deltaPitchTolerance = 5; //has to be less than 2 degree of change in 0.02 secs
     const double veryBadPitch = 10000000000;
     const double veryBadDeltaPitch = 10000000000;
 
     const double diagonalArmExtendWaitTime = 0;
     const double diagonalArmRaiseWaitTime = 1;
 
-    const double motorExtendedPose = -126167;
-    const double motorTestExtendPose = -100000;
-    const double motorRetractedPose = -50;
+    const double motorExtendedPose = -127167;
+    const double motorTestExtendPose = -15000;
+    const double motorRetractedPose = 4400;
 
-    const double motorP = 0.000009;
+    const double motorP = 0.000005;
     const double motorI = 0.000007;
     const double motorD = 0;
 
-    const double motorPoseTolerance = 10000;
+    const double motorPoseTolerance = 5000;
     const double deltaMotorPoseTolerance = 500;
 
     const double motorMaxOutput = 1;

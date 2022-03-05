@@ -41,7 +41,7 @@ class Climber{
         State VerticalArmRetract(double pitch, double delta_pitch, bool retry);
 
         State TestDiagonalArmExtend();
-        State DiagonalArmExtend(double pitch, double delta_pitch);
+        State DiagonalArmExtend(double pitch, double delta_pitch, bool passDiagonalArmRaise);
         State DiagonalArmRaise(bool passDiagonalArmRaise);
         State DiagonalArmRetract(bool doSecondClimb, double pitch, double delta_pitch);
 
@@ -50,6 +50,7 @@ class Climber{
 
         void Calibrate();
         void ToggleStopped() {stopped = !stopped;}
+        bool getStopped() {return stopped;}
 
         //the below public functions are for testing
         void setTime(units::second_t time) {currTime = time.value();}
@@ -88,6 +89,7 @@ class Climber{
         State prevState = IDLE; //for state just changed
 
         bool stopped = false;
+        bool goingTraversal = false;
 
         double currTime = 0;
         double waitStartTime = 0;

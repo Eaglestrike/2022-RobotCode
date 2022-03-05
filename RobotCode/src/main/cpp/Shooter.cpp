@@ -1,7 +1,6 @@
 #include <Shooter.h>
 #include <iostream>
 
-
 Shooter::Shooter(){
     colorMatcher.AddColorMatch(red); //red
     colorMatcher.AddColorMatch(blue); //blue

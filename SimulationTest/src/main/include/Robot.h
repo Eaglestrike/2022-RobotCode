@@ -56,7 +56,7 @@ class Robot : public frc::TimedRobot {
   std::string m_autoSelected;
   
   Limelight limelight;
-  testClimbOneBar test{m_climber};
+  //testClimbOneBar test{m_climber};
 
   AHRS *navx;
   SwerveDrive m_swerve;
