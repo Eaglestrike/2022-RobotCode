@@ -109,6 +109,7 @@ class Climber{
         void pneumaticsMed();
         void pneumaticsVert();
 
+
         bool stateJustChanged();
         units::length::meter_t meterPose();
 

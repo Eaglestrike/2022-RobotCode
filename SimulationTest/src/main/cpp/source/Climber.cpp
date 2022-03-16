@@ -31,7 +31,10 @@ Climber::Periodic(double delta_pitch, double pitch, double time, bool passIdle, 
     currTime = time;
 
     frc::SmartDashboard::PutBoolean("waiting", false);
-    frc::SmartDashboard::PutBoolean("motor done", motorDone(ClimbConstants::motorExtendedPose));
+    frc::SmartDashboard::PutBoolean("motor done extend", motorDone(ClimbConstants::motorExtendedPose));
+
+    // std::cout << "Pos: " << gearboxMaster.GetSelectedSensorPosition() << "\n";
+    // std::cout << "done extend: " << (motorDone(ClimbConstants::motorExtendedPose) || gearboxMaster.GetSelectedSensorPosition() < ClimbConstants::motorExtendedPose) << "\n";
 
     switch(state){
         case IDLE: //needs human input to start climb
@@ -88,27 +91,21 @@ Climber::State Climber::VerticalArmExtend(bool drivenForward){
     pneumaticsVert();
     gearboxMaster.SetNeutralMode(NeutralMode::Coast);
     if (!motorDone(ClimbConstants::motorExtendedPose)) {
-        if (TRYING_PERCENT_OUT) {
-            gearboxMaster.Set(ControlMode::PercentOutput, -0.5);
-        } else {
-            gearboxMaster.Set(ControlMode::PercentOutput, 
-            std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
-            ClimbConstants::motorExtendedPose), -0.7, 0.7));
-        }
-        
-    }
-    if (motorDone(ClimbConstants::motorExtendedPose)) {
+        //std::cout << "Extending\n";
+        gearboxMaster.Set(ControlMode::PercentOutput, -0.4);   
+    } else {
         gearboxMaster.Set(ControlMode::PercentOutput, 0);
         gearboxMaster.SetNeutralMode(NeutralMode::Brake);
+        //std::cout << "stopped\n";
     }
 
 
     //for debugging
-    // frc::SmartDashboard::PutBoolean("Driven forward", drivenForward);
-    // frc::SmartDashboard::PutNumber("Curr time", currTime);
-    //frc::SmartDashboard::PutBoolean("motor done", motorDone(ClimbConstants::motorExtendedPose));
+    frc::SmartDashboard::PutBoolean("Driven forward", drivenForward);
+    frc::SmartDashboard::PutNumber("Curr time", currTime);
+    frc::SmartDashboard::PutBoolean("motor done", motorDone(ClimbConstants::motorExtendedPose));
 
-    if (drivenForward && currTime <= ClimbConstants::verticalArmExtendEnoughTime && motorDone(ClimbConstants::motorExtendedPose)) { 
+    if (drivenForward && currTime <= ClimbConstants::verticalArmExtendEnoughTime && (motorDone(ClimbConstants::motorExtendedPose))) { 
         std::cout << "moving on to vertical arm retract\n"; return VERTICAL_ARM_RETRACT; }
     else return VERTICAL_ARM_EXTEND;
 }
@@ -130,8 +127,8 @@ Climber::State Climber::VerticalArmRetract(double pitch, double delta_pitch, boo
     // frc::SmartDashboard::PutBoolean("curr time", currTime);
     // frc::SmartDashboard::PutBoolean("pitch good", pitchGood(pitch, delta_pitch));
     
-    if ((motorDone(ClimbConstants::motorRetractedPose) || gearboxMaster.GetStatorCurrent() > 200) && currTime <= ClimbConstants::verticalArmRetractEnoughTime
-        && pitchGood(pitch, delta_pitch)) { std::cout << "moving on to test diagonal arm extend\n"; return TEST_DIAGONAL_ARM_EXTEND; }
+    if (motorDone(ClimbConstants::motorRetractedPose) && currTime <= ClimbConstants::verticalArmRetractEnoughTime && pitchGood(pitch, delta_pitch)) { 
+        std::cout << "moving on to test diagonal arm extend\n"; return TEST_DIAGONAL_ARM_EXTEND; }
     else return VERTICAL_ARM_RETRACT;
 
 }
@@ -142,7 +139,7 @@ Climber::State Climber::TestDiagonalArmExtend() {
 
     if (stateJustChanged()) waitStartTime = currTime;
 
-    gearboxMaster.Set(ControlMode::PercentOutput, -0.05);
+    gearboxMaster.Set(ControlMode::PercentOutput, -0.5); //REMEBER YOU CHANDED THIS - should be 0.05
 
     //for debugging
     frc::SmartDashboard::PutBoolean("hooked", hooked());
@@ -177,18 +174,12 @@ Climber::State Climber::DiagonalArmExtend(double pitch, double delta_pitch, bool
     if (!goingTraversal || (goingTraversal && motorDone(ClimbConstants::motorTestExtendPose))) {
         pneumaticsMed();
     }
-    
+   
     if (waited(ClimbConstants::diagonalArmExtendWaitTime, waitStartTime) && !motorDone(ClimbConstants::motorExtendedPose)) {
-        if (TRYING_PERCENT_OUT) {
-            gearboxMaster.Set(ControlMode::PercentOutput, -0.5);
-        } else {
-            gearboxMaster.Set(ControlMode::PercentOutput, 
-            std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
-            ClimbConstants::motorExtendedPose), -0.7, 0.7));
-        }
-        
-    }
-    if (motorDone(ClimbConstants::motorExtendedPose)) {
+        std::cout << "Extending\n";
+        gearboxMaster.Set(ControlMode::PercentOutput, -0.4);   
+    } else {
+        std::cout << "stopped\n";
         gearboxMaster.Set(ControlMode::PercentOutput, 0);
         gearboxMaster.SetNeutralMode(NeutralMode::Brake);
     }
@@ -274,8 +265,21 @@ bool Climber::hooked() {
 //is the motor at set point (kinda redundant now that I know about AtSetpoint(), may erase later)
 //done this way b/c on first loop set point hasn't been set yet
 bool Climber::motorDone(double pose) {
-    return (motorPIDController.AtSetpoint() && abs(pose-gearboxMaster.GetSelectedSensorPosition()) <= ClimbConstants::motorPoseTolerance);
+    bool closeToPoint = (motorPIDController.AtSetpoint() && abs(pose-gearboxMaster.GetSelectedSensorPosition()) <= ClimbConstants::motorPoseTolerance);
+   
+    //extending is negative reading on encoder
+    bool pastPoint = false;
+    if (pose == ClimbConstants::motorExtendedPose) pastPoint = gearboxMaster.GetSelectedSensorPosition() <= ClimbConstants::motorExtendedPose;
+    else if (pose == ClimbConstants::motorRetractedPose) pastPoint = gearboxMaster.GetSelectedSensorPosition() >= ClimbConstants::motorRetractedPose;
+    else if (pose == ClimbConstants::motorTestExtendPose) pastPoint = gearboxMaster.GetSelectedSensorPosition() <= ClimbConstants::motorTestExtendPose;
+    else std::cout << "unrecognized pose in motorDone!\n";
 
+    if (pose == ClimbConstants::motorRetractedPose && gearboxMaster.GetStatorCurrent() > 200) { //assume spool is innacurate and we have retracted
+        gearboxMaster.SetSelectedSensorPosition(0); //should I do this?
+        return true;
+    }
+
+    return closeToPoint || pastPoint;
 }
 
 //has the climber swinging stabilized enough to continue
@@ -329,6 +333,7 @@ void Climber::pneumaticsVert() {
     climbFullExtend.Set(false);
     climbMedExtend.Set(true);
 }
+
 
 //Calibration function for whatever
 void

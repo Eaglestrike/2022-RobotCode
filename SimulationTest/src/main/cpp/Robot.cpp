@@ -17,7 +17,7 @@ void Robot::RobotInit() {
 
   m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
   m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
-  frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+  //frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
    try{
     navx = new AHRS(frc::SPI::Port::kMXP);
   } catch(const std::exception& e) {
@@ -44,6 +44,7 @@ void Robot::SimulationPeriodic() {
 
 
 void Robot::TeleopInit() {
+  m_climber.getMotor().SetSelectedSensorPosition(0);
   //m_climber.SetState(Climber::State::IDLE);
   //std::cout << "here\n";
   m_climber.Stop();
@@ -118,9 +119,9 @@ void Robot::TeleopPeriodic() {
     return;
   }
 
- // climbTestPeriodic();
+  //climbTestPeriodic();
   //so A to continue
-  //right bumper to stop/start
+  //right bumper or B to stop/start
   //X to retry init climb
   //Y to continue to traversal bar
    m_climber.Periodic(navx->GetPitch()-prevPitch, navx->GetPitch(), timer.GetFPGATimestamp().value(), 
@@ -150,12 +151,12 @@ void Robot::TestPeriodic() {
 
 //put this here so we don't have to look at it 
 void Robot::climbTestPeriodic() {
+
   m_climber.getBrake().Set(false);
 
   frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", m_climber.getFullExtendPneumatic());
   frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
   frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMasterMotorOutput());
-  frc::SmartDashboard::PutNumber("Gearbox master position: ", m_climber.getMotor().GetSelectedSensorPosition());
   frc::SmartDashboard::PutNumber("Gearbox master current", m_climber.getMotor().GetStatorCurrent());
 
   // frc::SmartDashboard::PutNumber("time", timer.GetMatchTime().value());  
@@ -209,32 +210,44 @@ void Robot::climbTestPeriodic() {
    * Press the button and see if the climber goes to the right position
    * If it's too slow or going wrong way or anything, tune PID OR change max ClimbConstants::motorMaxOutput
   **/
-  if (xbox.GetRawButton(1)) { //A
+  // if (xbox.GetRawButton(1)) { //A
+  //   m_climber.testRaiseVerticalArm();
+  // }
+  // /** #7: test if motor can go to set retracted pose
+  //  * Start from extended position (just not retracted position)
+  //  * Press the button and see if the climber goes to the right position
+  //  * If it's too slow or going wrong way or anything, tune PID OR change max ClimbConstants::motorMaxOutput
+  // **/
+  // else if (xbox.GetRawButton(2)) { //B
+  //   //m_climber.retractArm();
+  //   m_climber.testRetractVerticalArm();
+  // }
+  // /** #8: test if arm can extend diagonally
+  //  * Not doing hooked for now, just walking through states. this for rest of else-ifs too, for now
+  // **/
+  // else if (xbox.GetRawButton(3)) { //X
+  //   m_climber.testDiagonalExtension();
+  // }
+  // else if (xbox.GetRawButton(4)) { //Y
+  //   m_climber.testDiagonalArmRaise();
+  // }
+  // else if (xbox.GetRawButton(8)) { //tiny button next to X
+  //   m_climber.testBarTraversalFromRaised();
+  // }
+  // else if (xbox.GetRawButton(7)) { //the other one
+  //   m_climber.retractArm();
+  // }
+
+  //FOR POSITION TESTING
+
+  if (xbox.GetRawButton(1)) {
     m_climber.testRaiseVerticalArm();
   }
-  /** #7: test if motor can go to set retracted pose
-   * Start from extended position (just not retracted position)
-   * Press the button and see if the climber goes to the right position
-   * If it's too slow or going wrong way or anything, tune PID OR change max ClimbConstants::motorMaxOutput
-  **/
-  else if (xbox.GetRawButton(2)) { //B
-    //m_climber.retractArm();
+  else if (xbox.GetRawButton(2)) {
     m_climber.testRetractVerticalArm();
   }
-  /** #8: test if arm can extend diagonally
-   * Not doing hooked for now, just walking through states. this for rest of else-ifs too, for now
-  **/
-  else if (xbox.GetRawButton(3)) { //X
-    m_climber.testDiagonalExtension();
-  }
-  else if (xbox.GetRawButton(4)) { //Y
-    m_climber.testDiagonalArmRaise();
-  }
-  else if (xbox.GetRawButton(8)) { //tiny button next to X
-    m_climber.testBarTraversalFromRaised();
-  }
-  else if (xbox.GetRawButton(7)) { //the other one
-    m_climber.retractArm();
+  else if (xbox.GetRawButton(3)) {
+    m_climber.getMotor().SetSelectedSensorPosition(0);
   }
 
   else {

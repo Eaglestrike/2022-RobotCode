@@ -189,15 +189,15 @@ ClimbConstants{
     const double diagonalArmExtendWaitTime = 0;
     const double diagonalArmRaiseWaitTime = 1;
 
-    const double motorExtendedPose = -127167;
+    const double motorExtendedPose = -115167;
     const double motorTestExtendPose = -15000;
-    const double motorRetractedPose = 4400;
+    const double motorRetractedPose = 1000;
 
     const double motorP = 0.000005;
     const double motorI = 0.000007;
     const double motorD = 0;
 
-    const double motorPoseTolerance = 5000;
+    const double motorPoseTolerance = 4000;
     const double deltaMotorPoseTolerance = 500;
 
     const double motorMaxOutput = 1;

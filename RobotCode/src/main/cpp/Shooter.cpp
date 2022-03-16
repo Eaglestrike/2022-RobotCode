@@ -12,18 +12,29 @@ Shooter::Shooter(){
     m_kicker.SetNeutralMode(NeutralMode::Brake);
 
     //Set the data into the Map
-    //Place actual values here
-    dataMap[-5] = {1,1};
-    dataMap[-4] = {1,1};
-    dataMap[-3] = {1,1};
-    dataMap[-2] = {1,1};
-    dataMap[-1] = {1,1};
-    dataMap[0] = {1,1};
-    dataMap[1] = {1,1};
-    dataMap[2] = {1,1};
-    dataMap[3] = {1,1};
-    dataMap[4] = {1,1};
-    dataMap[5] = {1,1};
+    dataMap[-24.0] = {5800, 18500};
+    dataMap[-23.5] = {5750, 18500};
+    dataMap[-22.5] = {5700, 18500};
+    dataMap[-21.5] = {5600, 18500};
+    dataMap[-20.0] = {5500, 18200};
+    dataMap[-19.2] = {5500, 18000};
+    dataMap[-18.0] = {5400, 17400};
+    dataMap[-16.7] = {5400, 17000}; 
+    dataMap[-15.4] = {4900, 15700};
+    dataMap[-14.5] = {4600, 15500};
+    dataMap[-12.6] = {4500, 14500};
+    dataMap[-11.2] = {4400, 13800};
+    dataMap[-9.7] = {4400, 13600};
+    dataMap[-8.0] = {4200, 13500};
+    dataMap[-6.2] = {4000, 13500};
+    dataMap[-5.0] = {3600, 13500};
+    dataMap[-2.5] = {3000, 13900};
+    dataMap[-0.5] = {2400, 13200};
+    dataMap[5.5] = {1900, 12300};
+    dataMap[9.1] = {1700, 12300};
+    dataMap[12.4] = {1500, 12300};
+    dataMap[16.5] = {1300, 12200};
+    dataMap[18.7] = {1200, 12000};
     //m_limelight->setLEDMode("OFF");
     m_hoodZero = false;
     m_turretZero = false;

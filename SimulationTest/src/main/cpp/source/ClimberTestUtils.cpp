@@ -63,25 +63,43 @@ void Climber::setArmVertical() {
 
 void Climber::testRaiseVerticalArm() {
    // SetState(VERTICAL_ARM_EXTEND);
-   climbMedExtend.Set(true);
-   climbFullExtend.Set(true);
-   std::cout << "here\n";    
-    gearboxMaster.SetNeutralMode(NeutralMode::Coast);
-    gearboxMaster.Set(ControlMode::PercentOutput, 
+//    climbMedExtend.Set(true);
+//    climbFullExtend.Set(true);
+//    std::cout << "here\n";   
+    std::cout << " pos:" << gearboxMaster.GetSelectedSensorPosition() << '\n';
+    //frc::SmartDashboard::PutBoolean("motor done: ", motorDone(ClimbConstants::motorExtendedPose));
+     std::cout <<" done: " << motorDone(ClimbConstants::motorExtendedPose) << "\n";
+    if (TRYING_PERCENT_OUT) {
+        //std::cout << "trying percwnt out\n";
+        //minus  tokerance cause negative poses
+        if (!motorDone(ClimbConstants::motorExtendedPose) && gearboxMaster.GetSelectedSensorPosition() > ClimbConstants::motorExtendedPose-ClimbConstants::motorPoseTolerance) 
+            gearboxMaster.Set(ControlMode::PercentOutput, -0.5);
+        else {
+            gearboxMaster.Set(ControlMode::PercentOutput, 0);
+            gearboxMaster.SetNeutralMode(NeutralMode::Brake);
+        }
+    } else {
+        //std::cout << "pid\n";
+        gearboxMaster.Set(ControlMode::PercentOutput, 
         std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
-        ClimbConstants::motorExtendedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
-    //gearboxMaster.Set(ControlMode::PercentOutput, motorProfiledPID.Calculate(136167_m));
+        ClimbConstants::motorExtendedPose), -0.7, 0.7));
+    }
     
 }
 
 void Climber::testRetractVerticalArm() {
   //  SetState(VERTICAL_ARM_RETRACT);
      
-    gearboxMaster.SetNeutralMode(NeutralMode::Coast);   
-    gearboxMaster.Set(ControlMode::PercentOutput, 
+    gearboxMaster.SetNeutralMode(NeutralMode::Coast); 
+    if (!motorDone(ClimbConstants::motorRetractedPose)) {
+        std::cout << "motor noty done\n";
+        gearboxMaster.Set(ControlMode::PercentOutput, 
         std::clamp(motorPIDController.Calculate(gearboxMaster.GetSelectedSensorPosition(), 
         ClimbConstants::motorRetractedPose), -ClimbConstants::motorMaxOutput, ClimbConstants::motorMaxOutput));
-    
+    }   else {
+            gearboxMaster.Set(ControlMode::PercentOutput, 0);
+            gearboxMaster.SetNeutralMode(NeutralMode::Brake);
+        }   
 }
 
 void Climber::testSeesIfHooked() {
