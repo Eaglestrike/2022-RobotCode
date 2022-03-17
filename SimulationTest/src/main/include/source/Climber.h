@@ -53,6 +53,8 @@ class Climber{
         bool getStopped() {return stopped;}
 
         //the below public functions are for testing
+        void basicSmartDashboard();
+
         void setTime(units::second_t time) {currTime = time.value();}
 
         bool getFullExtendPneumatic() {return climbFullExtend.Get();}

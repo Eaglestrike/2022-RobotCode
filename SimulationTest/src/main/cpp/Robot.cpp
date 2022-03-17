@@ -26,7 +26,9 @@ void Robot::RobotInit() {
 
 }
 
-void Robot::RobotPeriodic() {}
+void Robot::RobotPeriodic() {
+  m_climber.basicSmartDashboard();
+}
 
 void Robot::AutonomousInit() {
 }
@@ -52,10 +54,10 @@ void Robot::TeleopInit() {
   limelight.setLEDMode("OFF");
   timer.Reset();
   m_climber.SetState(Climber::State::IDLE); //comment in when running climber periodic
-  frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", m_climber.getFullExtendPneumatic());
-  frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
-  frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMotor().GetMotorOutputPercent());
-  frc::SmartDashboard::PutNumber("Gearbox master position: ", m_climber.getMotor().GetSelectedSensorPosition());
+  // frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", m_climber.getFullExtendPneumatic());
+  // frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
+  // frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMotor().GetMotorOutputPercent());
+  // frc::SmartDashboard::PutNumber("Gearbox master position: ", m_climber.getMotor().GetSelectedSensorPosition());
   m_climber.getMotor().SetNeutralMode(NeutralMode::Coast);
 }
 
@@ -89,17 +91,9 @@ void Robot::TeleopPeriodic() {
   limelight.setLEDMode("OFF");
   intake.Retract();
 
-  frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", m_climber.getFullExtendPneumatic());
-  frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
-  frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMasterMotorOutput());
-  frc::SmartDashboard::PutNumber("Gearbox master position: ", m_climber.getMotor().GetSelectedSensorPosition());
-  frc::SmartDashboard::PutNumber("Motor current", m_climber.getMotor().GetStatorCurrent());
-  frc::SmartDashboard::PutNumber("Pitch", navx->GetPitch());
-  frc::SmartDashboard::PutNumber("Delta pitch", navx->GetPitch()-prevPitch);
-  frc::SmartDashboard::PutNumber("fpga time", timer.GetFPGATimestamp().value());
   // frc::SmartDashboard::PutNumber("get time", timer.Get().value());
 
-  frc::SmartDashboard::PutNumber("time", timer.GetMatchTime().value());
+  //frc::SmartDashboard::PutNumber("time", timer.GetMatchTime().value());
 
   if (xbox.GetRawButtonPressed(6) || xbox.GetRawButtonPressed(2)) m_climber.ToggleStopped(); 
 
@@ -154,10 +148,11 @@ void Robot::climbTestPeriodic() {
 
   m_climber.getBrake().Set(false);
 
-  frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", m_climber.getFullExtendPneumatic());
-  frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
-  frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMasterMotorOutput());
-  frc::SmartDashboard::PutNumber("Gearbox master current", m_climber.getMotor().GetStatorCurrent());
+  m_climber.basicSmartDashboard();
+  // frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", m_climber.getFullExtendPneumatic());
+  // frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", m_climber.getMedExtendPneumatic());
+  // frc::SmartDashboard::PutNumber("Gearbox master percent out", m_climber.getMasterMotorOutput());
+  // frc::SmartDashboard::PutNumber("Gearbox master current", m_climber.getMotor().GetStatorCurrent());
 
   // frc::SmartDashboard::PutNumber("time", timer.GetMatchTime().value());  
 

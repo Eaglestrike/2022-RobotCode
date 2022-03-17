@@ -30,8 +30,8 @@ Climber::Periodic(double delta_pitch, double pitch, double time, bool passIdle, 
     }
     currTime = time;
 
-    frc::SmartDashboard::PutBoolean("waiting", false);
-    frc::SmartDashboard::PutBoolean("motor done extend", motorDone(ClimbConstants::motorExtendedPose));
+    // frc::SmartDashboard::PutBoolean("waiting", false);
+    // frc::SmartDashboard::PutBoolean("motor done extend", motorDone(ClimbConstants::motorExtendedPose));
 
     // std::cout << "Pos: " << gearboxMaster.GetSelectedSensorPosition() << "\n";
     // std::cout << "done extend: " << (motorDone(ClimbConstants::motorExtendedPose) || gearboxMaster.GetSelectedSensorPosition() < ClimbConstants::motorExtendedPose) << "\n";

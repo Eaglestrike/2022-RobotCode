@@ -11,6 +11,16 @@ void Climber::InitializeTests() {
     prevState = IDLE;
 }
 
+void Climber::basicSmartDashboard() {
+frc::SmartDashboard::PutBoolean("Full Extend Pneumatic", climbFullExtend.Get());
+  frc::SmartDashboard::PutBoolean("Med Extend Pneumatic", climbMedExtend.Get());
+  frc::SmartDashboard::PutNumber("Gearbox master percent out", gearboxMaster.GetMotorOutputPercent());
+  frc::SmartDashboard::PutNumber("Gearbox master position: ", gearboxMaster.GetSelectedSensorPosition());
+  frc::SmartDashboard::PutNumber("Motor current", gearboxMaster.GetStatorCurrent());
+  frc::SmartDashboard::PutNumber("Motor done", motorDone(motorPIDController.GetSetpoint()));
+  frc::SmartDashboard::PutBoolean("waiting", false);
+}
+
 void Climber::Stop() {
     gearboxMaster.Set(ControlMode::PercentOutput, 0);
     gearboxMaster.SetNeutralMode(NeutralMode::Brake);
