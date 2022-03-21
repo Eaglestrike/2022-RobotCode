@@ -3,6 +3,13 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 
+static const DataLogger::DataFields datalog_fields = {
+  // Teleop related data
+  {"teleop.joysticks.x1", DataLogger::DataType::FLOAT64},
+  {"teleop.joysticks.y1", DataLogger::DataType::FLOAT64},
+  {"teleop.joysticks.x2", DataLogger::DataType::FLOAT64},
+};
+
 void 
 Robot::RobotInit() {
   m_chooser.SetDefaultOption("Blue", blueAlliance);
@@ -21,6 +28,8 @@ Robot::RobotInit() {
   } catch(const std::exception& e){
     std::cout << e.what() <<std::endl;
   }
+
+  m_datalog = new DataLogger("/home/lvuser/robotlog.log", datalog_fields);
 
   m_swerve.debug(*navx);
   m_climbing = false;
@@ -127,7 +136,9 @@ Robot::TeleopInit() {
 void 
 Robot::TeleopPeriodic() {
   m_time += m_timeStep;
-  double x1, y1, x2;
+  auto& x1 = m_datalog->get_float64("teleop.joysticks.x1");
+  auto& y1 = m_datalog->get_float64("teleop.joysticks.y1");
+  auto& x2 = m_datalog->get_float64("teleop.joysticks.x2");
   x1 = l_joy.GetRawAxis(0) * 0.7;
   y1 = l_joy.GetRawAxis(1);
   x2 = r_joy.GetRawAxis(0);
@@ -204,6 +215,7 @@ Robot::TeleopPeriodic() {
   // frc::SmartDashboard::PutNumber("Yaw", navx->GetYaw());
   // frc::SmartDashboard::PutNumber("POV", l_joy.GetPOV());
 
+  m_datalog->publish();
 }
 
 

@@ -18,6 +18,7 @@
 #include "Climber.h"
 #include "AutoMode.h"
 #include "cameraserver/CameraServer.h"
+#include "DataLogger.hpp"
 
 
 frc::Joystick l_joy{OIConstants::l_joy_port};
@@ -52,6 +53,8 @@ class Robot : public frc::TimedRobot {
   Intake m_intake;
   Shooter m_shooter;
   Climber m_climber;
+
+  DataLogger *m_datalog;
 
   double out;
   bool m_climbing = false;
