@@ -45,7 +45,7 @@ Intake::Deploy(){
 //Run the Intake
 void
 Intake::Run(){
-    m_intakeMotor.Set(ControlMode::PercentOutput, -0.39);
+    m_intakeMotor.Set(ControlMode::PercentOutput, -0.45);
 }
 
 
@@ -65,7 +65,7 @@ Intake::Retract(){
 //Unjam the Intake
 void
 Intake::Unjam(){
-    m_intakeMotor.Set(ControlMode::PercentOutput, 0.39);
+    m_intakeMotor.Set(ControlMode::PercentOutput, 0.45);
 }
 
 

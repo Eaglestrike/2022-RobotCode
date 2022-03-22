@@ -30,7 +30,6 @@ class Climber{
         void RetractfirstStage();
         void RetractsecondStage();
         void enableBrake();
-        void disableBrake();
         void whenDisabled();
 
 

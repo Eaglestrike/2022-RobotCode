@@ -6,7 +6,6 @@
 #include <units/time.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 //#include <FramePeriod.h>
-#include <frc/DigitalInput.h>
 
 class Intake{
     public:
@@ -27,6 +26,7 @@ class Intake{
         void Retract();
         void Unjam();
         void setState(State newstate);
+        //void motorFrame(FramePeriod& frameperiod);
 
     private:
         WPI_TalonFX m_intakeMotor{IntakeConstants::intakeMotorPort, "Drivebase"};
