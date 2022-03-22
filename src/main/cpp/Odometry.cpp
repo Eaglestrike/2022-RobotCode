@@ -1,82 +1,74 @@
 #include <Odometry.h>
 
-//Constructor
-Odometry::Odometry(){}
+// Constructor
+Odometry::Odometry() {}
 
+// Updates the Odometry Robot location
+void Odometry::updateOdometry(double br_angle_rad, double br_dist_m,
+                              double bl_angle_rad, double bl_dist_m,
+                              double fr_angle_rad, double fr_dist_m,
+                              double fl_angle_rad, double fl_dist_m,
+                              double theta_rad, double dt) {
+    if (!init) {
+        prev_bl = bl_dist_m;
+        prev_br = br_dist_m;
+        prev_fr = fr_dist_m;
+        prev_fl = fl_dist_m;
+        init = true;
+        return;
+    }
+    double delta_bl_dist_m = bl_dist_m - prev_bl;
+    prev_bl = bl_dist_m;
+    double delta_br_dist_m = br_dist_m - prev_br;
+    prev_br = br_dist_m;
+    double delta_fr_dist_m = fr_dist_m - prev_fr;
+    prev_fr = fr_dist_m;
+    double delta_fl_dist_m = fl_dist_m - prev_fl;
+    prev_fl = fl_dist_m;
 
-//Updates the Odometry Robot location
-void
-Odometry::updateOdometry(double BR_A, double BR_V,
-            double BL_A, double BL_V,
-            double FR_A, double FR_V,
-            double FL_A, double FL_V,
-            double theta){
+    double br_y = sin(br_angle_rad) * delta_br_dist_m;
+    double br_x = cos(br_angle_rad) * delta_br_dist_m;
+    double bl_y = sin(bl_angle_rad) * delta_bl_dist_m;
+    double bl_x = cos(bl_angle_rad) * delta_bl_dist_m;
+    double fr_y = sin(fr_angle_rad) * delta_fr_dist_m;
+    double fr_x = cos(fr_angle_rad) * delta_fr_dist_m;
+    double fl_y = sin(fl_angle_rad) * delta_fl_dist_m;
+    double fl_x = cos(fl_angle_rad) * delta_fl_dist_m;
 
-    double B_FL = sin(FL_A * PI/180) * FL_V;
-    double A_RL = sin(BL_A * PI/180) * BL_V;
-    double A_RR = sin(BR_A * PI/180) * BR_V;
-    double D_FL = cos(FL_A * PI/180) * FL_V;
-    double C_FR = cos(FR_A * PI/180) * FR_V;
-    double B_FR = sin(FR_A * PI/180) * FR_V;
-    double D_RL = cos(BL_A * PI/180) * BL_V;
-    //Potential Typo
-    double C_RR = cos(BR_A * PI/180) * BR_V;
+    double robot_local_dy = (fl_y + fr_y + bl_y + br_y) / 4.0;
+    double robot_local_dx = (fl_x + fr_x + bl_x + br_x) / 4.0;
 
-    double A = (A_RR + A_RL) / 2;
-    double B = (B_FL + B_FR) / 2;
-    double C = (C_FR + C_RR) / 2;
-    double D = (D_FL + D_RL) / 2;
-
-    double ROT1 = (B-A)/m_L;
-    double ROT2 = (C-D)/m_W;
-    double ROT = (ROT1 + ROT2) / 2;
-
-    m_FWD = ((ROT * (m_L/2) + A) + (-ROT * (m_L/2) + B)) / 2;
-    m_STR = -((ROT * (m_W/2) + C) + (-ROT * (m_W/2) + D)) / 2;
-
-    m_FWD_new = m_FWD * cos(theta * PI/180) + m_STR * sin(theta * PI/180);
-    m_STR_new = m_STR * cos(theta * PI/180) - m_FWD * sin(theta * PI/180);
+    double global_dx =
+        robot_local_dx * cos(theta_rad) - robot_local_dy * sin(theta_rad);
+    double global_dy =
+        robot_local_dx * sin(theta_rad) + robot_local_dy * cos(theta_rad);
     // frc::SmartDashboard::PutNumber("m_FWD", m_FWD_new);
     // frc::SmartDashboard::PutNumber("m_STR", m_STR_new);
-    
-    //From Velocity to Position
-    m_prevtimeStep = m_timeStep;
-    m_timeStep += timeInterval;
-    m_x = m_x + m_FWD_new * (m_timeStep - m_prevtimeStep) * 58.04;
-    m_y = m_y + m_STR_new * (m_timeStep - m_prevtimeStep) * 58.04;
+
+    m_xdot = global_dx / dt;
+    m_ydot = global_dy / dt;
+
+    // From Velocity to Position
+    m_x += global_dx;
+    m_y += global_dy;
 }
 
+// Return X position
+double Odometry::getX() { return m_x; }
 
-//Return X position
-double
-Odometry::getX(){
-    return m_x;
-}
+// Return Y position
+double Odometry::getY() { return m_y; }
 
+double Odometry::getYSpeed() { return m_ydot; }
 
-//Return Y position
-double
-Odometry::getY(){
-    return m_y;
-}
+double Odometry::getXSpeed() { return m_xdot; }
 
-
-double
-Odometry::getYSpeed(){
-    return m_FWD_new;
-}
-
-
-double
-Odometry::getXSpeed(){
-    return m_STR_new;
-}
-
-
-//Reset Odometry
-void
-Odometry::Reset(){
+// Reset Odometry, without resetting seen encoder values.
+// To renormalize to seen encoder values, call updateOdometry,
+// then Reset.
+void Odometry::Reset() {
     m_x = 0;
     m_y = 0;
-    m_timeStep = 0;
+    m_xdot = 0;
+    m_ydot = 0;
 }
