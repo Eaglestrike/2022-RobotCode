@@ -124,7 +124,9 @@ Shooter::Periodic(){
             break;
     }
     if(m_targetTurretAng<ShooterConstants::turretMax && m_targetTurretAng>ShooterConstants::turretMin){
-        m_turret.Set(ControlMode::Position, m_targetTurretAng);
+        double intervalTarget = m_targetTurretAng-m_turret.GetSelectedSensorPosition();
+        intervalTarget = intervalTarget > turnInterval? turnInterval: (intervalTarget < -turnInterval? -turnInterval: intervalTarget);
+        m_turret.Set(ControlMode::Position, intervalTarget+m_turret.GetSelectedSensorPosition());
     }
     m_channel.Periodic();
 
@@ -359,6 +361,9 @@ Shooter::setPID(){
     frc::SmartDashboard::PutNumber("I", I);
     double D = frc::SmartDashboard::GetNumber("D", 0.0);
     frc::SmartDashboard::PutNumber("D", D);
+
+    turnInterval = frc::SmartDashboard::GetNumber("Turn Interval", 0.0);
+    frc::SmartDashboard::PutNumber("Turn Interval", turnInterval);
 
     m_turretPos.SetPID(P, I, D);
     m_turret.Config_kP(0, P);

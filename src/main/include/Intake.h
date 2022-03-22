@@ -31,7 +31,7 @@ class Intake{
     private:
         WPI_TalonFX m_intakeMotor{IntakeConstants::intakeMotorPort, "Drivebase"};
 
-        frc::Solenoid pneumatics{frc::PneumaticsModuleType::REVPH, 
+        frc::Solenoid pneumatics{frc::PneumaticsModuleType::CTREPCM, 
             IntakeConstants::solenoidPort};
 
         units::second_t duration{0.1};

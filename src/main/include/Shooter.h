@@ -112,4 +112,5 @@ class Shooter{
         double speed_scale_factor = 1.0;
 
         double m_targetTurretAng = 1;
+        double turnInterval = 90;
 };
