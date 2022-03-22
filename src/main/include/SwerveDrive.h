@@ -30,9 +30,6 @@ class SwerveDrive{
         double calcYawStraight(double targetAngle, double currentAngle);
         void GenerateTrajectory_1();
         void GenerateTrajectory_2();
-        void GenerateTrajectory_3();
-        // void GenerateTrajectory_2();
-        // void GenerateTrajectory_2();
 
         void debug(AHRS &navx);
 

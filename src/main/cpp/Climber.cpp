@@ -16,7 +16,7 @@ Climber::Climber(){
     climbStage2.SetPulseDuration(pulse);
     climbStage1.SetPulseDuration(pulse);
 
-    //diskBrake.Set(false);
+    diskBrake.Set(false);
 }
 
 
@@ -111,7 +111,7 @@ Climber::RetractsecondStage(){
 }
 
 void
-Climber::disableBrake(){
+Climber::enableBrake(){
     diskBrake.Set(true);
 }
 

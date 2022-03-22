@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <rev/ColorSensorV3.h>
 #include <rev/ColorMatch.h>
+#include <math.h>
 
 
 class Shooter{
@@ -29,7 +30,7 @@ class Shooter{
         Shooter();
         ~Shooter();
         void DisableMotors();
-        void Periodic();
+        void Periodic(double robotX, double robotY);
         void Aim();
         void Shoot();
         bool withinRange(std::vector<double>& array, double p, double& p1, double& p2);
@@ -44,8 +45,7 @@ class Shooter{
         double convertToRPM(double ticks);
         void setColor(bool isblue);
         void LowShot();
-        void peekTurret(double navX, double POV);
-        void enablelimelight();
+        void peekTurret();
 
     private:
         //TalonFX in ticks - 0 - 20,000
@@ -59,8 +59,6 @@ class Shooter{
 
         frc::DigitalInput m_turretLimitSwitch{ShooterConstants::turretLimitSwitch};
         frc::DigitalInput m_photogate{ShooterConstants::photogate};
-
-        frc::DigitalInput m_photogate2{7};
 
         frc2::PIDController m_turretController{ShooterConstants::turretP,
             ShooterConstants::turretI, ShooterConstants::turretD};
@@ -82,16 +80,11 @@ class Shooter{
 
         //For storing hood and angle values for shooting
         //angle , speed
-        // std::vector<double> dataPoints = {
-        //     -24.0, -23.5, -22.5, -21.5, -20.0, -19.2, -18.0, -16.7, -15.4, 
-        //     -14.5, -12.6, -11.2, -9.7, -8.0, -6.2, -5.0, -2.5, -0.5, 5.5, 
-        //     9.1, 12.4, 16.5, 18.7
-        // };
-
-        // std::vector<double> dataPoints = {19.88, 16.00, 14.20, 9.9, 6.0, 3.65, 1.7,
-        //     0.5, -1.8, -5.4, -7.4, -9.5, -12.5, -14.8, -17.5, -18.9, -19.4};
-        std::vector<double> dataPoints = {-19.4, -18.9, -17.5, -14.8, -12.5, -9.5,
-            -7.4, -5.4, -1.8, 0.5, 1.7, 3.65, 6.0, 9.9, 14.2, 16.0, 19.88};
+        std::vector<double> dataPoints = {
+            -24.0, -23.5, -22.5, -21.5, -20.0, -19.2, -18.0, -16.7, -15.4, 
+            -14.5, -12.6, -11.2, -9.7, -8.0, -6.2, -5.0, -2.5, -0.5, 5.5, 
+            9.1, 12.4, 16.5, 18.7
+        };
         std::unordered_map <double, std::pair<double, double>> dataMap;
 
         frc::Color ballColor;
@@ -107,6 +100,17 @@ class Shooter{
         bool m_blue;
         double confidence = 0.65;
 
-        double angle_scale_factor = 1.0;
-        double speed_scale_factor = 1.0;
+        double angle_scale_factor = 1;
+        double speed_scale_factor = 1;
+
+        //Shooting Without Limelight
+        double m_robotX = 0;
+        double m_robotY = 0;
+        double m_robotAng = 0;
+        double m_lastAngle = 0;
+        double m_lastDistance = 0;
+        double m_lastX = 0;
+        double m_lastY = 0;
+        //Probably increase over time -- not used right now
+        double m_OdometryErrorRate = 0;
 };

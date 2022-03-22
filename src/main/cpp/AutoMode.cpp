@@ -2,31 +2,13 @@
 
 AutoMode::AutoMode(){
     index = 0;
+   
 }
 
 
 void
 AutoMode::ResetAuto(){
     index = 0;
-}
-
-void
-AutoMode::SetMode(int autoMode){
-    if(autoMode == 1){
-        actions = actions1;
-        times = times1;
-        waypointIndex = waypointIndex1;
-    }
-    if(autoMode == 2){
-        actions = actions2;
-        times = times2;
-        waypointIndex = waypointIndex2;
-    }
-    if(autoMode == 3){
-        actions = actions3;
-        times = times3;
-        waypointIndex = waypointIndex3;
-    }
 }
 
 
