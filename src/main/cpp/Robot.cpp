@@ -186,8 +186,8 @@ Robot::TeleopPeriodic() {
     }
     //Start button on joystick will reset robot yaw
     else if(xbox.GetStartButtonPressed()){
-      navx->Reset();
-      // m_shooter.setPID();
+      // navx->Reset();
+      m_shooter.setPID();
       // m_shooter.Calibrate();
     }
     // Button A will outtake
