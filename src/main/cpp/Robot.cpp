@@ -8,6 +8,11 @@ Robot::RobotInit() {
   m_chooser.SetDefaultOption("Blue", blueAlliance);
   m_chooser.AddOption("RED", redAlliance);
   frc::SmartDashboard::PutData("Alliance Color", &m_chooser);
+
+  m_autoMode.SetDefaultOption("1", mode1);
+  m_autoMode.AddOption("2", mode2);
+  m_autoMode.AddOption("3", mode3);
+  frc::SmartDashboard::PutData("Auto Mode", &m_autoMode);
   
   camera = frc::CameraServer::GetInstance()->StartAutomaticCapture();
   
@@ -16,6 +21,7 @@ Robot::RobotInit() {
   } catch(const std::exception& e){
     std::cout << e.what() <<std::endl;
   }
+
   m_swerve.debug(*navx);
   m_climbing = false;
 }
@@ -28,10 +34,19 @@ Robot::RobotPeriodic() {
 
 void 
 Robot::AutonomousInit() {
+  int mode = m_autoMode.GetSelected();
+  m_auto.SetMode(mode);
+  if(mode == 1){
+    m_swerve.GenerateTrajectory_1();
+  } else if(mode == 2){
+    m_swerve.GenerateTrajectory_2();
+  } else if(mode == 3){
+    m_swerve.GenerateTrajectory_3();
+  }
+
   m_auto.ResetAuto();
   m_time = 0;
   m_swerve.ResetOdometry();
-  m_swerve.GenerateTrajectory_1();
   m_swerve.Initialize();
   m_intake.Deploy();
   m_shooter.setState(Shooter::State::IDLE);
@@ -39,18 +54,17 @@ Robot::AutonomousInit() {
   m_shooter.Zero();
   PDH.ClearStickyFaults();
   navx->Reset();
-
+  m_shooter.enablelimelight();
   //This might not work??
-  m_climber.Initialize();
+  
 }
 
 
 void 
 Robot::AutonomousPeriodic() {
   m_time += m_timeStep;
+
   m_auto.Periodic(m_time);
-  //frc::SmartDashboard::PutNumber("Y", m_swerve.GetYPosition());
-  //frc::SmartDashboard::PutNumber("X", m_swerve.GetXPostion());
 
   switch(m_auto.getState()){
     case AutoMode::State::IDLE:
@@ -70,21 +84,21 @@ Robot::AutonomousPeriodic() {
       m_swerve.TrajectoryFollow(navx->GetYaw(), m_auto.getWaypointIndex());
       break;
     case AutoMode::State::INTAKE:
-      // m_intake.setState(Intake::State::RUN);
-      // m_shooter.setState(Shooter::State::LOAD);
+      m_intake.setState(Intake::State::RUN);
+      m_shooter.setState(Shooter::State::LOAD);
       break;
     default:
       break;
   }
-
   m_intake.Periodic();
-  m_shooter.Periodic(m_swerve.GetXPosition(), m_swerve.GetYPosition());
+  m_shooter.Periodic();
 }
 
 
 void
 Robot::TeleopInit() {
-  //Put this in robotinit?
+  m_climber.Initialize();
+
   if(m_chooser.GetSelected() == blueAlliance){
     m_shooter.setColor(true);
   } else {
@@ -95,6 +109,7 @@ Robot::TeleopInit() {
   navx->Reset();
 
   m_shooter.setState(Shooter::State::IDLE);
+  m_shooter.enablelimelight();
   m_intake.setState(Intake::State::IDLE);
   m_swerve.Initialize();
 
@@ -103,7 +118,7 @@ Robot::TeleopInit() {
   
   PDH.ClearStickyFaults();
   m_intake.Deploy();
-  m_shooter.Periodic(m_swerve.GetXPosition(), m_swerve.GetYPosition());
+  m_shooter.Periodic();
   m_intake.Periodic();
   m_climber.Initialize();
 }
@@ -161,33 +176,33 @@ Robot::TeleopPeriodic() {
     //back button will enable climb
     else if(xbox.GetBackButtonPressed()){
       m_climbing = true;
+      m_climber.disableBrake();
     }
     //button A will reset robot yaw or outtake
     else if(xbox.GetStartButtonPressed()){
-      navx->Reset();
-      // m_shooter.setPID();
+      // navx->Reset();
+      std::cout << "set pid" << std::endl;
+      m_shooter.setPID();
       // m_shooter.Calibrate();
     }
     else if(xbox.GetRawButton(1)){
       m_intake.setState(Intake::State::UNJAM);
       m_shooter.setState(Shooter::BadIdea);
     }
-    // else if(xbox.GetRawButton(4)){
-    //   m_shooter.LowShot();
-    // }
-    // else if(l_joy.GetPOV() != -1){
-      //std::cout << "Peek" << std::endl;
-      // m_shooter.peekTurret();
-    // }
+    else if(l_joy.GetPOV() != -1){
+      // std::cout << "peek" << std::endl;
+      m_shooter.peekTurret(navx->GetYaw(), l_joy.GetPOV());
+    }
     else {
       m_shooter.setState(Shooter::State::IDLE);
       m_intake.setState(Intake::State::IDLE);
     }
     m_intake.Periodic(); 
-    m_shooter.Periodic(m_swerve.GetXPosition(), m_swerve.GetYPosition());
+    m_shooter.Periodic();
+    
   }
-  //frc::SmartDashboard::PutNumber("Yaw", navx->GetYaw());
-  //frc::SmartDashboard::PutNumber("POV", l_joy.GetPOV());
+  // frc::SmartDashboard::PutNumber("Yaw", navx->GetYaw());
+  // frc::SmartDashboard::PutNumber("POV", l_joy.GetPOV());
 
 }
 
@@ -204,8 +219,8 @@ Robot::TestPeriodic() {
 
 void 
 Robot::DisabledInit() {
-  m_climber.enableBrake();
-  m_climber.whenDisabled();
+  // m_climber.enableBrake();
+  // m_climber.whenDisabled();
 }
 
 
