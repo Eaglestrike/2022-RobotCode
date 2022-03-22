@@ -1,6 +1,7 @@
 #include <WheelDrive.h>
 
 
+//Constructor for each swerve modules
 WheelDrive::WheelDrive(int angleMotorPort, int speedMotorPort,
     int encoder)
     : angleMotor(angleMotorPort, "Drivebase"), speedMotor(speedMotorPort, "Drivebase"),

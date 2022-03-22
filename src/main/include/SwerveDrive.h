@@ -24,12 +24,14 @@ class SwerveDrive{
         void Initialize();
         void ResetEncoders();
         double GetYPosition();
-        double GetXPostion();
+        double GetXPosition();
         double GetYSpeed();
         double GetXSpeed();
         double calcYawStraight(double targetAngle, double currentAngle);
         void GenerateTrajectory_1();
         void GenerateTrajectory_2();
+        void GenerateTrajectory_3();
+        void GenerateTrajectory_5();
 
         void debug(AHRS &navx);
 

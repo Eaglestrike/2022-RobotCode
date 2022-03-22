@@ -25,7 +25,7 @@ frc::Joystick r_joy{OIConstants::r_joy_port};
 frc::XboxController xbox{OIConstants::O_joy_port};
 frc::PowerDistribution PDH{1, frc::PowerDistribution::ModuleType::kRev};
 cs::UsbCamera camera;
-
+ 
 double m_time = 0;
 double m_timeStep = GeneralConstants::timeStep;
 
@@ -44,9 +44,11 @@ class Robot : public frc::TimedRobot {
   void TestInit() override;
   void TestPeriodic() override;
 
+
  private:
-  SwerveDrive m_swerve;
+
   AutoMode m_auto;
+  SwerveDrive m_swerve;
   Intake m_intake;
   Shooter m_shooter;
   Climber m_climber;
@@ -57,5 +59,12 @@ class Robot : public frc::TimedRobot {
   frc::SendableChooser<std::string> m_chooser;
   const std::string blueAlliance = "BLUE";
   const std::string redAlliance = "RED";
-  std::string m_autoSelected;
+  //std::string m_autoSelected;
+
+  frc::SendableChooser<int> m_autoMode;
+  int mode1 = 1;
+  int mode2 = 2;
+  int mode3 = 3;
+  int mode5 = 5;
+  int m_autoSelelected;
 };

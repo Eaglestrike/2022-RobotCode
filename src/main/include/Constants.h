@@ -34,8 +34,8 @@ DriveConstants{
     const double BROFF = -18.98;
 
     //Ports for Back Right Swerve Module - SwerveDrive.h
-    const int BRanglePort = 18;
-    const int BRspeedPort = 17;
+    const int BRanglePort = 17;
+    const int BRspeedPort = 18;
     const int BRencoder = 8;
 
     //Ports for Back Left Swerve Module - SwerveDrive.h
@@ -92,9 +92,14 @@ ShooterConstants{
     const int photogate = 8; 
 
     //Turret Controller
-    const double turretP = 0.022; //fairly good
-    const double turretI = 0.0007;
-    const double turretD = 0.0012;
+    const double turretP = 0.023; //fairly good
+    const double turretI = 0.0001;
+    const double turretD = 0.002;
+
+    //Turret Position Controller
+    const double turretPosP = 0.01;
+    const double turretPosI = 0.0;
+    const double turretPosD = 0.001;
 
     //Flywheel Controller
     const double flywheelF = 0.049;
@@ -109,7 +114,7 @@ ShooterConstants{
     const double hoodF = 0.0;
 
     //Turret limit values;
-    const double turretMax = -1000.0; //confirmed
+    const double turretMax = 0.0; //confirmed
     const double turretMin = -63000.0; //confirmed
 
     const double hoodMax = 5700; //confirmed

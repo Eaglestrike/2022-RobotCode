@@ -30,6 +30,7 @@ class Climber{
         void RetractfirstStage();
         void RetractsecondStage();
         void enableBrake();
+        void disableBrake();
         void whenDisabled();
 
 
@@ -40,14 +41,14 @@ class Climber{
         WPI_TalonFX gearboxSlave{ClimbConstants::gearboxPort2, "rio"};
 
         //Higher pneumatic
-        frc::Solenoid climbStage1{frc::PneumaticsModuleType::REVPH, 
+        frc::Solenoid climbStage1{frc::PneumaticsModuleType::CTREPCM, 
             ClimbConstants::solenoid1Port};
         //Lower pneumatic
-        frc::Solenoid climbStage2{frc::PneumaticsModuleType::REVPH,
+        frc::Solenoid climbStage2{frc::PneumaticsModuleType::CTREPCM,
             ClimbConstants::solenoid2Port};
 
         //Disk Brake
-        frc::Solenoid diskBrake{frc::PneumaticsModuleType::REVPH,
+        frc::Solenoid diskBrake{frc::PneumaticsModuleType::CTREPCM,
             ClimbConstants::diskBrakePort};
 
         units::time::second_t pulse{0.1};

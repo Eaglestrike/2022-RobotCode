@@ -77,25 +77,25 @@ SwerveDrive::TrajectoryFollow(double rot, size_t waypointIndex){
     size_t index = m_trajectory_1.getIndex();
     
     bool YError = (abs(GetYPosition() - m_trajectory_1.getY(index)) < 0.3);
-    bool XError = (abs(GetXPostion() - m_trajectory_1.getX(index)) < 0.3);
+    bool XError = (abs(GetXPosition() - m_trajectory_1.getX(index)) < 0.3);
     bool RotError = (abs(rot - m_trajectory_1.getRotation(index)) < 5);
 
-    frc::SmartDashboard::PutNumber("RotError", (abs(rot - m_trajectory_1.getRotation(index))));
-    frc::SmartDashboard::PutBoolean("ROTERROR", RotError);
+    // frc::SmartDashboard::PutNumber("RotError", (abs(rot - m_trajectory_1.getRotation(index))));
+    // frc::SmartDashboard::PutBoolean("ROTERROR", RotError);
 
     if(m_trajectory_1.getX(index) == 0 &&
         m_trajectory_1.getY(index) == 0 &&
         m_trajectory_1.getRotation(index) != 0){
         if(RotError && index < waypointIndex){
             m_trajectory_1.Progress();
-            std::cout << "Gets here once" << std::endl;
+            // std::cout << "Gets here once" << std::endl;
             gyro->Reset();
         }
         Drive(0, 0, calcYawStraight(m_trajectory_1.getRotation(index), rot), rot, true);
         return;
     }
 
-    m_swerveController.updatePosition(GetYPosition(), GetXPostion(), rot);
+    m_swerveController.updatePosition(GetYPosition(), GetXPosition(), rot);
 
     //frc::SmartDashboard::PutNumber("YError", abs(GetYPosition() - m_trajectory_1.getY(index)));
     //frc::SmartDashboard::PutNumber("XError", abs(GetXPostion() - m_trajectory_1.getX(index)));
@@ -118,51 +118,55 @@ SwerveDrive::TrajectoryFollow(double rot, size_t waypointIndex){
 void
 SwerveDrive::GenerateTrajectory_1(){
     m_trajectory_1.clearTrajectory();
-
     // Default Scoot and Shoot
-    // Trajectory::Waypoint p1(1.2, 0, 0, 0);
-    // m_trajectory_1.addWaypoint(p1);
-
-    // 2 ball auto
-    // Trajectory::Waypoint p1(1.5, 0.1, 0, 0);
-    // m_trajectory_1.addWaypoint(p1);
-
-    // 3 ball auto
-    Trajectory::Waypoint p1(1.5, 0.15, 0, 0);
-    Trajectory::Waypoint p2(0, 0, 0, -110);
-    Trajectory::Waypoint p3(5.0, 0.55, 0, 0);
-    Trajectory::Waypoint p4(0, 0, 0, 40);
-    Trajectory::Waypoint p5(0, 0, 0, 70);
+    Trajectory::Waypoint p1(1.2, 0, 0, 0);
     m_trajectory_1.addWaypoint(p1);
-    m_trajectory_1.addWaypoint(p2);
-    m_trajectory_1.addWaypoint(p3);  
-    m_trajectory_1.addWaypoint(p4);
-    m_trajectory_1.addWaypoint(p5);
-
-    // 5 ball auto
-    // Trajectory::Waypoint p1(1.4, 0.15, 0, 0);
-    // Trajectory::Waypoint p2(0, 0, 0, -110);
-    // Trajectory::Waypoint p3(5.0, 0.4, 0, 0);
-    // Trajectory::Waypoint p4(0, 0, 0, 40);
-    // Trajectory::Waypoint p5(10.0, 1.4, 0, 0);
-    // Trajectory::Waypoint p6(7.0, 1.4, 0, 0);
-    // m_trajectory_1.addWaypoint(p1);
-    // m_trajectory_1.addWaypoint(p2);
-    // m_trajectory_1.addWaypoint(p3);  
-    // m_trajectory_1.addWaypoint(p4);
-    // m_trajectory_1.addWaypoint(p5);
-    // m_trajectory_1.addWaypoint(p6);
 }
 
 
 void
 SwerveDrive::GenerateTrajectory_2(){
-    m_trajectory_2.clearTrajectory();
-    // Trajectory::Waypoint p1(0, 0, 0, 90);
-
-    // m_trajectory_2.addWaypoint(p1);  
+     m_trajectory_1.clearTrajectory();
+    // 2 ball auto
+    Trajectory::Waypoint p1(1.5, 0.05, 0, 0);
+    m_trajectory_1.addWaypoint(p1);
 }
 
+
+void
+SwerveDrive::GenerateTrajectory_3(){
+    m_trajectory_1.clearTrajectory();
+    // 3 ball auto
+    Trajectory::Waypoint p1(1.25, 0.15, 0, 0);
+    Trajectory::Waypoint p2(0, 0, 0, -110);
+    Trajectory::Waypoint p3(4.2, 1.0, 0, 0); // 0.3 doesn't go enough in library testing to the right
+    Trajectory::Waypoint p4(0, 0, 0, 40);
+    Trajectory::Waypoint p5(0, 0, 0, 160);
+    m_trajectory_1.addWaypoint(p1);
+    m_trajectory_1.addWaypoint(p2);
+    m_trajectory_1.addWaypoint(p3);  
+    m_trajectory_1.addWaypoint(p4);
+    m_trajectory_1.addWaypoint(p5);
+}
+
+
+void
+SwerveDrive::GenerateTrajectory_5(){
+    m_trajectory_1.clearTrajectory();
+    // 5 ball auto
+    Trajectory::Waypoint p1(1.25, 0.15, 0, 0);
+    Trajectory::Waypoint p2(0, 0, 0, -110);
+    Trajectory::Waypoint p3(4.2, 0.9, 0, 0);
+    Trajectory::Waypoint p4(0, 0, 0, 40);
+    Trajectory::Waypoint p5(7.5, 2.1, 0, 0);
+    Trajectory::Waypoint p6(4.0, 1.3, 0, 0);
+    m_trajectory_1.addWaypoint(p1);
+    m_trajectory_1.addWaypoint(p2);
+    m_trajectory_1.addWaypoint(p3);  
+    m_trajectory_1.addWaypoint(p4);
+    m_trajectory_1.addWaypoint(p5);
+    m_trajectory_1.addWaypoint(p6);
+}
 
 //Return y position of the robot
 double
@@ -173,7 +177,7 @@ SwerveDrive::GetYPosition(){
 
 //Return x position of the robot
 double
-SwerveDrive::GetXPostion(){
+SwerveDrive::GetXPosition(){
     return m_odometry.getX();
 }
 

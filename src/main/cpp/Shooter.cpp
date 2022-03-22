@@ -15,6 +15,7 @@ Shooter::Shooter(){
     
     m_flywheelMaster.ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor);
     m_flywheelSlave.ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor);
+    m_turret.ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor);
     m_kicker.SetStatusFramePeriod(StatusFrameEnhanced::Status_12_Feedback1, 100);
 
     m_flywheelMaster.Config_kF(0, ShooterConstants::flywheelF);
@@ -32,31 +33,53 @@ Shooter::Shooter(){
     m_hood.Config_kD(0, ShooterConstants::hoodD);
     m_hood.Config_kF(0, ShooterConstants::hoodF);
 
+    m_turret.Config_kP(0, ShooterConstants::turretPosP);
+    m_turret.Config_kI(0, ShooterConstants::turretPosI);
+    m_turret.Config_kD(0, ShooterConstants::turretPosD);
+
     // m_turretPos.EnableContinuousInput(-1000, -63000);
 
-    dataMap[-24.0] = {5800, 18500};
-    dataMap[-23.5] = {5750, 18500};
-    dataMap[-22.5] = {5700, 18500};
-    dataMap[-21.5] = {5600, 18500};
-    dataMap[-20.0] = {5500, 18200};
-    dataMap[-19.2] = {5500, 18000};
-    dataMap[-18.0] = {5400, 17400};
-    dataMap[-16.7] = {5400, 17000}; 
-    dataMap[-15.4] = {4900, 15700};
-    dataMap[-14.5] = {4600, 15500};
-    dataMap[-12.6] = {4500, 14500};
-    dataMap[-11.2] = {4400, 13800};
-    dataMap[-9.7] = {4400, 13600};
-    dataMap[-8.0] = {4200, 13500};
-    dataMap[-6.2] = {4000, 13500};
-    dataMap[-5.0] = {3600, 14000};
-    dataMap[-2.5] = {3000, 13900};
-    dataMap[-0.5] = {2400, 13400};
-    dataMap[5.5] = {1900, 12900};
-    dataMap[9.1] = {1700, 12900};
-    dataMap[12.4] = {1500, 12800};
-    dataMap[16.5] = {1300, 12700};
-    dataMap[18.7] = {1200, 12500};
+    // dataMap[-24.0] = {5800, 18500};
+    // dataMap[-23.5] = {5750, 18500};
+    // dataMap[-22.5] = {5700, 18500};
+    // dataMap[-21.5] = {5600, 18500};
+    // dataMap[-20.0] = {5500, 18200};
+    // dataMap[-19.2] = {5500, 18000};
+    // dataMap[-18.0] = {5400, 17400};
+    // dataMap[-16.7] = {5400, 17000}; 
+    // dataMap[-15.4] = {4900, 15700};
+    // dataMap[-14.5] = {4600, 15500};
+    // dataMap[-12.6] = {4500, 14500};
+    // dataMap[-11.2] = {4400, 13800};
+    // dataMap[-9.7] = {4400, 13600};
+    // dataMap[-8.0] = {4200, 13500};
+    // dataMap[-6.2] = {4000, 13500};
+    // dataMap[-5.0] = {3600, 14000};
+    // dataMap[-2.5] = {3000, 13900};
+    // dataMap[-0.5] = {2400, 13400};
+    // dataMap[5.5] = {1900, 12900};
+    // dataMap[9.1] = {1700, 12900};
+    // dataMap[12.4] = {1500, 12800};
+    // dataMap[16.5] = {1300, 12700};
+    // dataMap[18.7] = {1200, 12500};
+
+    dataMap[-19.4] = {5700, 17200};
+    dataMap[-18.9] = {5700, 16400};
+    dataMap[-17.5] = {5600, 15900};
+    dataMap[-14.8] = {5600, 14900};
+    dataMap[-12.5] = {5600, 14000};
+    dataMap[-9.5] = {5500, 13500};
+    dataMap[-7.4] = {5400, 13200};
+    dataMap[-5.4] = {5200, 12600};
+    dataMap[-1.8] = {4800, 12300};
+    dataMap[0.5] = {4700, 12200};
+    dataMap[1.7] = {4500, 12000};
+    dataMap[3.65] = {4100, 12000};
+    dataMap[6.0] = {3800, 11800};
+    dataMap[9.9] = {2800, 11700};
+    dataMap[14.2] = {2800, 11500};
+    dataMap[16.0] = {2600, 11000};
+    dataMap[19.88] = {1800, 10500};
 
     m_hoodZero = false;
     m_turretZero = false;
@@ -72,11 +95,10 @@ Shooter::~Shooter(){}
 
 //Periodic Function
 void
-Shooter::Periodic(double robotX, double robotY){
+Shooter::Periodic(){
+
     switch(m_state){
         case State::SHOOT:
-            m_robotX = robotX;
-            m_robotY = robotY;
             Aim();
             Shoot();
             m_channel.setState(Channel::State::RUN);
@@ -85,8 +107,6 @@ Shooter::Periodic(double robotX, double robotY){
             Stop();
             break;
         case State::AIM:
-            m_robotX = robotX;
-            m_robotY = robotY;
             Aim();
             break;
         case State::ZERO:
@@ -95,7 +115,7 @@ Shooter::Periodic(double robotX, double robotY){
         case State::LOAD:
             Load();
             break;
-        case State::CLIMB:
+        case State::PEEK:
             break;
         case State::MANUAL:
             break;
@@ -117,7 +137,7 @@ Shooter::Periodic(double robotX, double robotY){
 //Aim Function for Turret
 void
 Shooter::Aim(){
-    m_limelight->setLEDMode("ON");
+    //m_limelight->setLEDMode("ON");
 
     if(m_colorMatcher.MatchClosestColor(m_colorSensor.GetColor(), confidence) == ballColor){
         m_speed = 8000;
@@ -133,24 +153,19 @@ Shooter::Aim(){
 
     //Check if the limelight sees the target
     double point = m_limelight->getYOff();
-    //If point is not found
-    if(point == 10000.0 && m_OdometryErrorRate < 10){
-        //Law of cosines
-        //CalcAng = angle from hub to last recorded location to current location
-        double calcAng = PI+(-m_lastAngle*PI/180)-atan2((m_robotY-m_lastY,m_robotX-m_lastX);
-        double changeDist = pow(m_robotX-m_lastX,2)+pow(m_robotY-m_lastY,2);
-        point = sqrt(pow(m_lastDist,2)+changeDist-(2*m_lastDist*sqrt(changeDist)*cos(calcAng)));
+    frc::SmartDashboard::PutNumber("yoff", point);
+    if(point == 0.000){
+        m_channel.setState(Channel::State::IDLE);
+        return;
     }
-    //Calculate
+    
+
+    // Comment this for shooter recalibration
+
     auto data = dataMap.find(point);
     if(data != dataMap.end()){
         m_angle = data->second.first;
         m_speed = data->second.second;
-        //Sets last known X, Y, and distance
-        m_lastX = m_robotX;
-        m_lastY = m_robotY;
-        m_lastDistance = point;
-
     } else {
         double point1, point2;
         if(withinRange(dataPoints, point, point1, point2)){
@@ -163,36 +178,29 @@ Shooter::Aim(){
             angle2 = data2.first;
             speed2 = data2.second;
 
-            m_angle = (angle1 + angle2)/2 * angle_scale_factor;
-            m_speed = (speed1 + speed2)/2 * speed_scale_factor;
-            //frc::SmartDashboard::PutNumber("velocity", m_speed);
-            //frc::SmartDashboard::PutNumber("position",  m_angle);
+            // interpolate - 
+            double interval = point1 - point2;
+            double xdiff = point - point1;
+            m_angle = (((angle2 - angle1)/interval * xdiff) + angle1) * angle_scale_factor;
+            m_speed = (((speed2 - speed1)/interval * xdiff) + speed1) * speed_scale_factor;
 
-            //Sets last known X, Y, and distance
-            m_lastX = m_robotX;
-            m_lastY = m_robotY;
-            m_lastDistance = point;
+            // taking the average - 
+            // m_angle = (angle1 + angle2)/2 * angle_scale_factor;
+            // m_speed = (speed1 + speed2)/2 * speed_scale_factor;
 
         }else{
             m_angle = 0;
             m_speed = 0;
         }
     }
+    
+    // frc::SmartDashboard::PutNumber("turret position", m_turret.GetSelectedSensorPosition());
+
     // Set Turret movement
-    double x_off = m_limelight->getXOff()+3.85;
-    if(x_off == 10000.0 && m_OdometryErrorRate < 10){
-        //tan of distance between hub and robot
-        double hubX = m_lastDistance*cos(m_lastAngle/PI*180)
-        double hubY = m_lastDistance*sin(m_lastAngle/PI*180)
-        x_off = (tan2(hubY- m_lastY + m_robotY, hubX - m_lastX + m_robotX))/PI*180 - m_turrPos;
-    }
-    //Record Last Angle
-    else{
-        m_lastAngle = x_off + m_turrPos;
-    }
+    double x_off = m_limelight->getXOff()+4.3;
     double output = -m_turretController.Calculate(x_off);
-    output = output > 0  && output > 0.4 ? 0.4: output;
-    output = output < 0 && output < -0.4 ? -0.4: output;
+    output = output > 0  && output > 0.38 ? 0.38: output;
+    output = output < 0 && output < -0.38 ? -0.38: output;
     if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax &&
         output > 0){
         m_turret.Set(ControlMode::PercentOutput, 0.0);  
@@ -210,8 +218,8 @@ Shooter::Aim(){
     // Set Flywheel Velocity
     m_flywheelMaster.Set(ControlMode::Velocity, m_speed);
     m_flywheelSlave.Set(ControlMode::Velocity, -m_speed);
-    frc::SmartDashboard::PutNumber("flywheel speed", m_flywheelMaster.GetSelectedSensorVelocity());
-    frc::SmartDashboard::PutNumber("hood angle", m_hood.GetSelectedSensorPosition());
+    // frc::SmartDashboard::PutNumber("flywheel speed", m_flywheelMaster.GetSelectedSensorVelocity());
+    // frc::SmartDashboard::PutNumber("hood angle", m_hood.GetSelectedSensorPosition());
     
     // Set Hood Position
     m_hood.Set(ControlMode::Position, m_angle);
@@ -229,6 +237,7 @@ Shooter::withinRange(std::vector<double>& array, double p, double& p1, double& p
     int left =0;
     int right = array.size() -1;
     if(p < array[left] || p > array[right]){
+        // std::cout << "bad1" <<std::endl;
         return false;
     }
     int mid = (left + right)/2;
@@ -237,6 +246,7 @@ Shooter::withinRange(std::vector<double>& array, double p, double& p1, double& p
             p1 = array[mid];
             p2 = array[mid+1];
             return true;
+            // std::cout << "does find point" <<std::endl;
         } else if(array[mid] <= p){
             left = mid;
         } else if(array[mid] >= p){
@@ -244,6 +254,7 @@ Shooter::withinRange(std::vector<double>& array, double p, double& p1, double& p
         }
         mid = (left + right)/2;
     }
+    // std::cout << "bad2" <<std::endl;
     return false;
 }
 
@@ -253,11 +264,6 @@ void
 Shooter::Shoot(){
     if(Aimed()){
         Load();
-    //     m_channel.setState(Channel::State::RUN);
-    //     Load();
-    // } else {
-    //     m_channel.setState(Channel::State::IDLE);
-    // }
     }
 }
 
@@ -292,10 +298,19 @@ Shooter::Load(){
         m_kicker.Set(ControlMode::PercentOutput, 0.2);
     } 
     else if(m_state == State::LOAD){
-        if(!m_photogate.Get()){
+        if(!m_photogate.Get() && !m_photogate2.Get()){
             m_kicker.Set(ControlMode::PercentOutput, 0.0);
             m_channel.setState(Channel::State::IDLE);
-        } else {
+        } 
+        else if(m_photogate2.Get() && !m_photogate.Get()){
+            m_channel.setState(Channel::State::RUN);
+            m_kicker.Set(ControlMode::PercentOutput, 0.0);
+        }
+        else if(!m_photogate2.Get() && m_photogate.Get()){
+            m_kicker.Set(ControlMode::PercentOutput, 0.2);
+            m_channel.setState(Channel::State::RUN);
+        }
+        else {
             m_kicker.Set(ControlMode::PercentOutput, 0.2);
             m_channel.setState(Channel::State::RUN);
         }
@@ -313,13 +328,14 @@ Shooter::setState(State newState){
 //Check if the turret is aimed
 bool
 Shooter::Aimed(){
-    bool flywheelReady = abs(m_flywheelMaster.GetSelectedSensorVelocity() - m_speed) < 500;
-    bool hoodReady = abs(m_hood.GetSelectedSensorPosition() - m_angle) < 250;
-    bool turretReady = abs(m_limelight->getXOff()+3.85) < 3;
+    bool flywheelReady = abs(m_flywheelMaster.GetSelectedSensorVelocity() - m_speed) < 400;
+    bool hoodReady = abs(m_hood.GetSelectedSensorPosition() - m_angle) < 100; // make this interval smaller
+    bool turretReady = abs(m_limelight->getXOff()+4.3) < 2.5;
     frc::SmartDashboard::PutBoolean("flywheelReady", flywheelReady);
     frc::SmartDashboard::PutBoolean("hoodReady", hoodReady);
     frc::SmartDashboard::PutBoolean("turretReady", turretReady);
 
+    //Add turret ready
     if( flywheelReady && hoodReady && turretReady){ 
         return true;
     } else {
@@ -335,24 +351,28 @@ Shooter::Calibrate(){
     // m_angle = frc::SmartDashboard::GetNumber("angle", 0.0);
     // frc::SmartDashboard::PutNumber("speed", m_speed);
     // frc::SmartDashboard::PutNumber("angle", m_angle);
-    m_turrPos = frc::SmartDashboard::GetNumber("turr_pos", 0.0);
-    frc::SmartDashboard::PutNumber("turr_pos", m_turrPos);
+    
+    // m_turrPos = frc::SmartDashboard::GetNumber("turr_pos", 0.0);
+    // frc::SmartDashboard::PutNumber("turr_pos", m_turrPos);
 }
 
 
 //Set PID values
 void
 Shooter::setPID(){
+    // double F = frc::SmartDashboard::GetNumber("F", 0.0);
+    // frc::SmartDashboard::PutNumber("F", F);
     double P = frc::SmartDashboard::GetNumber("P", 0.0);
     frc::SmartDashboard::PutNumber("P", P);
     double I = frc::SmartDashboard::GetNumber("I", 0.0);
     frc::SmartDashboard::PutNumber("I", I);
-    // double F = frc::SmartDashboard::GetNumber("F", 0.0);
-    // frc::SmartDashboard::PutNumber("F", F);
     double D = frc::SmartDashboard::GetNumber("D", 0.0);
     frc::SmartDashboard::PutNumber("D", D);
 
-    m_turretPos.SetPID(P, I, D);
+    // m_turretPos.SetPID(P, I, D);
+    m_turret.Config_kP(0, P);
+    m_turret.Config_kI(0, I);
+    m_turret.Config_kD(0, D);
 
     // m_flywheelMaster.Config_kF(0, F);
     // m_flywheelMaster.Config_kP(0, P);
@@ -364,7 +384,7 @@ Shooter::setPID(){
     // m_flywheelSlave.Config_kI(0, I);
     // m_flywheelSlave.Config_kD(0, D);
     
-    //m_turretController.SetPID(P, I, D);
+    // m_turretController.SetPID(P, I, D);
     
     // m_hood.Config_kP(0, P);
     // m_hood.Config_kI(0, I);
@@ -382,7 +402,7 @@ Shooter::Stop(){
     m_flywheelMaster.Set(0);
     m_kicker.Set(0);
     m_hood.Set(0);
-    m_limelight->setLEDMode("OFF");
+    // m_limelight->setLEDMode("OFF");
     m_channel.setState(Channel::State::IDLE);
 }
 
@@ -437,6 +457,26 @@ Shooter::LowShot(){
 
 
 void
-Shooter::peekTurret(){
-    m_turret.Set(std::clamp(m_turretPos.Calculate(m_turret.GetSelectedSensorPosition(), m_turrPos), -0.5, 0.5));
+Shooter::peekTurret(double navX, double POV){
+    const double robotAngRatio = 63000.0/360.0;
+    // const double robotAngRatio = -63000/360.0;
+    double POV_deg = POV>180? POV-360:POV;
+    double navX_deg = -navX;
+    double target_turret_tick = (POV-navX_deg);
+
+    // convert above scale to -63000 to 0
+    target_turret_tick = target_turret_tick<0? target_turret_tick:target_turret_tick-360;
+    target_turret_tick*=robotAngRatio;
+    frc::SmartDashboard::PutNumber("target value", target_turret_tick);
+    // m_turret.Set(ControlMode::Position, target_turret_tick);
+    double output = m_turretPos.Calculate(m_turret.GetSelectedSensorPosition(), target_turret_tick);
+    frc::SmartDashboard::PutNumber("output", output);
+    // m_turret.Set(output);
+    m_turret.Set(ControlMode::Position, target_turret_tick);
+}
+
+
+void
+Shooter::enablelimelight(){
+    m_limelight->setLEDMode("ON");
 }
