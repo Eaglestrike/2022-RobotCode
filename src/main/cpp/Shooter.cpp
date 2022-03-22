@@ -33,6 +33,10 @@ Shooter::Shooter(){
     m_hood.Config_kD(0, ShooterConstants::hoodD);
     m_hood.Config_kF(0, ShooterConstants::hoodF);
 
+    m_turret.Config_kP(0, ShooterConstants::turretPosP);
+    m_turret.Config_kI(0, ShooterConstants::turretPosI);
+    m_turret.Config_kD(0, ShooterConstants::turretPosD);
+
     // m_turretPos.EnableContinuousInput(-1000, -63000);
 
     // dataMap[-24.0] = {5800, 18500};

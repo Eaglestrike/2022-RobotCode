@@ -5,11 +5,14 @@ AutoMode::AutoMode(){
 }
 
 
+//Initializes the auto indexer
 void
 AutoMode::ResetAuto(){
     index = 0;
 }
 
+
+// For auto chooser before the match
 void
 AutoMode::SetMode(int autoMode){
     if(autoMode == 1){
@@ -35,6 +38,7 @@ AutoMode::SetMode(int autoMode){
 }
 
 
+// Running through the auto routines
 void
 AutoMode::Periodic(double time){
     frc::SmartDashboard::PutNumber("index", index);
@@ -46,6 +50,7 @@ AutoMode::Periodic(double time){
 }
 
 
+//Return the state of auto action
 AutoMode::State 
 AutoMode::getState(){
     return actions[index]; 

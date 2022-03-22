@@ -31,25 +31,25 @@ Odometry::updateOdometry(double BR_A, double BR_V,
     double ROT2 = (C-D)/m_W;
     double ROT = (ROT1 + ROT2) / 2;
 
-    // m_FWD = ((ROT * (m_L/2) + A) + (-ROT * (m_L/2) + B)) / 2;
-    // m_STR = -((ROT * (m_W/2) + C) + (-ROT * (m_W/2) + D)) / 2;
+    m_FWD = ((ROT * (m_L/2) + A) + (-ROT * (m_L/2) + B)) / 2;
+    m_STR = -((ROT * (m_W/2) + C) + (-ROT * (m_W/2) + D)) / 2;
 
-    // m_FWD_new = m_FWD * cos(theta * PI/180) + m_STR * sin(theta * PI/180);
-    // m_STR_new = m_STR * cos(theta * PI/180) - m_FWD * sin(theta * PI/180);
+    m_FWD_new = m_FWD * cos(theta * PI/180) + m_STR * sin(theta * PI/180);
+    m_STR_new = m_STR * cos(theta * PI/180) - m_FWD * sin(theta * PI/180);
     
-    double STR, FWD, STR1, STR2, FWD1, FWD2;
-    STR1 = ROT * (m_L / 2.0) + A;
-	STR2 = -ROT * (m_L / 2.0) + B;
-	FWD1 = ROT * (m_W / 2.0) + C;
-	FWD2 = -ROT * (m_W / 2.0) + D;
+    // double STR, FWD, STR1, STR2, FWD1, FWD2;
+    // STR1 = ROT * (m_L / 2.0) + A;
+	// STR2 = -ROT * (m_L / 2.0) + B;
+	// FWD1 = ROT * (m_W / 2.0) + C;
+	// FWD2 = -ROT * (m_W / 2.0) + D;
 
-	STR = (STR1 + STR2) / 2.0;
-	FWD = (FWD1 + FWD2) / 2.0;
-    // //From Velocity to Position
-    // m_prevtimeStep = m_timeStep;
-    // m_timeStep += timeInterval;
-    // m_x = m_x + m_FWD_new * (m_timeStep - m_prevtimeStep) * 58.04;
-    // m_y = m_y + m_STR_new * (m_timeStep - m_prevtimeStep) * 58.04;
+	// STR = (STR1 + STR2) / 2.0;
+	// FWD = (FWD1 + FWD2) / 2.0;
+    //From Velocity to Position
+    m_prevtimeStep = m_timeStep;
+    m_timeStep += timeInterval;
+    m_x = m_x + m_FWD_new * (m_timeStep - m_prevtimeStep) * 58.04;
+    m_y = m_y + m_STR_new * (m_timeStep - m_prevtimeStep) * 58.04;
 }
 
 

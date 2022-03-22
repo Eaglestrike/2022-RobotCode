@@ -97,9 +97,9 @@ ShooterConstants{
     const double turretD = 0.001;
 
     //Turret Position Controller
-    const double turretPosP = 0.0;
+    const double turretPosP = 0.01;
     const double turretPosI = 0.0;
-    const double turretPosD = 0.0;
+    const double turretPosD = 0.002;
 
     //Flywheel Controller
     const double flywheelF = 0.049;

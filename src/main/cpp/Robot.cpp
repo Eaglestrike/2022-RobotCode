@@ -139,8 +139,8 @@ Robot::TeleopPeriodic() {
   y1 = abs(y1) < 0.05 ? 0.0: y1;
   x2 = abs(x2) < 0.05 ? 0.0: x2;
   
-  frc::SmartDashboard::PutNumber("X",m_swerve.GetXPosition());
-  frc::SmartDashboard::PutNumber("Y",m_swerve.GetYPosition());
+  // frc::SmartDashboard::PutNumber("X",m_swerve.GetXPosition());
+  // frc::SmartDashboard::PutNumber("Y",m_swerve.GetYPosition());
   m_swerve.Drive(-x1, -y1, -x2, navx->GetYaw(), true);
   
   //Climbing
@@ -174,6 +174,7 @@ Robot::TeleopPeriodic() {
     else if(l_joy.GetTrigger()){
       m_shooter.setState(Shooter::State::SHOOT);
     }
+    //Peeking the turret feild oriented
     else if(l_joy.GetPOV() != -1){
       m_shooter.peekTurret(navx->GetYaw(), l_joy.GetPOV());
       m_shooter.setState(Shooter::State::PEEK);
@@ -183,12 +184,13 @@ Robot::TeleopPeriodic() {
       m_climbing = true;
       m_climber.disableBrake();
     }
-    //button A will reset robot yaw or outtake
+    //Start button on joystick will reset robot yaw
     else if(xbox.GetStartButtonPressed()){
-      // navx->Reset();
-      m_shooter.setPID();
+      navx->Reset();
+      // m_shooter.setPID();
       // m_shooter.Calibrate();
     }
+    // Button A will outtake
     else if(xbox.GetRawButton(1)){
       m_intake.setState(Intake::State::UNJAM);
       m_shooter.setState(Shooter::BadIdea);
