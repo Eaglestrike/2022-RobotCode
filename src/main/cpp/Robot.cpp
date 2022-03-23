@@ -173,11 +173,15 @@ Robot::TeleopPeriodic() {
     else if(l_joy.GetTrigger()){
       m_shooter.setState(Shooter::State::SHOOT);
     }
-    //Peeking the turret feild oriented
-    else if(l_joy.GetPOV() != -1){
-      m_shooter.peekTurret(navx->GetYaw(), l_joy.GetPOV());
-      m_shooter.setState(Shooter::State::PEEK);
+    else if(abs(xbox.GetRawAxis(4)) > 0.2 ){
+      m_shooter.Manual(xbox.GetRawAxis(4));
+      m_shooter.setState(Shooter::State::MANUAL);
     }
+    // //Peeking the turret feild oriented
+    // else if(l_joy.GetPOV() != -1){
+    //   m_shooter.peekTurret(navx->GetYaw(), l_joy.GetPOV());
+    //   m_shooter.setState(Shooter::State::PEEK);
+    // }
     //back button will enable climb
     else if(xbox.GetBackButtonPressed()){
       m_climbing = true;
@@ -185,8 +189,8 @@ Robot::TeleopPeriodic() {
     }
     //Start button on joystick will reset robot yaw
     else if(xbox.GetStartButtonPressed()){
-      // navx->Reset();
-      m_shooter.setPID();
+      navx->Reset();
+      // m_shooter.setPID();
       // m_shooter.Calibrate();
     }
     // Button A will outtake

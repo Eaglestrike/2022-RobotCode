@@ -470,14 +470,14 @@ Shooter::peekTurret(double navX, double POV){
     target_turret_tick*=robotAngRatio;
     // frc::SmartDashboard::PutNumber("target value", target_turret_tick);
     
-    double intervalTarget;
+    // double intervalTarget;
 
-    if(target_turret_tick<ShooterConstants::turretMax && target_turret_tick>ShooterConstants::turretMin){
-        double intervalTarget = target_turret_tick-m_turret.GetSelectedSensorPosition();
-        intervalTarget = intervalTarget > turnInterval? turnInterval: (intervalTarget < -turnInterval? -turnInterval: intervalTarget);
-    }
+    // if(target_turret_tick<ShooterConstants::turretMax && target_turret_tick>ShooterConstants::turretMin){
+    //     double intervalTarget = target_turret_tick-m_turret.GetSelectedSensorPosition();
+    //     intervalTarget = intervalTarget > turnInterval? turnInterval: (intervalTarget < -turnInterval? -turnInterval: intervalTarget);
+    // }
 
-    m_turret.Set(ControlMode::Position, intervalTarget+m_turret.GetSelectedSensorPosition());
+    m_turret.Set(ControlMode::Position, target_turret_tick);
 }
 
 
