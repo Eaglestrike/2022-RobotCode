@@ -16,7 +16,7 @@
 #include <string>
 
 #include "AutoMode.h"
-// #include "AutoMode2.h"
+#include "AutoMode2.h"
 #include "Climber.h"
 #include "Intake.h"
 #include "Shooter.h"

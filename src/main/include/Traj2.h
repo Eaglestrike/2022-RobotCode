@@ -1,15 +1,17 @@
+#pragma once
+
 #include <cassert>
 #include <cmath>
+#include <iostream>
 #include <tuple>
 #include <utility>
 #include <vector>
 
 #include "Constants.h"
-#include "SwerveDrive.h"
 
-// struct Vec3 {
-//     double a{0.0}, b{0.0}, c{0.0};
-// };
+#ifndef PATH_TEST_PROGRAM
+#include "SwerveDrive.h"
+#endif
 
 struct Cubic3DUnitSpline {
     double p0, v0, p1, v1;
@@ -23,7 +25,7 @@ struct Cubic3DUnitSpline {
         double h01 = tt * tt * (3 - 2 * tt);
         double h11 = tt * tt * (tt - 1);
 
-        double a = h00 * p0 + h10 * dt * v1 + h01 * p1 + h11 * dt * v1;
+        double a = h00 * p0 + h10 * dt * v0 + h01 * p1 + h11 * dt * v1;
         return a;
     }
 
@@ -36,7 +38,7 @@ struct Cubic3DUnitSpline {
         double dh01 = -6 * tt2 + 6 * tt;
         double dh11 = 3 * tt2 - 2 * tt;
 
-        double a = dh00 * p0 + dh10 * dt * v1 + dh01 * p1 + dh11 * dt * v1;
+        double a = dh00 * p0 + dh10 * dt * v0 + dh01 * p1 + dh11 * dt * v1;
         return a;
     }
 };
@@ -71,7 +73,7 @@ class Traj1D {
         time -= time_offset;
         if (spline_idx >= splines.size()) {
             auto& spline = splines.back();
-            return std::make_pair(spline.a1, spline.v1);
+            return std::make_pair(spline.p1, spline.v1);
         }
         auto* spline = &splines[spline_idx];
         while (time > spline->t1) {
@@ -96,6 +98,7 @@ class Traj1D {
 };
 
 class RobotTraj {
+   public:
     RobotTraj(Traj1D xx, Traj1D yy, Traj1D tt)
         : x{std::move(xx)}, y{std::move(yy)}, theta{std::move(tt)} {
         // Perform some basic verification of the path
@@ -104,22 +107,27 @@ class RobotTraj {
         y.start(faketime);
         theta.start(faketime);
 
-        double r = hypot(DriveConstants::Width, DriveConstants::Length);
+        double r =
+            0.5 * 0.0254 * hypot(DriveConstants::Width, DriveConstants::Length);
 
         while (!(x.is_done(faketime) && y.is_done(faketime) &&
                  theta.is_done(faketime))) {
-            faketime += 0.1;
-
             double xvel = x.continue_get_pos_vel(faketime).second;
             double yvel = y.continue_get_pos_vel(faketime).second;
             double omega = theta.continue_get_pos_vel(faketime).second;
 
             double trans_vel = sqrt(xvel * xvel + yvel * yvel);
-            double tangential_vel = omega * r;
+
+            double tangential_vel = abs(omega) * r;
 
             double max_possible_vel = trans_vel + tangential_vel;
-            assert(max_possible_vel <
-                   DriveConstants::MAX_TRAJ_WHEEL_VELOCITY_MPS);
+            if (max_possible_vel >
+                DriveConstants::MAX_TRAJ_WHEEL_VELOCITY_MPS) {
+                std::cout << "failure at time " << faketime << std::endl;
+                assert(max_possible_vel <
+                       DriveConstants::MAX_TRAJ_WHEEL_VELOCITY_MPS);
+            }
+            faketime += 0.1;
         }
 
         // Reset after verification
@@ -134,6 +142,7 @@ class RobotTraj {
         theta.start(time);
     }
 
+#ifndef PATH_TEST_PROGRAM
     void drive(double time, SwerveDrive* sd) {
         auto xd = x.continue_get_pos_vel(time);
         auto yd = y.continue_get_pos_vel(time);
@@ -142,7 +151,7 @@ class RobotTraj {
         sd->TrajectoryFollow2(xd.first, yd.first, td.first, xd.second,
                               yd.second, td.second);
     }
-
+#endif
     bool is_done(double time) {
         return x.is_done(time) && y.is_done(time) && theta.is_done(time);
     }
@@ -150,4 +159,4 @@ class RobotTraj {
     Traj1D x;
     Traj1D y;
     Traj1D theta;
-}
+};

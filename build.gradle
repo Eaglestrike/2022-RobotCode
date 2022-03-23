@@ -76,6 +76,18 @@ model {
             wpi.cpp.vendor.cpp(it)
             wpi.cpp.deps.wpilib(it)
         }
+        pathTestProgram(NativeExecutableSpec) {
+            targetPlatform wpi.platforms.desktop
+            sources.cpp {
+                source {
+                    srcDir 'src/pathtest/cpp'
+                    include '**/*.cpp', '**/*.cc'
+                }
+                exportedHeaders {
+                    srcDir 'src/main/include'
+                }
+            }
+        }
     }
     testSuites {
         frcUserProgramTest(GoogleTestTestSuiteSpec) {
