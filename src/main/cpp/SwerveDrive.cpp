@@ -1,5 +1,6 @@
 #include "SwerveDrive.h"
 
+#include <algorithm>
 #include <iostream>
 // Constructor
 SwerveDrive::SwerveDrive() {}
@@ -29,6 +30,20 @@ void SwerveDrive::Drive(double x1, double y1, double x2, double rot,
     double frontRightSpeed = sqrt((b * b) + (d * d));
     double frontLeftSpeed = sqrt((b * b) + (c * c));
 
+    // If the commanded wheel speeds are not achievable, maintain their ratio.
+    // If we didn't do this, some motors would saturate, breaking the manuevre.
+    double max = std::max(std::max(backRightSpeed, backLeftSpeed),
+                          std::max(frontRightSpeed, frontLeftSpeed));
+    if (max > 1.0) {
+        backRightSpeed /= max;
+        backLeftSpeed /= max;
+        frontRightSpeed /= max;
+        frontLeftSpeed /= max;
+        // Remove this if it fires often:
+        std::cout << "Swerve drive cmd renormalized, prior max was " << max
+                  << std::endl;
+    }
+
     double backRightAngle = atan2(a, d) * 180 / M_PI;
     double backLeftAngle = atan2(a, c) * 180 / M_PI;
     double frontRightAngle = atan2(b, d) * 180 / M_PI;
@@ -50,7 +65,7 @@ void SwerveDrive::Drive(double x1, double y1, double x2, double rot,
 }
 
 // Updates the Odometry
-void SwerveDrive::UpdateOdometry(double theta_rad, double dt) {
+void SwerveDrive::UpdateOdometry(double dt) {
     // NOTE I am explicitly ignoring any polarity flips,
     // because those should be fixed elsewhere, not here.
     // The offsets are sufficient to ensure that modules
@@ -65,7 +80,7 @@ void SwerveDrive::UpdateOdometry(double theta_rad, double dt) {
     double FL_A = m_frontLeft.getAngleRad(DriveConstants::FLOFF);
     double FL_D = m_frontLeft.getWheelDistance();
     m_odometry.updateOdometry(BR_A, BR_D, BL_A, BL_D, FR_A, FR_D, FL_A, FL_D,
-                              theta_rad, dt);
+                              GetGyroAngleRad(), dt);
 }
 
 // Trajectory Following for Swerve
@@ -113,6 +128,47 @@ void SwerveDrive::TrajectoryFollow(double rot, size_t waypointIndex) {
 
     Drive(strafe, forward,
           calcYawStraight(m_trajectory_1.getRotation(index), rot), rot, true);
+}
+
+void SwerveDrive::TrajectoryFollow2(double x_d, double y_d, double theta_d,
+                                    double xdot_d, double ydot_d,
+                                    double thetadot_d) {
+    // We run PIDF controllers on each of x,y,theta independently.
+    // We run these controllers to be stateless, which simplified the code.
+    // Usually PID controllers are stateful due to integrator and differentiator
+    // state. We are not going to use any integral terms (raise your P and tune
+    // your paths instead) (though theres a slim chance integral is needed
+    // eventually) Differentiator state is handled through noting that D is
+    // equivalent to negative sensor rate feedback, which is stateless:
+    //
+    // output = P * poserror + D * d/dt poserror + F * pathvel
+    //        = P * poserror + D * d/dt (pos - pathpos) + F * pathvel
+    //        = P * poserror + D * vel - D * pathvel + F * pathvel
+    //        = P * poserror + D * vel + (F-D) * pathvel
+    //
+    // So with a slight adjustment, we can make it work.
+    // Another improvement would be to add an acceleration feedforward.
+
+    double xerr = x_d - GetXPosition();
+    double yerr = y_d - GetXPosition();
+    double terr = theta_d - GetGyroAngleRad();
+    // bound angle error properly to (-pi, pi)
+    terr = terr - M_2_PI * round(terr / M_2_PI);
+
+    double xvel = GetXSpeed();
+    double yvel = GetXSpeed();
+    double tvel = GetGyroVelRad();
+
+    using namespace DriveConstants;
+    double world_x_cmd = TRAJ_TRANSLATE_P * xerr + TRAJ_TRANSLATE_D * xvel +
+                         TRAJ_TRANSLATE_F * xdot_d;
+    double world_y_cmd = TRAJ_TRANSLATE_P * yerr + TRAJ_TRANSLATE_D * yvel +
+                         TRAJ_TRANSLATE_F * ydot_d;
+    double world_t_cmd =
+        TRAJ_ROT_P * terr + TRAJ_ROT_D * tvel + TRAJ_ROT_F * thetadot_d;
+
+    // TODO: I am not sure if this argument order is correct.
+    Drive(world_y_cmd, world_x_cmd, world_t_cmd, gyro->GetYaw(), true);
 }
 
 // Function for generating trajectory_1
@@ -211,4 +267,18 @@ void SwerveDrive::ResetEncoders() {
 }
 
 // Helper Function
-void SwerveDrive::debug(AHRS &navx) { gyro = &navx; }
+void SwerveDrive::InjectNavx(AHRS *navx) { gyro = navx; }
+
+double SwerveDrive::GetGyroAngleRad() {
+    assert(gyro != nullptr);
+    // flip direction, navx is CW around Z, not CCW
+    // but double flip since roborio is upsidedown
+    return gyro->GetYaw() * (M_PI / 180.0);
+}
+
+double SwerveDrive::GetGyroVelRad() {
+    assert(gyro != nullptr);
+    // flip direction, navx is CW around Z, not CCW
+    // but double flip since roborio is upsidedown
+    return gyro->GetRawGyroZ() * (M_PI / 180.0);
+}

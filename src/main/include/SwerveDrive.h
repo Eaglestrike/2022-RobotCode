@@ -16,9 +16,11 @@ class SwerveDrive {
     void Drive(double x1, double y1, double x2, double rot, bool fieldOrient);
     void SetPID();
     void TrajectoryFollow(double rot, size_t waypointIndex = 9999);
+    void TrajectoryFollow2(double x_d, double y_d, double theta_d,
+                           double xdot_d, double ydot_d, double thetadot_d);
     void SetDriveControllerPID();
     void SetDriveControllerROTPID();
-    void UpdateOdometry(double theta, double dt);
+    void UpdateOdometry(double dt);
     void ResetOdometry();
     void Initialize();
     void ResetEncoders();
@@ -30,9 +32,12 @@ class SwerveDrive {
     void GenerateTrajectory_1();
     void GenerateTrajectory_2();
 
-    void debug(AHRS &navx);
+    void InjectNavx(AHRS *navx);
 
    private:
+    double GetGyroAngleRad();
+    double GetGyroVelRad();
+
     double m_W = DriveConstants::Width;
     double m_L = DriveConstants::Length;
 

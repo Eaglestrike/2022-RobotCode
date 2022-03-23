@@ -85,6 +85,14 @@ const double rotI = 0.00006;
 const double rotD = 0.0;
 
 const double EMPIRIC_WHEEL_METERS_PER_TICK = 1.0;  // TODO: TUNE
+const double TRAJ_TRANSLATE_P = 1.0;               // TODO: TUNE
+const double TRAJ_TRANSLATE_D = 1.0;               // TODO: TUNE
+const double TRAJ_TRANSLATE_F = 1.0;               // TODO: TUNE
+const double TRAJ_ROT_P = 1.0;                     // TODO: TUNE
+const double TRAJ_ROT_D = 1.0;                     // TODO: TUNE
+const double TRAJ_ROT_F = 1.0;                     // TODO: TUNE
+
+const double MAX_TRAJ_WHEEL_VELOCITY_MPS = 3.6;  // TODO: TUNE
 }  // namespace DriveConstants
 
 // None of these values have been set yet

@@ -16,6 +16,7 @@
 #include <string>
 
 #include "AutoMode.h"
+// #include "AutoMode2.h"
 #include "Climber.h"
 #include "Intake.h"
 #include "Shooter.h"
@@ -60,4 +61,6 @@ class Robot : public frc::TimedRobot {
     const std::string blueAlliance = "BLUE";
     const std::string redAlliance = "RED";
     std::string m_autoSelected;
+
+    // std::unique_ptr<AutoMode2> m_automode;
 };

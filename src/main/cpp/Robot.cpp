@@ -16,21 +16,14 @@ void Robot::RobotInit() {
     } catch (const std::exception &e) {
         std::cout << e.what() << std::endl;
     }
-    m_swerve.debug(*navx);
+    m_swerve.InjectNavx(navx);
     m_climbing = false;
 }
 
-double Robot::GetGyroAngleRad() {
-    if (navx) {
-        // flip direction, navx is CW around Z, not CCW
-        // but double flip since roborio is upsidedown
-        return navx->GetYaw() * (M_PI / 180.0);
-    }
-    return 0.0;
-}
-
 void Robot::RobotPeriodic() {
-    m_swerve.UpdateOdometry(GetGyroAngleRad(), m_timeStep);
+    m_swerve.UpdateOdometry(m_timeStep);
+    m_intake.Periodic();
+    m_shooter.Periodic(m_swerve.GetXPosition(), m_swerve.GetYPosition());
 }
 
 void Robot::AutonomousInit() {
@@ -48,11 +41,31 @@ void Robot::AutonomousInit() {
 
     // This might not work??
     m_climber.Initialize();
+
+    // // the "new" automodes would be used like
+    // std::string choice = getSendableChooserValue();
+    // if (choice == "TwoBall") {
+    //     m_automode =
+    //         std::make_unique<TwoBallAuto>(&m_swerve, &m_shooter, &m_intake);
+    // } else if (choice == "OtherAuto") {
+    //     m_automode =
+    //         std::make_unique<OtherAuto>(&m_swerve, &m_shooter, &m_intake);
+    // } else {
+    //     m_automode =
+    //         std::make_unique<DefaultAuto>(&m_swerve, &m_shooter, &m_intake);
+    // }
+    // m_automode->start()
 }
 
 void Robot::AutonomousPeriodic() {
     m_time += m_timeStep;
     m_auto.Periodic(m_time);
+
+    // // The "new" automodes would be used like:
+    // if (m_automode) {
+    //     m_automode->tick(time);
+    // }
+
     // frc::SmartDashboard::PutNumber("Y", m_swerve.GetYPosition());
     // frc::SmartDashboard::PutNumber("X", m_swerve.GetXPosition());
 
@@ -82,9 +95,6 @@ void Robot::AutonomousPeriodic() {
         default:
             break;
     }
-
-    m_intake.Periodic();
-    m_shooter.Periodic(m_swerve.GetXPosition(), m_swerve.GetYPosition());
 }
 
 void Robot::TeleopInit() {
@@ -107,8 +117,6 @@ void Robot::TeleopInit() {
 
     PDH.ClearStickyFaults();
     m_intake.Deploy();
-    m_shooter.Periodic(m_swerve.GetXPosition(), m_swerve.GetYPosition());
-    m_intake.Periodic();
     m_climber.Initialize();
 }
 
@@ -180,8 +188,6 @@ void Robot::TeleopPeriodic() {
             m_shooter.setState(Shooter::State::IDLE);
             m_intake.setState(Intake::State::IDLE);
         }
-        m_intake.Periodic();
-        m_shooter.Periodic(m_swerve.GetXPosition(), m_swerve.GetYPosition());
     }
     // frc::SmartDashboard::PutNumber("Yaw", navx->GetYaw());
     // frc::SmartDashboard::PutNumber("POV", l_joy.GetPOV());
