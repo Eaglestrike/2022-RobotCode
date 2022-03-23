@@ -12,6 +12,7 @@ Shooter::Shooter(){
     m_flywheelMaster.SetSafetyEnabled(false);
     m_flywheelSlave.SetSafetyEnabled(false);
     m_turret.SetSafetyEnabled(false);
+    // m_turret.
     
     m_flywheelMaster.ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor);
     m_flywheelSlave.ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor);
@@ -467,12 +468,16 @@ Shooter::peekTurret(double navX, double POV){
     // convert above scale to -63000 to 0
     target_turret_tick = target_turret_tick<0? target_turret_tick:target_turret_tick-360;
     target_turret_tick*=robotAngRatio;
-    frc::SmartDashboard::PutNumber("target value", target_turret_tick);
-    // m_turret.Set(ControlMode::Position, target_turret_tick);
-    double output = m_turretPos.Calculate(m_turret.GetSelectedSensorPosition(), target_turret_tick);
-    frc::SmartDashboard::PutNumber("output", output);
-    // m_turret.Set(output);
-    m_turret.Set(ControlMode::Position, target_turret_tick);
+    // frc::SmartDashboard::PutNumber("target value", target_turret_tick);
+    
+    double intervalTarget;
+
+    if(target_turret_tick<ShooterConstants::turretMax && target_turret_tick>ShooterConstants::turretMin){
+        double intervalTarget = target_turret_tick-m_turret.GetSelectedSensorPosition();
+        intervalTarget = intervalTarget > turnInterval? turnInterval: (intervalTarget < -turnInterval? -turnInterval: intervalTarget);
+    }
+
+    m_turret.Set(ControlMode::Position, intervalTarget+m_turret.GetSelectedSensorPosition());
 }
 
 

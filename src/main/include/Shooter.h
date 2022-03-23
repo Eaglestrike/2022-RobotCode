@@ -109,4 +109,6 @@ class Shooter{
 
         double angle_scale_factor = 1.0;
         double speed_scale_factor = 1.0;
+
+        double turnInterval = 90;
 };
