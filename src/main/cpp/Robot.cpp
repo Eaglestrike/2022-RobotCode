@@ -116,7 +116,7 @@ Robot::TeleopInit() {
   m_swerve.Initialize();
 
   //REMOVE THIS WHEN AT COMPETITION!
-  m_shooter.Zero();
+  // m_shooter.Zero();
   
   PDH.ClearStickyFaults();
   m_intake.Deploy();

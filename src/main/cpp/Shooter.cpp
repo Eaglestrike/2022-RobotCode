@@ -219,8 +219,8 @@ Shooter::Aim(){
     // Set Flywheel Velocity
     m_flywheelMaster.Set(ControlMode::Velocity, m_speed);
     m_flywheelSlave.Set(ControlMode::Velocity, -m_speed);
-    // frc::SmartDashboard::PutNumber("flywheel speed", m_flywheelMaster.GetSelectedSensorVelocity());
-    // frc::SmartDashboard::PutNumber("hood angle", m_hood.GetSelectedSensorPosition());
+    frc::SmartDashboard::PutNumber("flywheel speed", m_flywheelMaster.GetSelectedSensorVelocity());
+    frc::SmartDashboard::PutNumber("hood angle", m_hood.GetSelectedSensorPosition());
     
     // Set Hood Position
     m_hood.Set(ControlMode::Position, m_angle);

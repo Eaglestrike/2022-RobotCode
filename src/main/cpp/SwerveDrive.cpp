@@ -139,7 +139,7 @@ SwerveDrive::GenerateTrajectory_3(){
     // 3 ball auto
     Trajectory::Waypoint p1(1.25, 0.15, 0, 0);
     Trajectory::Waypoint p2(0, 0, 0, -110);
-    Trajectory::Waypoint p3(4.2, 1.0, 0, 0); // 0.3 doesn't go enough in library testing to the right
+    Trajectory::Waypoint p3(4.2, 0.9, 0, 0); // 0.3 doesn't go enough in library testing to the right
     Trajectory::Waypoint p4(0, 0, 0, 40);
     Trajectory::Waypoint p5(0, 0, 0, 160);
     m_trajectory_1.addWaypoint(p1);
