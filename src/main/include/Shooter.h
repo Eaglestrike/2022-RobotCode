@@ -23,7 +23,9 @@ class Shooter{
             LOAD,
             PEEK,
             MANUAL,
-            BadIdea
+            BadIdea,
+            Tarmac,
+            Hood
         };
 
         Shooter();
@@ -46,6 +48,8 @@ class Shooter{
         void LowShot();
         void peekTurret(double navX, double POV);
         void enablelimelight();
+        void EdgeofTarmac();
+        void zeroHood();
 
     private:
         //TalonFX in ticks - 0 - 20,000
@@ -80,6 +84,9 @@ class Shooter{
         bool m_hoodZero = false;
         bool m_turretZero = false;
 
+        double m_tarmac_speed = 7000;
+        double m_tarmac_angle = 3000;
+
         //For storing hood and angle values for shooting
         //angle , speed
         // std::vector<double> dataPoints = {
@@ -107,8 +114,8 @@ class Shooter{
         bool m_blue;
         double confidence = 0.65;
 
-        double angle_scale_factor = 1.0;
-        double speed_scale_factor = 1.0;
+        double angle_scale_factor = 0.99;
+        double speed_scale_factor = 1.01;
 
         double turnInterval = 90;
 };

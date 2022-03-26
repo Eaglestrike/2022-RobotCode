@@ -45,7 +45,7 @@ Robot::AutonomousInit() {
   } else if(mode == 5){
     m_swerve.GenerateTrajectory_5();
   }
-
+  m_shooter.Zero();
   m_auto.ResetAuto();
   m_time = 0;
   m_swerve.ResetOdometry();
@@ -53,7 +53,7 @@ Robot::AutonomousInit() {
   m_intake.Deploy();
   m_shooter.setState(Shooter::State::IDLE);
   m_intake.setState(Intake::State::IDLE);
-  m_shooter.Zero();
+  
   PDH.ClearStickyFaults();
   navx->Reset();
   m_shooter.enablelimelight();
@@ -197,6 +197,13 @@ Robot::TeleopPeriodic() {
     else if(xbox.GetRawButton(1)){
       m_intake.setState(Intake::State::UNJAM);
       m_shooter.setState(Shooter::BadIdea);
+    }
+    else if(xbox.GetLeftBumper()){
+      m_shooter.setState(Shooter::State::Hood);
+    }
+    // Hard point shooting location at edge of tarmac
+    else if (xbox.GetRawButton(4)){
+      m_shooter.setState(Shooter::State::Tarmac);
     }
     else {
       m_shooter.setState(Shooter::State::IDLE);

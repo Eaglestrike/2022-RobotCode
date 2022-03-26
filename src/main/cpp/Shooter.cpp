@@ -123,6 +123,12 @@ Shooter::Periodic(){
         case State::BadIdea:
             m_channel.setState(Channel::State::Badidea);
             break;
+        case State::Tarmac:
+            EdgeofTarmac();
+            // Shoot();
+            m_channel.setState(Channel::State::RUN);
+        case State::Hood:
+            zeroHood();
         default:
             break;
     }
@@ -223,12 +229,55 @@ Shooter::Aim(){
     frc::SmartDashboard::PutNumber("hood angle", m_hood.GetSelectedSensorPosition());
     
     // Set Hood Position
+    // if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
+    //     m_hood.Set(ControlMode::PercentOutput, 0.0);
+    // } else {
     m_hood.Set(ControlMode::Position, m_angle);
+    // }
+    //frc::SmartDashboard::PutNumber("yOff", m_limelight->getYOff());
+    //frc::SmartDashboard::PutNumber("xOff", m_limelight->getXOff());
+}
+
+
+void
+Shooter::EdgeofTarmac(){
+    // double x_off = m_limelight->getXOff()+4.3;
+    // double output = -m_turretController.Calculate(x_off);
+    // output = output > 0  && output > 0.38 ? 0.38: output;
+    // output = output < 0 && output < -0.38 ? -0.38: output;
+    // if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax &&
+    //     output > 0){
+    //     m_turret.Set(ControlMode::PercentOutput, 0.0);  
+    //     return;
+    // }
+    // if(m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin &&
+    //     output < 0){
+    //     m_turret.Set(ControlMode::PercentOutput, 0.0);
+    //     return;
+    // }
+    // else {
+    //     m_turret.Set(output);
+    // }
+
+    m_flywheelMaster.Set(ControlMode::Velocity, m_tarmac_speed);
+    m_flywheelSlave.Set(ControlMode::Velocity, -m_tarmac_speed);
+
+    m_hood.Set(ControlMode::Position, m_tarmac_angle);
     if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
         m_hood.Set(ControlMode::PercentOutput, 0.0);
     }
-    //frc::SmartDashboard::PutNumber("yOff", m_limelight->getYOff());
-    //frc::SmartDashboard::PutNumber("xOff", m_limelight->getXOff());
+
+    bool flywheelReady = abs(m_flywheelMaster.GetSelectedSensorVelocity() - m_tarmac_speed) < 400;
+    bool hoodReady = abs(m_hood.GetSelectedSensorPosition() - m_tarmac_angle) < 100; // make this interval smaller
+    // bool turretReady = abs(m_limelight->getXOff()+4.3) < 2.5;
+
+    frc::SmartDashboard::PutBoolean("wheel", flywheelReady);
+    frc::SmartDashboard::PutBoolean("hood", hoodReady);
+    // frc::SmartDashboard::PutBoolean("turret", turretReady);
+
+    if(flywheelReady && hoodReady ){
+        Load();
+    }
 }
 
 
@@ -276,7 +325,7 @@ Shooter::Zero(){
     m_turret.SetSelectedSensorPosition(-31500);
     m_turretZero = true;
     m_hood.SetSelectedSensorPosition(0);
-    m_hoodZero = true;
+    // m_hoodZero = true;
     // if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
     //     m_hood.Set(ControlMode::PercentOutput, 0.0);
     //     m_hood.SetSelectedSensorPosition(0);
@@ -292,10 +341,23 @@ Shooter::Zero(){
 }
 
 
+void
+Shooter::zeroHood(){
+    if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
+        m_hood.Set(ControlMode::PercentOutput, 0.0);
+        m_hood.SetSelectedSensorPosition(0);   
+        m_hoodZero = true;
+    }
+    if(!m_hoodZero){
+        m_hood.Set(ControlMode::PercentOutput, -0.30);   
+    }
+}
+
+
 //Load Function
 void
 Shooter::Load(){
-    if(m_state == State::SHOOT){
+    if(m_state == State::SHOOT || m_state == State::Tarmac){
         m_kicker.Set(ControlMode::PercentOutput, 0.2);
     } 
     else if(m_state == State::LOAD){
@@ -348,10 +410,10 @@ Shooter::Aimed(){
 //Calibrate function
 void
 Shooter::Calibrate(){
-    // m_speed = frc::SmartDashboard::GetNumber("speed", 0.0);
-    // m_angle = frc::SmartDashboard::GetNumber("angle", 0.0);
-    // frc::SmartDashboard::PutNumber("speed", m_speed);
-    // frc::SmartDashboard::PutNumber("angle", m_angle);
+    m_speed = frc::SmartDashboard::GetNumber("speed", 0.0);
+    m_angle = frc::SmartDashboard::GetNumber("angle", 0.0);
+    frc::SmartDashboard::PutNumber("speed", m_speed);
+    frc::SmartDashboard::PutNumber("angle", m_angle);
     
     // m_turrPos = frc::SmartDashboard::GetNumber("turr_pos", 0.0);
     // frc::SmartDashboard::PutNumber("turr_pos", m_turrPos);
