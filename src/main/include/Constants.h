@@ -122,7 +122,7 @@ ShooterConstants{
 
     const double angleOff = 300;
 
-    const double zeroingcurrent = 3.2; //confirmed
+    const double zeroingcurrent = 2.8; //confirmed
 
     const double TalonFXunitsperrot = 2048;
 }
