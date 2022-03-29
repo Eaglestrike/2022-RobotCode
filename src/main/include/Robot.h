@@ -45,6 +45,7 @@ class Robot : public frc::TimedRobot {
   void TestPeriodic() override;
 
 
+
  private:
 
   AutoMode m_auto;

@@ -22,7 +22,7 @@ Robot::RobotInit() {
   } catch(const std::exception& e){
     std::cout << e.what() <<std::endl;
   }
-  m_swerve.debug(*navx);
+ m_swerve.debug(*navx);
   m_climbing = false;
 }
 
@@ -140,7 +140,7 @@ Robot::TeleopPeriodic() {
   
   // frc::SmartDashboard::PutNumber("X",m_swerve.GetXPosition());
   // frc::SmartDashboard::PutNumber("Y",m_swerve.GetYPosition());
-  m_swerve.Drive(-x1, -y1, -x2, navx->GetYaw(), true);
+  //m_swerve.Drive(-x1, -y1, -x2, navx->GetYaw(), true);
   
   //Climbing
   if(m_climbing){
@@ -219,6 +219,7 @@ Robot::TeleopPeriodic() {
 
 void 
 Robot::TestInit() {
+  //m_shooter.getHood()->SetSelectedSensorPosition(ShooterConstants::hoodInitAngle);
 }
 
 
@@ -230,6 +231,38 @@ Robot::TestPeriodic() {
     //   m_shooter.Manual(xbox.GetRawAxis(4));
     //   m_shooter.setState(Shooter::State::MANUAL);
     // }
+
+  //HOOD TESTING UTILS BELOW
+
+    // double P = frc::SmartDashboard::GetNumber("Hood P", 0.0);
+    // double I = frc::SmartDashboard::GetNumber("Hood I", 0.0);
+    // double D = frc::SmartDashboard::GetNumber("Hood D", 0.0);
+    // frc::SmartDashboard::PutNumber("Hood P", P);
+    // frc::SmartDashboard::PutNumber("Hood I", I);
+    // frc::SmartDashboard::PutNumber("Hood D", D);
+
+    // m_shooter.getHood()->Config_kP(0, P);
+    // m_shooter.getHood()->Config_kI(0, I);
+    // m_shooter.getHood()->Config_kD(0, D);
+
+    // //Note: This uses percent output instead of m_angle to check for past limit
+    // if(m_shooter.getHood()->GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
+    //      m_shooter.getHood()->Set(ControlMode::PercentOutput, 0.0);
+    // } 
+    // else if(m_shooter.getHood()->GetSelectedSensorPosition() > ShooterConstants::hoodMax &&
+    //     m_shooter.getHood()->GetMotorOutputPercent() > 0){
+    //     m_shooter.getHood()->Set(ControlMode::PercentOutput, 0.0);  
+    //     return;
+    // }
+    // else if(m_shooter.getHood()->GetSelectedSensorPosition() < ShooterConstants::hoodMin &&
+    //     m_shooter.getHood()->GetMotorOutputPercent() < 0){
+    //     m_shooter.getHood()->Set(ControlMode::PercentOutput, 0.0);
+    //     return;
+    // }
+    // if (xbox.GetRawButton(1)) m_shooter.hoodGoTo511();
+    // else if (xbox.GetRawButton(2)) m_shooter.hoodGoTo5700();
+    // else if (xbox.GetRawButton(3)) m_shooter.hoodGoTo3000();
+    // frc::SmartDashboard::PutNumber("hood pose", m_shooter.getHood()->GetSelectedSensorPosition());
 }
 
 

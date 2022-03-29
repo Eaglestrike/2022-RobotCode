@@ -51,6 +51,14 @@ class Shooter{
         void EdgeofTarmac();
         void zeroHood();
 
+        //For testing
+        void hoodGoTo511() {m_hood.Set(ControlMode::Position, 511);}
+        void hoodGoTo5700() {m_hood.Set(ControlMode::Position, 5700);}
+        void hoodGoTo3000() {m_hood.Set(ControlMode::Position, 3000);}
+        WPI_TalonFX * getHood() {return &m_hood; }
+        WPI_TalonFX * getTurret() {return &m_turret; }
+        WPI_TalonFX * getFlywheel() {return &m_flywheelMaster; }        
+
     private:
         //TalonFX in ticks - 0 - 20,000
         //in rpm - 0 -6000

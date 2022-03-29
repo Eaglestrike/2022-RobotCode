@@ -118,7 +118,8 @@ ShooterConstants{
     const double turretMin = -63000.0; //confirmed
 
     const double hoodMax = 5700; //confirmed
-    const double hoodMin = 0; //confirmed
+    const double hoodInitAngle = 511;
+    const double hoodMin = hoodInitAngle;
 
     const double angleOff = 300;
 

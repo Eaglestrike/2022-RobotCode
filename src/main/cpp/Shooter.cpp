@@ -145,6 +145,7 @@ Shooter::Periodic(){
 void
 Shooter::Aim(){
     //m_limelight->setLEDMode("ON");
+    std::cout << "in aim\n";
 
     if(m_colorMatcher.MatchClosestColor(m_colorSensor.GetColor(), confidence) == ballColor){
         m_speed = 8000;
@@ -229,11 +230,23 @@ Shooter::Aim(){
     frc::SmartDashboard::PutNumber("hood angle", m_hood.GetSelectedSensorPosition());
     
     // Set Hood Position
-    // if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
-    //     m_hood.Set(ControlMode::PercentOutput, 0.0);
-    // } else {
-    m_hood.Set(ControlMode::Position, m_angle);
-    // }
+    if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
+         m_hood.Set(ControlMode::PercentOutput, 0.0);
+         return;
+    } 
+    else if(m_hood.GetSelectedSensorPosition() > ShooterConstants::hoodMax &&
+        m_angle >= ShooterConstants::hoodMax){
+        m_hood.Set(ControlMode::PercentOutput, 0.0); 
+        return;
+    }
+    else if(m_hood.GetSelectedSensorPosition() < ShooterConstants::hoodMin &&
+        m_angle <= ShooterConstants::hoodMin){
+        m_hood.Set(ControlMode::PercentOutput, 0.0);
+        return;
+    }
+    else {
+        m_hood.Set(ControlMode::Position, m_angle);
+    }
     //frc::SmartDashboard::PutNumber("yOff", m_limelight->getYOff());
     //frc::SmartDashboard::PutNumber("xOff", m_limelight->getXOff());
 }
@@ -324,7 +337,8 @@ void
 Shooter::Zero(){
     m_turret.SetSelectedSensorPosition(-31500);
     m_turretZero = true;
-    m_hood.SetSelectedSensorPosition(0);
+    //NOTE: REPLACE INIT ANGLE WITH ZERO IF WE'RE DOING CURRENT BASED ZEROING
+    m_hood.SetSelectedSensorPosition(ShooterConstants::hoodInitAngle);
     // m_hoodZero = true;
     // if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
     //     m_hood.Set(ControlMode::PercentOutput, 0.0);
@@ -341,6 +355,7 @@ Shooter::Zero(){
 }
 
 
+//NOTE: SHOULD NOT BE CALLED IN CASE WHERE WE'RE DOING RAISED ZERO HOOD
 void
 Shooter::zeroHood(){
     if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
