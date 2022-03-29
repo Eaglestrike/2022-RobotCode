@@ -140,7 +140,7 @@ Robot::TeleopPeriodic() {
   
   // frc::SmartDashboard::PutNumber("X",m_swerve.GetXPosition());
   // frc::SmartDashboard::PutNumber("Y",m_swerve.GetYPosition());
-  //m_swerve.Drive(-x1, -y1, -x2, navx->GetYaw(), true);
+  m_swerve.Drive(-x1, -y1, -x2, navx->GetYaw(), true);
   
   //Climbing
   if(m_climbing){

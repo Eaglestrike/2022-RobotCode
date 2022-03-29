@@ -145,7 +145,6 @@ Shooter::Periodic(){
 void
 Shooter::Aim(){
     //m_limelight->setLEDMode("ON");
-    std::cout << "in aim\n";
 
     if(m_colorMatcher.MatchClosestColor(m_colorSensor.GetColor(), confidence) == ballColor){
         m_speed = 8000;
