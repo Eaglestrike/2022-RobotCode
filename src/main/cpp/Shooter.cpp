@@ -138,6 +138,28 @@ Shooter::Periodic(){
     //frc::SmartDashboard::PutNumber("blue", m_colorSensor.GetColor().blue);
     //frc::SmartDashboard::PutNumber("green", m_colorSensor.GetColor().green);
 
+    double point = m_limelight->getYOff();
+    double x_off = m_limelight->getXOff()+4.3;
+    double output = -m_turretController.Calculate(x_off);
+    output = output > 0  && output > 0.38 ? 0.38: output;
+    output = output < 0 && output < -0.38 ? -0.38: output;
+    if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax &&
+        output > 0){
+        m_turret.Set(ControlMode::PercentOutput, 0.0);  
+        return;
+    }
+    if(m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin &&
+        output < 0){
+        m_turret.Set(ControlMode::PercentOutput, 0.0);
+        return;
+    }
+    else {
+        m_turret.Set(output);
+    }
+    if(point == 0.000){
+        m_turret.Set(ControlMode::PercentOutput, 0.0);
+        return;
+    }
 }
 
 
@@ -147,25 +169,25 @@ Shooter::Aim(){
     //m_limelight->setLEDMode("ON");
 
     // This is racism stuff. Commented out for drive practice 3/27/22
-    // if(m_colorMatcher.MatchClosestColor(m_colorSensor.GetColor(), confidence) == ballColor){
-    //     m_speed = 8000;
-    //     m_angle = 100;
-    //     m_hood.Set(ControlMode::Position, m_angle);
-    //     m_flywheelMaster.Set(ControlMode::Velocity, m_speed);
-    //     m_flywheelSlave.Set(ControlMode::Velocity, -m_speed);
-    //     m_channel.Run();
+    if(m_colorMatcher.MatchClosestColor(m_colorSensor.GetColor(), confidence) == ballColor){
+        m_speed = 8000;
+        m_angle = 100;
+        m_hood.Set(ControlMode::Position, m_angle);
+        m_flywheelMaster.Set(ControlMode::Velocity, m_speed);
+        m_flywheelSlave.Set(ControlMode::Velocity, -m_speed);
+        m_channel.Run();
         
-    //     Load();
-    //     return;
-    // }
+        Load();
+        return;
+    }
 
     //Check if the limelight sees the target
     double point = m_limelight->getYOff();
-    frc::SmartDashboard::PutNumber("yoff", point);
-    if(point == 0.000){
-        m_channel.setState(Channel::State::IDLE);
-        return;
-    }
+    // frc::SmartDashboard::PutNumber("yoff", point);
+    // if(point == 0.000){
+    //     m_channel.setState(Channel::State::IDLE);
+    //     return;
+    // }
     
 
     // Comment this for shooter recalibration
@@ -205,23 +227,23 @@ Shooter::Aim(){
     // frc::SmartDashboard::PutNumber("turret position", m_turret.GetSelectedSensorPosition());
 
     // Set Turret movement
-    double x_off = m_limelight->getXOff()+4.3;
-    double output = -m_turretController.Calculate(x_off);
-    output = output > 0  && output > 0.38 ? 0.38: output;
-    output = output < 0 && output < -0.38 ? -0.38: output;
-    if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax &&
-        output > 0){
-        m_turret.Set(ControlMode::PercentOutput, 0.0);  
-        return;
-    }
-    if(m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin &&
-        output < 0){
-        m_turret.Set(ControlMode::PercentOutput, 0.0);
-        return;
-    }
-    else {
-        m_turret.Set(output);
-    }
+    // double x_off = m_limelight->getXOff()+4.3;
+    // double output = -m_turretController.Calculate(x_off);
+    // output = output > 0  && output > 0.38 ? 0.38: output;
+    // output = output < 0 && output < -0.38 ? -0.38: output;
+    // if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax &&
+    //     output > 0){
+    //     m_turret.Set(ControlMode::PercentOutput, 0.0);  
+    //     return;
+    // }
+    // if(m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin &&
+    //     output < 0){
+    //     m_turret.Set(ControlMode::PercentOutput, 0.0);
+    //     return;
+    // }
+    // else {
+    //     m_turret.Set(output);
+    // }
 
     // Set Flywheel Velocity
     m_flywheelMaster.Set(ControlMode::Velocity, m_speed);
