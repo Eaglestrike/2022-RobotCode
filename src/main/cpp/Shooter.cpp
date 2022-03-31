@@ -127,8 +127,10 @@ Shooter::Periodic(){
             EdgeofTarmac();
             // Shoot();
             m_channel.setState(Channel::State::RUN);
+            break;
         case State::Hood:
             zeroHood();
+            break;
         default:
             break;
     }
@@ -186,7 +188,7 @@ Shooter::Aim(){
             speed2 = data2.second;
 
             // interpolate - 
-            double interval = point1 - point2;
+            double interval = point2 - point1;
             double xdiff = point - point1;
             m_angle = (((angle2 - angle1)/interval * xdiff) + angle1) * angle_scale_factor;
             m_speed = (((speed2 - speed1)/interval * xdiff) + speed1) * speed_scale_factor;
