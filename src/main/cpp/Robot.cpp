@@ -220,6 +220,7 @@ Robot::TeleopPeriodic() {
 void 
 Robot::TestInit() {
   //m_shooter.getHood()->SetSelectedSensorPosition(ShooterConstants::hoodInitAngle);
+  m_shooter.Zero();
 }
 
 
@@ -245,24 +246,24 @@ Robot::TestPeriodic() {
     // m_shooter.getHood()->Config_kI(0, I);
     // m_shooter.getHood()->Config_kD(0, D);
 
-    // //Note: This uses percent output instead of m_angle to check for past limit
-    // if(m_shooter.getHood()->GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
-    //      m_shooter.getHood()->Set(ControlMode::PercentOutput, 0.0);
-    // } 
-    // else if(m_shooter.getHood()->GetSelectedSensorPosition() > ShooterConstants::hoodMax &&
-    //     m_shooter.getHood()->GetMotorOutputPercent() > 0){
-    //     m_shooter.getHood()->Set(ControlMode::PercentOutput, 0.0);  
-    //     return;
-    // }
-    // else if(m_shooter.getHood()->GetSelectedSensorPosition() < ShooterConstants::hoodMin &&
-    //     m_shooter.getHood()->GetMotorOutputPercent() < 0){
-    //     m_shooter.getHood()->Set(ControlMode::PercentOutput, 0.0);
-    //     return;
-    // }
-    // if (xbox.GetRawButton(1)) m_shooter.hoodGoTo511();
-    // else if (xbox.GetRawButton(2)) m_shooter.hoodGoTo5700();
-    // else if (xbox.GetRawButton(3)) m_shooter.hoodGoTo3000();
-    // frc::SmartDashboard::PutNumber("hood pose", m_shooter.getHood()->GetSelectedSensorPosition());
+    //Note: This uses percent output instead of m_angle to check for past limit
+    if(m_shooter.getHood()->GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
+         m_shooter.getHood()->Set(ControlMode::PercentOutput, 0.0);
+    } 
+    else if(m_shooter.getHood()->GetSelectedSensorPosition() > ShooterConstants::hoodMax &&
+        m_shooter.getHood()->GetMotorOutputPercent() > 0){
+        m_shooter.getHood()->Set(ControlMode::PercentOutput, 0.0);  
+        return;
+    }
+    else if(m_shooter.getHood()->GetSelectedSensorPosition() < ShooterConstants::hoodMin &&
+        m_shooter.getHood()->GetMotorOutputPercent() < 0){
+        m_shooter.getHood()->Set(ControlMode::PercentOutput, 0.0);
+        return;
+    }
+    if (xbox.GetRawButton(1)) m_shooter.hoodGoTo511();
+    else if (xbox.GetRawButton(2)) m_shooter.hoodGoTo5700();
+    else if (xbox.GetRawButton(3)) m_shooter.hoodGoTo3000();
+    frc::SmartDashboard::PutNumber("hood pose", m_shooter.getHood()->GetSelectedSensorPosition());
 }
 
 

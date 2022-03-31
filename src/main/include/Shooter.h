@@ -52,7 +52,7 @@ class Shooter{
         void zeroHood();
 
         //For testing
-        void hoodGoTo511() {m_hood.Set(ControlMode::Position, 511);}
+        void hoodGoTo511() {m_hood.Set(ControlMode::Position, 511); }
         void hoodGoTo5700() {m_hood.Set(ControlMode::Position, 5700);}
         void hoodGoTo3000() {m_hood.Set(ControlMode::Position, 3000);}
         WPI_TalonFX * getHood() {return &m_hood; }

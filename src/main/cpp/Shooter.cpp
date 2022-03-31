@@ -40,47 +40,47 @@ Shooter::Shooter(){
 
     // m_turretPos.EnableContinuousInput(-1000, -63000);
 
-    // dataMap[-24.0] = {5800, 18500};
-    // dataMap[-23.5] = {5750, 18500};
-    // dataMap[-22.5] = {5700, 18500};
-    // dataMap[-21.5] = {5600, 18500};
-    // dataMap[-20.0] = {5500, 18200};
-    // dataMap[-19.2] = {5500, 18000};
-    // dataMap[-18.0] = {5400, 17400};
-    // dataMap[-16.7] = {5400, 17000}; 
-    // dataMap[-15.4] = {4900, 15700};
-    // dataMap[-14.5] = {4600, 15500};
-    // dataMap[-12.6] = {4500, 14500};
-    // dataMap[-11.2] = {4400, 13800};
-    // dataMap[-9.7] = {4400, 13600};
-    // dataMap[-8.0] = {4200, 13500};
-    // dataMap[-6.2] = {4000, 13500};
-    // dataMap[-5.0] = {3600, 14000};
-    // dataMap[-2.5] = {3000, 13900};
-    // dataMap[-0.5] = {2400, 13400};
-    // dataMap[5.5] = {1900, 12900};
-    // dataMap[9.1] = {1700, 12900};
-    // dataMap[12.4] = {1500, 12800};
-    // dataMap[16.5] = {1300, 12700};
-    // dataMap[18.7] = {1200, 12500};
+    dataMap[-24.0] = {5800, 18500};
+    dataMap[-23.5] = {5750, 18500};
+    dataMap[-22.5] = {5700, 18500};
+    dataMap[-21.5] = {5600, 18500};
+    dataMap[-20.0] = {5500, 18200};
+    dataMap[-19.2] = {5500, 18000};
+    dataMap[-18.0] = {5400, 17400};
+    dataMap[-16.7] = {5400, 17000}; 
+    dataMap[-15.4] = {4900, 15700};
+    dataMap[-14.5] = {4600, 15500};
+    dataMap[-12.6] = {4500, 14500};
+    dataMap[-11.2] = {4400, 13800};
+    dataMap[-9.7] = {4400, 13600};
+    dataMap[-8.0] = {4200, 13500};
+    dataMap[-6.2] = {4000, 13500};
+    dataMap[-5.0] = {3600, 14000};
+    dataMap[-2.5] = {3000, 13900};
+    dataMap[-0.5] = {2400, 13400};
+    dataMap[5.5] = {1900, 12900};
+    dataMap[9.1] = {1700, 12900};
+    dataMap[12.4] = {1500, 12800};
+    dataMap[16.5] = {1300, 12700};
+    dataMap[18.7] = {1200, 12500};
 
-    dataMap[-19.4] = {5700, 17200};
-    dataMap[-18.9] = {5700, 16400};
-    dataMap[-17.5] = {5600, 15900};
-    dataMap[-14.8] = {5600, 14900};
-    dataMap[-12.5] = {5600, 14000};
-    dataMap[-9.5] = {5500, 13500};
-    dataMap[-7.4] = {5400, 13200};
-    dataMap[-5.4] = {5200, 12600};
-    dataMap[-1.8] = {4800, 12300};
-    dataMap[0.5] = {4700, 12200};
-    dataMap[1.7] = {4500, 12000};
-    dataMap[3.65] = {4100, 12000};
-    dataMap[6.0] = {3800, 11800};
-    dataMap[9.9] = {2800, 11700};
-    dataMap[14.2] = {2800, 11500};
-    dataMap[16.0] = {2600, 11000};
-    dataMap[19.88] = {1800, 10500};
+    // dataMap[-19.4] = {5700, 17200};
+    // dataMap[-18.9] = {5700, 16400};
+    // dataMap[-17.5] = {5600, 15900};
+    // dataMap[-14.8] = {5600, 14900};
+    // dataMap[-12.5] = {5600, 14000};
+    // dataMap[-9.5] = {5500, 13500};
+    // dataMap[-7.4] = {5400, 13200};
+    // dataMap[-5.4] = {5200, 12600};
+    // dataMap[-1.8] = {4800, 12300};
+    // dataMap[0.5] = {4700, 12200};
+    // dataMap[1.7] = {4500, 12000};
+    // dataMap[3.65] = {4100, 12000};
+    // dataMap[6.0] = {3800, 11800};
+    // dataMap[9.9] = {2800, 11700};
+    // dataMap[14.2] = {2800, 11500};
+    // dataMap[16.0] = {2600, 11000};
+    // dataMap[19.88] = {1800, 10500};
 
     m_hoodZero = false;
     m_turretZero = false;
@@ -129,7 +129,8 @@ Shooter::Periodic(){
             m_channel.setState(Channel::State::RUN);
             break;
         case State::Hood:
-            zeroHood();
+            //commented this out to prevent going down to most down position
+            //zeroHood();
             break;
         default:
             break;
@@ -231,22 +232,26 @@ Shooter::Aim(){
     frc::SmartDashboard::PutNumber("hood angle", m_hood.GetSelectedSensorPosition());
     
     // Set Hood Position
+    //could alternatively do m_hood.Set(ControlMode::Position, std::min(ShooterConstants::hoodMax, std::max(ShooterConstants::hoodMin, m_angle)));
     if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
          m_hood.Set(ControlMode::PercentOutput, 0.0);
-         return;
+         frc::SmartDashboard::PutString("Booted", "hoot got booted - zeroing current");
     } 
     else if(m_hood.GetSelectedSensorPosition() > ShooterConstants::hoodMax &&
-        m_angle >= ShooterConstants::hoodMax){
-        m_hood.Set(ControlMode::PercentOutput, 0.0); 
+        m_hood.GetMotorOutputPercent() > 0){
+        m_hood.Set(ControlMode::PercentOutput, 0.0);  
+        frc::SmartDashboard::PutString("Booted", "hoot got booted - past hood max");
         return;
     }
     else if(m_hood.GetSelectedSensorPosition() < ShooterConstants::hoodMin &&
-        m_angle <= ShooterConstants::hoodMin){
+        m_hood.GetMotorOutputPercent() < 0){
         m_hood.Set(ControlMode::PercentOutput, 0.0);
+        frc::SmartDashboard::PutString("Booted", "hoot got booted - past hood min");
         return;
     }
     else {
         m_hood.Set(ControlMode::Position, m_angle);
+        frc::SmartDashboard::PutString("Booted", "hood not booted");
     }
     //frc::SmartDashboard::PutNumber("yOff", m_limelight->getYOff());
     //frc::SmartDashboard::PutNumber("xOff", m_limelight->getXOff());
@@ -280,6 +285,29 @@ Shooter::EdgeofTarmac(){
     if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
         m_hood.Set(ControlMode::PercentOutput, 0.0);
     }
+
+    // // Set Hood Position
+    // //could alternatively do m_hood.Set(ControlMode::Position, std::min(ShooterConstants::hoodMax, std::max(ShooterConstants::hoodMin, m_angle)));
+    // if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
+    //      m_hood.Set(ControlMode::PercentOutput, 0.0);
+    //      frc::SmartDashboard::PutString("Booted", "hoot got booted - zeroing current");
+    // } 
+    // else if(m_hood.GetSelectedSensorPosition() > ShooterConstants::hoodMax &&
+    //     m_hood.GetMotorOutputPercent() > 0){
+    //     m_hood.Set(ControlMode::PercentOutput, 0.0);  
+    //     frc::SmartDashboard::PutString("Booted", "hoot got booted - past hood max");
+    //     return;
+    // }
+    // else if(m_hood.GetSelectedSensorPosition() < ShooterConstants::hoodMin &&
+    //     m_hood.GetMotorOutputPercent() < 0){
+    //     m_hood.Set(ControlMode::PercentOutput, 0.0);
+    //     frc::SmartDashboard::PutString("Booted", "hoot got booted - past hood min");
+    //     return;
+    // }
+    // else {
+    //     m_hood.Set(ControlMode::Position, m_tarmac_angle);
+    //     frc::SmartDashboard::PutString("Booted", "hood not booted");
+    // }
 
     bool flywheelReady = abs(m_flywheelMaster.GetSelectedSensorVelocity() - m_tarmac_speed) < 400;
     bool hoodReady = abs(m_hood.GetSelectedSensorPosition() - m_tarmac_angle) < 100; // make this interval smaller
