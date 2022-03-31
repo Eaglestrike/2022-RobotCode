@@ -189,14 +189,14 @@ Shooter::Aim(){
             speed2 = data2.second;
 
             // interpolate - 
-            double interval = point2 - point1;
-            double xdiff = point - point1;
-            m_angle = (((angle2 - angle1)/interval * xdiff) + angle1) * angle_scale_factor;
-            m_speed = (((speed2 - speed1)/interval * xdiff) + speed1) * speed_scale_factor;
+            // double interval = point2 - point1;
+            // double xdiff = point - point1;
+            // m_angle = (((angle2 - angle1)/interval * xdiff) + angle1) * angle_scale_factor;
+            // m_speed = (((speed2 - speed1)/interval * xdiff) + speed1) * speed_scale_factor;
 
             // taking the average - 
-            // m_angle = (angle1 + angle2)/2 * angle_scale_factor;
-            // m_speed = (speed1 + speed2)/2 * speed_scale_factor;
+            m_angle = (angle1 + angle2)/2 * angle_scale_factor;
+            m_speed = (speed1 + speed2)/2 * speed_scale_factor;
 
         }else{
             m_angle = 0;
@@ -236,6 +236,7 @@ Shooter::Aim(){
     if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
          m_hood.Set(ControlMode::PercentOutput, 0.0);
          frc::SmartDashboard::PutString("Booted", "hoot got booted - zeroing current");
+         return;
     } 
     else if(m_hood.GetSelectedSensorPosition() > ShooterConstants::hoodMax &&
         m_hood.GetMotorOutputPercent() > 0){
