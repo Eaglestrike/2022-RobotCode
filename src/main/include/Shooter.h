@@ -31,7 +31,7 @@ class Shooter{
         Shooter();
         ~Shooter();
         void DisableMotors();
-        void Periodic();
+        void Periodic(bool autonomous);
         void Aim();
         void Shoot();
         bool withinRange(std::vector<double>& array, double p, double& p1, double& p2);
@@ -104,7 +104,7 @@ class Shooter{
         frc::Color ballColor;
         frc::Color redBall{0.57, 0.31, 0.105};
         frc::Color blueBall{0.1536, 0.4, 0.4451};
-        frc::Color defualtColor{0.265, 0.45, 0.28};
+        frc::Color defualtColor{0.265, 0.45, 0.28};  
 
         static constexpr auto i2cPort = frc::I2C::Port::kOnboard;
         rev::ColorSensorV3 m_colorSensor{i2cPort};
@@ -114,8 +114,8 @@ class Shooter{
         bool m_blue;
         double confidence = 0.65;
 
-        double angle_scale_factor = 0.99;
-        double speed_scale_factor = 1.01;
+        double angle_scale_factor = 1.04;
+        double speed_scale_factor = 0.98;
 
         double turnInterval = 90;
 };

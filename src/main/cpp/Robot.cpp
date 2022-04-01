@@ -93,7 +93,7 @@ Robot::AutonomousPeriodic() {
       break;
   }
   m_intake.Periodic();
-  m_shooter.Periodic();
+  m_shooter.Periodic(true);
 }
 
 
@@ -120,7 +120,7 @@ Robot::TeleopInit() {
   
   PDH.ClearStickyFaults();
   m_intake.Deploy();
-  m_shooter.Periodic();
+  m_shooter.Periodic(false);
   m_intake.Periodic();
   m_climber.Initialize();
 }
@@ -151,16 +151,20 @@ Robot::TeleopPeriodic() {
       m_climber.ExtendfirstStage();
       
     }
-    else if(xbox.GetRightBumper()){
-      out = 0;
-      m_climber.armExtension(out);
-    }
     else if(abs(xbox.GetRawAxis(1)) > 0.1){
       out = xbox.GetRawAxis(1);
       if(abs(out) < 0.3){
         out = 0;
       }
       m_climber.armExtension(out);
+    }
+    else if(abs(xbox.GetRawAxis(4)) > 0.2 ){
+      m_shooter.Manual(xbox.GetRawAxis(4));
+      m_shooter.setState(Shooter::State::MANUAL);
+    }
+    else {
+      m_shooter.Manual(0);
+      m_climber.armExtension(0);
     }
   } else {
     //Teleop Operation
@@ -172,10 +176,6 @@ Robot::TeleopPeriodic() {
     //Shoot
     else if(l_joy.GetTrigger()){
       m_shooter.setState(Shooter::State::SHOOT);
-    }
-    else if(abs(xbox.GetRawAxis(4)) > 0.2 ){
-      m_shooter.Manual(xbox.GetRawAxis(4));
-      m_shooter.setState(Shooter::State::MANUAL);
     }
     // //Peeking the turret feild oriented
     // else if(l_joy.GetPOV() != -1){
@@ -205,12 +205,17 @@ Robot::TeleopPeriodic() {
     else if (xbox.GetRawButton(4)){
       m_shooter.setState(Shooter::State::Tarmac);
     }
+     else if(abs(xbox.GetRawAxis(4)) > 0.2 ){
+      m_shooter.Manual(xbox.GetRawAxis(4));
+      m_shooter.setState(Shooter::State::MANUAL);
+    }
     else {
+      m_shooter.Manual(0);
       m_shooter.setState(Shooter::State::IDLE);
       m_intake.setState(Intake::State::IDLE);
     }
     m_intake.Periodic(); 
-    m_shooter.Periodic();
+    m_shooter.Periodic(false);
   }
   
 

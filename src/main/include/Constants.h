@@ -92,9 +92,9 @@ ShooterConstants{
     const int photogate = 8; 
 
     //Turret Controller
-    const double turretP = 0.023; //fairly good
-    const double turretI = 0.0001;
-    const double turretD = 0.002;
+    const double turretP = 0.021; //fairly good
+    const double turretI = 0.000;
+    const double turretD = 0.0001;
 
     //Turret Position Controller
     const double turretPosP = 0.01;

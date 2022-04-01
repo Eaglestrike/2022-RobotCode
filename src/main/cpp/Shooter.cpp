@@ -70,16 +70,16 @@ Shooter::Shooter(){
     // dataMap[-14.8] = {5600, 14900};
     // dataMap[-12.5] = {5600, 14000};
     // dataMap[-9.5] = {5500, 13500};
-    // dataMap[-7.4] = {5400, 13200};
-    // dataMap[-5.4] = {5200, 12600};
-    // dataMap[-1.8] = {4800, 12300};
-    // dataMap[0.5] = {4700, 12200};
-    // dataMap[1.7] = {4500, 12000};
-    // dataMap[3.65] = {4100, 12000};
-    // dataMap[6.0] = {3800, 11800};
-    // dataMap[9.9] = {2800, 11700};
-    // dataMap[14.2] = {2800, 11500};
-    // dataMap[16.0] = {2600, 11000};
+    // dataMap[-7.4] = {5200, 13200};
+    // dataMap[-5.4] = {4800, 12600};
+    // dataMap[-1.8] = {4400, 12300};
+    // dataMap[0.5] = {4300, 12200};
+    // dataMap[1.7] = {4100, 12000};
+    // dataMap[3.65] = {3800, 12000};
+    // dataMap[6.0] = {3400, 11800};
+    // dataMap[9.9] = {2500, 11700};
+    // dataMap[14.2] = {2300, 11500};
+    // dataMap[16.0] = {2000, 11000};
     // dataMap[19.88] = {1800, 10500};
 
     m_hoodZero = false;
@@ -96,7 +96,7 @@ Shooter::~Shooter(){}
 
 //Periodic Function
 void
-Shooter::Periodic(){
+Shooter::Periodic(bool autonomous){
 
     switch(m_state){
         case State::SHOOT:
@@ -137,29 +137,31 @@ Shooter::Periodic(){
     //frc::SmartDashboard::PutNumber("Red", m_colorSensor.GetColor().red);
     //frc::SmartDashboard::PutNumber("blue", m_colorSensor.GetColor().blue);
     //frc::SmartDashboard::PutNumber("green", m_colorSensor.GetColor().green);
+    // if (autonomous){
+    //     return;
+    // }
+    // double point = m_limelight->getYOff();
+    // double x_off = m_limelight->getXOff()+4.3;
+    // double output = -m_turretController.Calculate(x_off);
+    // output = output > 0  && output > 0.38 ? 0.38: output;
+    // output = output < 0 && output < -0.38 ? -0.38: output;
 
-    double point = m_limelight->getYOff();
-    double x_off = m_limelight->getXOff()+4.3;
-    double output = -m_turretController.Calculate(x_off);
-    output = output > 0  && output > 0.38 ? 0.38: output;
-    output = output < 0 && output < -0.38 ? -0.38: output;
-    if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax &&
-        output > 0){
-        m_turret.Set(ControlMode::PercentOutput, 0.0);  
-        return;
-    }
-    if(m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin &&
-        output < 0){
-        m_turret.Set(ControlMode::PercentOutput, 0.0);
-        return;
-    }
-    else {
-        m_turret.Set(output);
-    }
-    if(point == 0.000){
-        m_turret.Set(ControlMode::PercentOutput, 0.0);
-        return;
-    }
+    //flip around
+    // if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax &&
+    
+    // }
+    // if(m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin &&
+    //     output < 0){
+    //     m_turret.Set(ControlMode::PercentOutput, 0.0);
+    //     return;
+    // }
+    // else {
+    //     m_turret.Set(output);
+    // }
+    // if(point == 0.000){
+    //     m_turret.Set(ControlMode::PercentOutput, 0.0);
+    //     return;
+    // }
 }
 
 
@@ -227,23 +229,23 @@ Shooter::Aim(){
     // frc::SmartDashboard::PutNumber("turret position", m_turret.GetSelectedSensorPosition());
 
     // Set Turret movement
-    // double x_off = m_limelight->getXOff()+4.3;
-    // double output = -m_turretController.Calculate(x_off);
-    // output = output > 0  && output > 0.38 ? 0.38: output;
-    // output = output < 0 && output < -0.38 ? -0.38: output;
-    // if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax &&
-    //     output > 0){
-    //     m_turret.Set(ControlMode::PercentOutput, 0.0);  
-    //     return;
-    // }
-    // if(m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin &&
-    //     output < 0){
-    //     m_turret.Set(ControlMode::PercentOutput, 0.0);
-    //     return;
-    // }
-    // else {
-    //     m_turret.Set(output);
-    // }
+    double x_off = m_limelight->getXOff()+4.3;
+    double output = -m_turretController.Calculate(x_off);
+    output = output > 0  && output > 0.38 ? 0.38: output;
+    output = output < 0 && output < -0.38 ? -0.38: output;
+    if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax &&
+        output > 0){
+        m_turret.Set(ControlMode::PercentOutput, 0.0);  
+        return;
+    }
+    if(m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin &&
+        output < 0){
+        m_turret.Set(ControlMode::PercentOutput, 0.0);
+        return;
+    }
+    else {
+        m_turret.Set(output);
+    }
 
     // Set Flywheel Velocity
     m_flywheelMaster.Set(ControlMode::Velocity, m_speed);
@@ -459,9 +461,9 @@ Shooter::setPID(){
     frc::SmartDashboard::PutNumber("D", D);
 
     // m_turretPos.SetPID(P, I, D);
-    m_turret.Config_kP(0, P);
-    m_turret.Config_kI(0, I);
-    m_turret.Config_kD(0, D);
+    // m_turret.Config_kP(0, P);
+    // m_turret.Config_kI(0, I);
+    // m_turret.Config_kD(0, D);
 
     // m_flywheelMaster.Config_kF(0, F);
     // m_flywheelMaster.Config_kP(0, P);
@@ -473,7 +475,7 @@ Shooter::setPID(){
     // m_flywheelSlave.Config_kI(0, I);
     // m_flywheelSlave.Config_kD(0, D);
     
-    // m_turretController.SetPID(P, I, D);
+    m_turretController.SetPID(P, I, D);
     
     // m_hood.Config_kP(0, P);
     // m_hood.Config_kI(0, I);

@@ -30,13 +30,13 @@ class AutoMode{
 
         // 2 ball Auto
         std::vector<State> actions2 = {DRIVEnINTAKE, IDLE, SHOOT, IDLE};
-        std::vector<double> times2 = {3.0, 3.1, 6.4, 6.5};
+        std::vector<double> times2 = {3.0, 3.1, 10.0, 10.1};
         std::vector<int> waypointIndex2 = {0, 0, 0, 0};
 
         // 3 ball Auto
         std::vector<State> actions3 = {DRIVEnINTAKE, IDLE, SHOOT, IDLE, DRIVE, IDLE, DRIVEnINTAKE, IDLE, DRIVE, IDLE, SHOOT, IDLE, DRIVE, IDLE};
-        std::vector<double> times3 = {2.4, 2.5, 4.4, 4.5, 5.2, 5.3, 7.4, 7.5, 8.0, 8.1, 9.9, 10.0, 11.0, 11.1};
-        std::vector<int> waypointIndex3 = {0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 3, 3, 4, 4};
+        std::vector<double> times3 = {2.4, 2.5, 5.0, 5.1, 5.7, 5.8, 8.0, 8.1, 8.5, 8.6, 12.0, 12.1, 12.4, 12.5};
+        std::vector<int> waypointIndex3 = {0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3};
 
         // 5 ball Auto
         std::vector<State> actions5 = {SHOOT, IDLE, DRIVEnINTAKE, IDLE, DRIVE, IDLE, DRIVEnINTAKE, IDLE, DRIVE, IDLE, SHOOT, IDLE, DRIVEnINTAKE, 
