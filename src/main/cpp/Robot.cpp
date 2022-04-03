@@ -142,6 +142,11 @@ Robot::TeleopPeriodic() {
   // frc::SmartDashboard::PutNumber("Y",m_swerve.GetYPosition());
   m_swerve.Drive(-x1, -y1, -x2, navx->GetYaw(), true);
   
+  if(xbox.GetBackButtonPressed()){
+      m_climbing = !m_climbing;
+      m_climber.disableBrake();
+      frc::SmartDashboard::PutBoolean("CLIMB", m_climbing);
+  }
   //Climbing
   if(m_climbing){
     if(xbox.GetRawButtonPressed(2)){
@@ -183,10 +188,6 @@ Robot::TeleopPeriodic() {
     //   m_shooter.setState(Shooter::State::PEEK);
     // }
     //back button will enable climb
-    else if(xbox.GetBackButtonPressed()){
-      m_climbing = true;
-      m_climber.disableBrake();
-    }
     //Start button on joystick will reset robot yaw
     else if(xbox.GetStartButtonPressed()){
       navx->Reset();

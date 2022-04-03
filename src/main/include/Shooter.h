@@ -84,21 +84,19 @@ class Shooter{
         bool m_hoodZero = false;
         bool m_turretZero = false;
 
-        double m_tarmac_speed = 7000;
-        double m_tarmac_angle = 3000;
+        double m_tarmac_speed = 5000;
+        double m_tarmac_angle = 1000;
 
         //For storing hood and angle values for shooting
         //angle , speed
-        std::vector<double> dataPoints = {
-            -24.0, -23.5, -22.5, -21.5, -20.0, -19.2, -18.0, -16.7, -15.4, 
-            -14.5, -12.6, -11.2, -9.7, -8.0, -6.2, -5.0, -2.5, -0.5, 5.5, 
-            9.1, 12.4, 16.5, 18.7
-        };
+        // std::vector<double> dataPoints = {
+        //     -24.0, -23.5, -22.5, -21.5, -20.0, -19.2, -18.0, -16.7, -15.4, 
+        //     -14.5, -12.6, -11.2, -9.7, -8.0, -6.2, -5.0, -2.5, -0.5, 5.5, 
+        //     9.1, 12.4, 16.5, 18.7
+        // };
 
-        // std::vector<double> dataPoints = {19.88, 16.00, 14.20, 9.9, 6.0, 3.65, 1.7,
-        //     0.5, -1.8, -5.4, -7.4, -9.5, -12.5, -14.8, -17.5, -18.9, -19.4};
-        // std::vector<double> dataPoints = {-19.4, -18.9, -17.5, -14.8, -12.5, -9.5,
-        //     -7.4, -5.4, -1.8, 0.5, 1.7, 3.65, 6.0, 9.9, 14.2, 16.0, 19.88};
+        std::vector<double> dataPoints = {-19.4, -18.9, -17.5, -14.8, -12.5, -9.5,
+            -7.4, -5.4, -1.8, 0.5, 1.7, 3.65, 6.0, 9.9, 14.2, 16.0, 19.88};
         std::unordered_map <double, std::pair<double, double>> dataMap;
 
         frc::Color ballColor;
@@ -114,8 +112,13 @@ class Shooter{
         bool m_blue;
         double confidence = 0.65;
 
-        double angle_scale_factor = 1.04;
-        double speed_scale_factor = 0.98;
+        double angle_scale_factor = 0.945;
+        double speed_scale_factor = 0.99;
 
         double turnInterval = 90;
+
+        bool swivelRight = false;
+        bool swivelLeft = false;
+
+        bool m_autonomous;
 };
