@@ -21,7 +21,7 @@ class Shooter{
             ZERO,
             AIM,
             LOAD,
-            PEEK,
+            SWIVEL,
             MANUAL,
             BadIdea,
             Tarmac,
@@ -33,6 +33,7 @@ class Shooter{
         void DisableMotors();
         void Periodic(bool autonomous);
         void Aim();
+        void Swivel();
         void Shoot();
         bool withinRange(std::vector<double>& array, double p, double& p1, double& p2);
         void Zero();

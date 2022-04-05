@@ -99,12 +99,19 @@ void
 Shooter::Periodic(bool autonomous){
 
     m_autonomous = autonomous;
+
+    if(swivelLeft || swivelRight){
+        setState(State::SWIVEL);
+    }
     // For checking the color values 
     //frc::SmartDashboard::PutNumber("Red", m_colorSensor.GetColor().red);
     //frc::SmartDashboard::PutNumber("blue", m_colorSensor.GetColor().blue);
     //frc::SmartDashboard::PutNumber("green", m_colorSensor.GetColor().green);
 
     switch(m_state){
+        case State::SWIVEL:
+            Swivel();
+            break;
         case State::SHOOT:
             Aim();
             Shoot();
@@ -121,8 +128,6 @@ Shooter::Periodic(bool autonomous){
             break;
         case State::LOAD:
             Load();
-            break;
-        case State::PEEK:
             break;
         case State::MANUAL:
             break;
@@ -141,21 +146,22 @@ Shooter::Periodic(bool autonomous){
     }
     m_channel.Periodic();
     
-    // if (m_autonomous){
-    //     return;
-    // }
-    // double point = m_limelight->getYOff();
-    // double x_off = m_limelight->getXOff()+4.3;
-    // double output = -m_turretController.Calculate(x_off);
-    // output = output > 0  && output > 0.38 ? 0.38: output;
-    // output = output < 0 && output < -0.38 ? -0.38: output;
+    if (m_autonomous){
+        return;
+    }
+    double point = m_limelight->getYOff();
+    double x_off = m_limelight->getXOff()+4.3;
+    double output = -m_turretController.Calculate(x_off);
+    output = output > 0  && output > 0.38 ? 0.38: output;
+    output = output < 0 && output < -0.38 ? -0.38: output;
 
     frc::SmartDashboard::PutBoolean("leftSwivel", swivelLeft);
     frc::SmartDashboard::PutBoolean("rightSwivel", swivelRight);
 
-    // if(point == 0.000){
-    //     m_turret.Set(ControlMode::PercentOutput, 0.0);
-    //     return;
+    if(point == 0.000 && !swivelLeft && !swivelRight){
+        m_turret.Set(ControlMode::PercentOutput, 0.0);
+        return;
+    }
     // } else if(swivelRight){
     //     m_turret.Set(ControlMode::Position, -60000);
     //         if(abs(m_turret.GetSelectedSensorPosition() + 60000) < 2000){
@@ -171,19 +177,35 @@ Shooter::Periodic(bool autonomous){
     // }
 
    
-    // else if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax &&
-    //     output > 0){
-    //     swivelRight = true;
-    // }
-    // else if(m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin &&
-    //     output < 0){
-    //     swivelLeft = true;
-    // }
-    // else {
-    //     m_turret.Set(output);
-    // }
+    else if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax &&
+        output > 0){
+        swivelRight = true;
+    }
+    else if(m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin &&
+        output < 0){
+        swivelLeft = true;
+    }
+    else {
+        m_turret.Set(output);
+    }
 }
 
+
+void Shooter::Swivel(){
+    if(swivelRight){
+        m_turret.Set(ControlMode::Position, -60000);
+            if(abs(m_turret.GetSelectedSensorPosition() + 60000) < 2000){
+                swivelRight = false;
+            }
+        return;
+    } else if(swivelLeft){
+        m_turret.Set(ControlMode::Position, -3000);
+            if(abs(m_turret.GetSelectedSensorPosition() + 3000) < 2000){
+                swivelLeft = false;
+            }
+        return;
+    } 
+}
 
 //Aim Function for Turret
 void
@@ -249,7 +271,7 @@ Shooter::Aim(){
     // frc::SmartDashboard::PutNumber("turret position", m_turret.GetSelectedSensorPosition());
 
     // Set Turret movement
-    // if(m_autonomous){
+    if(m_autonomous){
         double x_off = m_limelight->getXOff()+4.3;
         double output = -m_turretController.Calculate(x_off);
         output = output > 0  && output > 0.38 ? 0.38: output;
@@ -268,12 +290,12 @@ Shooter::Aim(){
         else {
             m_turret.Set(output);
         }
-    // }
+    }
     // Set Flywheel Velocity
     m_flywheelMaster.Set(ControlMode::Velocity, m_speed);
     m_flywheelSlave.Set(ControlMode::Velocity, -m_speed);
-    frc::SmartDashboard::PutNumber("flywheel speed", m_flywheelMaster.GetSelectedSensorVelocity());
-    frc::SmartDashboard::PutNumber("hood angle", m_hood.GetSelectedSensorPosition());
+    // frc::SmartDashboard::PutNumber("flywheel speed", m_flywheelMaster.GetSelectedSensorVelocity());
+    // frc::SmartDashboard::PutNumber("hood angle", m_hood.GetSelectedSensorPosition());
     
     // Set Hood Position
     if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
@@ -318,7 +340,6 @@ Shooter::withinRange(std::vector<double>& array, double p, double& p1, double& p
     int left =0;
     int right = array.size() -1;
     if(p < array[left] || p > array[right]){
-        // std::cout << "bad1" <<std::endl;
         return false;
     }
     int mid = (left + right)/2;
@@ -327,7 +348,6 @@ Shooter::withinRange(std::vector<double>& array, double p, double& p1, double& p
             p1 = array[mid];
             p2 = array[mid+1];
             return true;
-            // std::cout << "does find point" <<std::endl;
         } else if(array[mid] <= p){
             left = mid;
         } else if(array[mid] >= p){
@@ -335,7 +355,6 @@ Shooter::withinRange(std::vector<double>& array, double p, double& p1, double& p
         }
         mid = (left + right)/2;
     }
-    // std::cout << "bad2" <<std::endl;
     return false;
 }
 

@@ -116,7 +116,7 @@ Robot::TeleopInit() {
   m_swerve.Initialize();
 
   //REMOVE THIS WHEN AT COMPETITION!
-  // m_shooter.Zero();
+  m_shooter.Zero();
   
   PDH.ClearStickyFaults();
   m_intake.Deploy();
@@ -137,11 +137,15 @@ Robot::TeleopPeriodic() {
   x1 = abs(x1) < 0.05 ? 0.0: x1;
   y1 = abs(y1) < 0.05 ? 0.0: y1;
   x2 = abs(x2) < 0.05 ? 0.0: x2;
+  double yaw = navx->GetYaw();
   
-  // frc::SmartDashboard::PutNumber("X",m_swerve.GetXPosition());
-  // frc::SmartDashboard::PutNumber("Y",m_swerve.GetYPosition());
-  m_swerve.Drive(-x1, -y1, -x2, navx->GetYaw(), true);
   
+  m_swerve.Drive(-x1, -y1, -x2, yaw, true);
+  m_swerve.UpdateOdometry(yaw);
+
+  frc::SmartDashboard::PutNumber("X",m_swerve.GetXPosition());
+  frc::SmartDashboard::PutNumber("Y",m_swerve.GetYPosition());
+
   if(xbox.GetBackButtonPressed()){
       m_climbing = !m_climbing;
       m_climber.disableBrake();
@@ -184,14 +188,14 @@ Robot::TeleopPeriodic() {
     }
     // //Peeking the turret feild oriented
     // else if(l_joy.GetPOV() != -1){
-    //   m_shooter.peekTurret(navx->GetYaw(), l_joy.GetPOV());
+    //   m_shooter.peekTurret(yaw, l_joy.GetPOV());
     //   m_shooter.setState(Shooter::State::PEEK);
     // }
     //back button will enable climb
     //Start button on joystick will reset robot yaw
     else if(xbox.GetStartButtonPressed()){
       navx->Reset();
-      // m_shooter.setPID();
+      m_shooter.setPID();
       // m_shooter.Calibrate();
     }
     // Button A will outtake
