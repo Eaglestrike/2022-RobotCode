@@ -12,7 +12,8 @@ Shooter::Shooter(){
     m_flywheelMaster.SetSafetyEnabled(false);
     m_flywheelSlave.SetSafetyEnabled(false);
     m_turret.SetSafetyEnabled(false);
-    // m_turret.
+    swivelRight = false;
+    swivelLeft = false;
     
     m_flywheelMaster.ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor);
     m_flywheelSlave.ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor);
@@ -100,10 +101,7 @@ Shooter::Periodic(bool autonomous){
 
     m_autonomous = autonomous;
 
-    if(swivelLeft || swivelRight){
-        setState(State::SWIVEL);
-    }
-    // For checking the color values 
+// For checking the color values 
     //frc::SmartDashboard::PutNumber("Red", m_colorSensor.GetColor().red);
     //frc::SmartDashboard::PutNumber("blue", m_colorSensor.GetColor().blue);
     //frc::SmartDashboard::PutNumber("green", m_colorSensor.GetColor().green);
@@ -149,62 +147,73 @@ Shooter::Periodic(bool autonomous){
     if (m_autonomous){
         return;
     }
+    
+    // if we're swivelling, keep swivelling, and don't do anyting else.
+    if (m_state == State:SWIVEL) {
+       return;
+    }
+    
+    // aim at the target 
     double point = m_limelight->getYOff();
     double x_off = m_limelight->getXOff()+4.3;
     double output = -m_turretController.Calculate(x_off);
+    // limit the rate at which we spin.
     output = output > 0  && output > 0.38 ? 0.38: output;
     output = output < 0 && output < -0.38 ? -0.38: output;
 
-    frc::SmartDashboard::PutBoolean("leftSwivel", swivelLeft);
-    frc::SmartDashboard::PutBoolean("rightSwivel", swivelRight);
-
-    if(point == 0.000 && !swivelLeft && !swivelRight){
+     // if we don't see a target, stop spinning turret.
+    if(point == 0.000){
         m_turret.Set(ControlMode::PercentOutput, 0.0);
         return;
-    }
-    // } else if(swivelRight){
-    //     m_turret.Set(ControlMode::Position, -60000);
-    //         if(abs(m_turret.GetSelectedSensorPosition() + 60000) < 2000){
-    //             swivelRight = false;
-    //         }
-    //     return;
-    // } else if(swivelLeft){
-    //     m_turret.Set(ControlMode::Position, -3000);
-    //         if(abs(m_turret.GetSelectedSensorPosition() + 3000) < 2000){
-    //             swivelLeft = false;
-    //         }
-    //     return;
-    // }
-
-   
+    }   
+    
+    // if we're trying to rotate past the limit, swing around and start SWIVEL state.
     else if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax &&
         output > 0){
         swivelRight = true;
+        setState(State:SWIVEL)
     }
     else if(m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin &&
         output < 0){
         swivelLeft = true;
+        setState(State:SWIVEL)
     }
     else {
+        // target is in sight, keep aiming at it.
         m_turret.Set(output);
     }
 }
 
 
 void Shooter::Swivel(){
+    frc::SmartDashboard::PutBoolean("leftSwivel", swivelLeft);
+    frc::SmartDashboard::PutBoolean("rightSwivel", swivelRight);
     if(swivelRight){
         m_turret.Set(ControlMode::Position, -60000);
+            // should stop swivelling when within 2000 units of target, which is -60,000
             if(abs(m_turret.GetSelectedSensorPosition() + 60000) < 2000){
                 swivelRight = false;
-            }
-        return;
+                setState(State:IDLE);
+                }
     } else if(swivelLeft){
         m_turret.Set(ControlMode::Position, -3000);
+            // should stop swivelling when within 2000 units of target, which is -3,000
             if(abs(m_turret.GetSelectedSensorPosition() + 3000) < 2000){
                 swivelLeft = false;
+                setState(State:IDLE);
             }
-        return;
-    } 
+    }
+    // shouldn't get here, so doing nothing.
+}
+
+void Shooter:EjectBall() {
+        m_speed = 8000;
+        m_angle = 100;
+        m_hood.Set(ControlMode::Position, m_angle);
+        m_flywheelMaster.Set(ControlMode::Velocity, m_speed);
+        m_flywheelSlave.Set(ControlMode::Velocity, -m_speed);
+        m_channel.Run();        
+        Load();
 }
 
 //Aim Function for Turret
@@ -212,17 +221,10 @@ void
 Shooter::Aim(){
     //m_limelight->setLEDMode("ON");
 
-    // This is racism stuff. Commented out for drive practice 3/27/22
+    //  If the ball is ballColor, eject it...
     if(m_colorMatcher.MatchClosestColor(m_colorSensor.GetColor(), confidence) == ballColor){
-        m_speed = 8000;
-        m_angle = 100;
-        m_hood.Set(ControlMode::Position, m_angle);
-        m_flywheelMaster.Set(ControlMode::Velocity, m_speed);
-        m_flywheelSlave.Set(ControlMode::Velocity, -m_speed);
-        m_channel.Run();
-        
-        Load();
-        return;
+      EjectBall();
+      return;
     }
 
     //Check if the limelight sees the target
@@ -236,14 +238,11 @@ Shooter::Aim(){
 
     // Comment this for shooter recalibration
 
+    // dataMap is the calibration for elevation for the hood.
     auto data = dataMap.find(point);
-    if(data != dataMap.end()){
-        m_angle = data->second.first;
-        m_speed = data->second.second;
-    } else {
-        double point1, point2;
-        if(withinRange(dataPoints, point, point1, point2)){
-            auto data1 = dataMap[point1];
+    double point1, point2;
+    if(withinRange(dataPoints, point, point1, point2)){
+        auto data1 = dataMap[point1];
             auto data2 = dataMap[point2];
             double angle1, speed1;
             double angle2, speed2;
@@ -277,20 +276,21 @@ Shooter::Aim(){
         output = output > 0  && output > 0.38 ? 0.38: output;
         output = output < 0 && output < -0.38 ? -0.38: output;
         frc::SmartDashboard::PutNumber("output", output);
+        // if we don't see the target, this will stop us from shooting blindly.
+        // hopefully we see the target next cycle
         if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax &&
             output > 0){
             m_turret.Set(ControlMode::PercentOutput, 0.0);  
             return;
-        }
-        if(m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin &&
+        } else if(m_turret.GetSelectedSensorPosition() < ShooterConstants::turretMin &&
             output < 0){
             m_turret.Set(ControlMode::PercentOutput, 0.0);
             return;
-        }
-        else {
+        } else {
             m_turret.Set(output);
         }
     }
+    // We can see the target, spin up the flywheel
     // Set Flywheel Velocity
     m_flywheelMaster.Set(ControlMode::Velocity, m_speed);
     m_flywheelSlave.Set(ControlMode::Velocity, -m_speed);
@@ -310,7 +310,7 @@ Shooter::Aim(){
 
 void
 Shooter::EdgeofTarmac(){
-    
+    // Intended to dump the balls into the low bucket.
 
     m_flywheelMaster.Set(ControlMode::Velocity, m_tarmac_speed);
     m_flywheelSlave.Set(ControlMode::Velocity, -m_tarmac_speed);
