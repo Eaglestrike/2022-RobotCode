@@ -192,6 +192,8 @@ Shooter::Periodic(bool autonomous){
 
 
 void Shooter::Swivel(){
+    frc::SmartDashboard::PutBoolean("leftSwivel", swivelLeft);
+    frc::SmartDashboard::PutBoolean("rightSwivel", swivelRight);
     if(swivelRight){
         m_turret.Set(ControlMode::Position, -60000);
             // should stop swivelling when within 2000 units of target, which is -60,000                
