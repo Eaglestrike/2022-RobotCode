@@ -64,6 +64,15 @@ SwerveDrive::UpdateOdometry(double theta){
     double FR_V = m_frontRight.getVelocity();
     double FL_A = m_frontLeft.getAngle(DriveConstants::FLOFF);
     double FL_V = m_frontLeft.getVelocity();
+    frc::SmartDashboard::PutNumber("BRA", BR_A);
+    frc::SmartDashboard::PutNumber("BRV", BR_V);
+    frc::SmartDashboard::PutNumber("BLA", BL_A);
+    frc::SmartDashboard::PutNumber("BLV", BL_V);
+    frc::SmartDashboard::PutNumber("FRA", FR_A);
+    frc::SmartDashboard::PutNumber("FRV", FR_V);
+    frc::SmartDashboard::PutNumber("FLA", FL_A);
+    frc::SmartDashboard::PutNumber("FLV", FL_V);
+    std::cout << FR_V << std::endl;
     m_odometry.updateOdometry(BR_A, BR_V, BL_A, BL_V, FR_A, FR_V,
         FL_A, FL_V, theta);
 }
@@ -257,4 +266,10 @@ SwerveDrive::ResetEncoders(){
 void 
 SwerveDrive::debug(AHRS &navx){
     gyro = &navx;
+}
+
+
+Odometry 
+SwerveDrive::copy(){
+    return m_odometry;
 }

@@ -23,6 +23,7 @@ Robot::RobotInit() {
     std::cout << e.what() <<std::endl;
   }
   m_swerve.debug(*navx);
+  
   m_climbing = false;
 }
 
@@ -150,15 +151,19 @@ Robot::TeleopPeriodic() {
       m_climbing = !m_climbing;
       m_climber.disableBrake();
       frc::SmartDashboard::PutBoolean("CLIMB", m_climbing);
+      m_time_climb = 0;
   }
   //Climbing
   if(m_climbing){
-    if(xbox.GetRawButtonPressed(2)){
+    m_time_climb +=m_timeStep;
+    if(m_time_climb < 0.75){
+      m_shooter.Climb();
+    }
+    else if(xbox.GetRawButtonPressed(2)){
       m_climber.ExtendsecondStage();
     }
     else if(xbox.GetRawButtonPressed(3)){
       m_climber.ExtendfirstStage();
-      
     }
     else if(abs(xbox.GetRawAxis(1)) > 0.1){
       out = xbox.GetRawAxis(1);
@@ -195,7 +200,7 @@ Robot::TeleopPeriodic() {
     //Start button on joystick will reset robot yaw
     else if(xbox.GetStartButtonPressed()){
       navx->Reset();
-      m_shooter.setPID();
+      // m_shooter.setPID();
       // m_shooter.Calibrate();
     }
     // Button A will outtake

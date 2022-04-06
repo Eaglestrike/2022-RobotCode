@@ -18,6 +18,7 @@
 #include "Climber.h"
 #include "AutoMode.h"
 #include "cameraserver/CameraServer.h"
+#include "Odometry.h"
 
 
 frc::Joystick l_joy{OIConstants::l_joy_port};
@@ -27,6 +28,7 @@ frc::PowerDistribution PDH{1, frc::PowerDistribution::ModuleType::kRev};
 cs::UsbCamera camera;
  
 double m_time = 0;
+double m_time_climb = 0;
 double m_timeStep = GeneralConstants::timeStep;
 
 AHRS *navx;
@@ -52,6 +54,7 @@ class Robot : public frc::TimedRobot {
   Intake m_intake;
   Shooter m_shooter;
   Climber m_climber;
+  Odometry *odom;
 
   double out;
   bool m_climbing = false;

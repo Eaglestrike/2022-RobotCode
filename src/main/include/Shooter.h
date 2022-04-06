@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <rev/ColorSensorV3.h>
 #include <rev/ColorMatch.h>
+#include "Odometry.h"
 
 
 class Shooter{
@@ -18,7 +19,7 @@ class Shooter{
         enum State{
             IDLE,
             SHOOT,
-            ZERO,
+            CLIMB,
             AIM,
             LOAD,
             SWIVEL,
@@ -33,6 +34,7 @@ class Shooter{
         void DisableMotors();
         void Periodic(bool autonomous);
         void Aim();
+        void Climb();
         void Swivel();
         void Shoot();
         bool withinRange(std::vector<double>& array, double p, double& p1, double& p2);
@@ -51,6 +53,7 @@ class Shooter{
         void enablelimelight();
         void EdgeofTarmac();
         void zeroHood();
+        void EjectBall();
 
     private:
         //TalonFX in ticks - 0 - 20,000
@@ -122,4 +125,6 @@ class Shooter{
         bool swivelLeft = false;
 
         bool m_autonomous;
+
+        
 };

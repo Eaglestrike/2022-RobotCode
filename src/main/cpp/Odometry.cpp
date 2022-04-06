@@ -19,7 +19,6 @@ Odometry::updateOdometry(double BR_A, double BR_V,
     double C_FR = cos(FR_A * PI/180) * FR_V;
     double B_FR = sin(FR_A * PI/180) * FR_V;
     double D_RL = cos(BL_A * PI/180) * BL_V;
-    //Potential Typo
     double C_RR = cos(BR_A * PI/180) * BR_V;
 
     double A = (A_RR + A_RL) / 2;
@@ -48,8 +47,8 @@ Odometry::updateOdometry(double BR_A, double BR_V,
     //From Velocity to Position
     m_prevtimeStep = m_timeStep;
     m_timeStep += timeInterval;
-    m_x = m_x + m_FWD_new * (m_timeStep - m_prevtimeStep) * 58.04;
-    m_y = m_y + m_STR_new * (m_timeStep - m_prevtimeStep) * 58.04;
+    m_x = m_x + m_FWD_new * (m_timeStep - m_prevtimeStep);
+    m_y = m_y + m_STR_new * (m_timeStep - m_prevtimeStep);
 }
 
 

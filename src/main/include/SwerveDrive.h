@@ -34,6 +34,7 @@ class SwerveDrive{
         void GenerateTrajectory_5();
 
         void debug(AHRS &navx);
+        Odometry copy();
 
 
     private:
@@ -46,6 +47,9 @@ class SwerveDrive{
         double m_FR_Offset = DriveConstants::FROFF;
         double m_BL_Offset = DriveConstants::BLOFF;
         double m_BR_Offset = DriveConstants::BROFF;
+
+        double Vx, Vy;
+        double Vx_p = 0, Vy_p = 0;
 
         WheelDrive m_backRight{DriveConstants::BRanglePort,
             DriveConstants::BRspeedPort, DriveConstants::BRencoder};
