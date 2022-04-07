@@ -65,12 +65,12 @@ SwerveDrive::UpdateOdometry(double theta){
     double FL_A = m_frontLeft.getAngle(DriveConstants::FLOFF);
     double FL_V = m_frontLeft.getVelocity();
     frc::SmartDashboard::PutNumber("BRA", BR_A);
-    frc::SmartDashboard::PutNumber("BRV", BR_V);
+    frc::SmartDashboard::PutNumber("BRV", -BR_V);
     frc::SmartDashboard::PutNumber("BLA", BL_A);
     frc::SmartDashboard::PutNumber("BLV", BL_V);
-    frc::SmartDashboard::PutNumber("FRA", FR_A);
-    frc::SmartDashboard::PutNumber("FRV", FR_V);
-    frc::SmartDashboard::PutNumber("FLA", FL_A);
+    frc::SmartDashboard::PutNumber("FRA", -FR_A);
+    frc::SmartDashboard::PutNumber("FRV", -FR_V);
+    frc::SmartDashboard::PutNumber("FLA", -FL_A);
     frc::SmartDashboard::PutNumber("FLV", FL_V);
     std::cout << FR_V << std::endl;
     m_odometry.updateOdometry(BR_A, BR_V, BL_A, BL_V, FR_A, FR_V,
@@ -98,16 +98,13 @@ SwerveDrive::TrajectoryFollow(double rot, size_t waypointIndex){
         if(RotError && index < waypointIndex){
             m_trajectory_1.Progress();
             // std::cout << "Gets here once" << std::endl;
-            gyro->Reset();
+            // gyro->Reset();
         }
         Drive(0, 0, calcYawStraight(m_trajectory_1.getRotation(index), rot), rot, true);
         return;
     }
 
-    m_swerveController.updatePosition(GetYPosition(), GetXPosition(), rot);
-
-    //frc::SmartDashboard::PutNumber("YError", abs(GetYPosition() - m_trajectory_1.getY(index)));
-    //frc::SmartDashboard::PutNumber("XError", abs(GetXPostion() - m_trajectory_1.getX(index)));
+    // m_swerveController.updatePosition(GetYPosition(), GetXPosition(), rot);
 
     double forward = m_swerveController.calculateForward(m_trajectory_1.getY(index));
     double strafe = m_swerveController.calculateStrafe(m_trajectory_1.getX(index));
@@ -265,7 +262,7 @@ SwerveDrive::ResetEncoders(){
 //Helper Function
 void 
 SwerveDrive::debug(AHRS &navx){
-    gyro = &navx;
+    gyro = navx;
 }
 
 
