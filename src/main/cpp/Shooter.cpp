@@ -83,8 +83,10 @@ Shooter::Shooter(){
     dataMap[16.0] = {2000, 11000};
     dataMap[19.88] = {1800, 10500};
 
-    m_hoodZero = false;
-    m_turretZero = false;
+    // m_hoodZero = false;
+    // m_turretZero = false;
+    swivelLeft = true;
+    swivelRight = true;
 
     m_colorMatcher.AddColorMatch(redBall);
     m_colorMatcher.AddColorMatch(blueBall);
@@ -118,7 +120,6 @@ Shooter::Periodic(bool autonomous){
             Aim();
             Shoot();
             m_channel.setState(Channel::State::RUN);
-            break;
         case State::IDLE:
             Stop();
             break;
@@ -422,10 +423,10 @@ Shooter::Load(){
         m_kicker.Set(ControlMode::PercentOutput, 0.2);
     } 
     else if(m_state == State::LOAD){
-        if(!m_photogate.Get() && !m_photogate2.Get()){
-            m_kicker.Set(ControlMode::PercentOutput, 0.0);
-            m_channel.setState(Channel::State::IDLE);
-        } 
+        // if(!m_photogate.Get() && !m_photogate2.Get()){
+            // m_kicker.Set(ControlMode::PercentOutput, 0.0);
+            // m_channel.setState(Channel::State::IDLE);
+        // } 
         else if(m_photogate2.Get() && !m_photogate.Get()){
             m_channel.setState(Channel::State::RUN);
             m_kicker.Set(ControlMode::PercentOutput, 0.0);
