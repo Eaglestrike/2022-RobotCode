@@ -80,6 +80,7 @@ SwerveDrive::UpdateOdometry(double theta){
 
 //Trajectory Following for Swerve
 //Cannot turn and move at the same time
+// ok I fixed odometry so it should rotate and move now??
 //If you want to turn make Waypoint as 0,0,0, theta
 void
 SwerveDrive::TrajectoryFollow(double rot, size_t waypointIndex){
@@ -92,14 +93,14 @@ SwerveDrive::TrajectoryFollow(double rot, size_t waypointIndex){
     // frc::SmartDashboard::PutNumber("RotError", (abs(rot - m_trajectory_1.getRotation(index))));
     // frc::SmartDashboard::PutBoolean("ROTERROR", RotError);
 
-    if(m_trajectory_1.getX(index) == 0 &&
-        m_trajectory_1.getY(index) == 0 &&
-        m_trajectory_1.getRotation(index) != 0){
-        if(RotError && index < waypointIndex){
-            m_trajectory_1.Progress();
-            // std::cout << "Gets here once" << std::endl;
-            // gyro->Reset();
-        }
+//     if(m_trajectory_1.getX(index) == 0 &&
+//         m_trajectory_1.getY(index) == 0 &&
+//         m_trajectory_1.getRotation(index) != 0){
+//         if(RotError && index < waypointIndex){
+//             m_trajectory_1.Progress();
+//             // std::cout << "Gets here once" << std::endl;
+//             // gyro->Reset();
+//         }
         Drive(0, 0, calcYawStraight(m_trajectory_1.getRotation(index), rot), rot, true);
         return;
     }
