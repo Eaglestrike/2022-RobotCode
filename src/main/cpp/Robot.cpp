@@ -115,8 +115,6 @@ Robot::TeleopInit() {
   m_shooter.enablelimelight();
   m_intake.setState(Intake::State::IDLE);
   m_swerve.Initialize();
-
-  //REMOVE THIS WHEN AT COMPETITION!
   m_shooter.Zero();
   
   PDH.ClearStickyFaults();
