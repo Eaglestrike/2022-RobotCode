@@ -11,14 +11,14 @@ Limelight::Limelight(){
 double
 Limelight::calculateDistance(){
     return (GeneralConstants::goalHeight - GeneralConstants::cameraHeight)
-        / tan(GeneralConstants::cameraPitch + getYOff());
+        / sin(GeneralConstants::cameraPitch + getYOff());
 }
 
 
 //Return the X offset
 double
 Limelight::getXOff(){
-    return network_table->GetNumber("tx", 10000.0);
+    return network_table->GetNumber("tv", 10000.0);
 }
 
 
