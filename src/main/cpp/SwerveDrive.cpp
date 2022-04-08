@@ -161,14 +161,12 @@ void
 SwerveDrive::GenerateTrajectory_5(){
     m_trajectory_1.clearTrajectory();
     // 5 ball auto
-    Trajectory::Waypoint p1(1.25, 0.15, 0, 0);
-    Trajectory::Waypoint p2(0, 0, 0, -110);
+    Trajectory::Waypoint p1(1.25, 0.15, -110, 0);
     Trajectory::Waypoint p3(4.2, 0.9, 0, 0);
     Trajectory::Waypoint p4(0, 0, 0, 40);
     Trajectory::Waypoint p5(7.3, 2.0, 0, 0);
     Trajectory::Waypoint p6(4.0, 1.3, 0, 0);
     m_trajectory_1.addWaypoint(p1);
-    m_trajectory_1.addWaypoint(p2);
     m_trajectory_1.addWaypoint(p3);  
     m_trajectory_1.addWaypoint(p4);
     m_trajectory_1.addWaypoint(p5);
