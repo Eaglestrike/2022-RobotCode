@@ -1,8 +1,9 @@
 #include <Shooter.h>
+#include "MoveShoot.h"
 #include <iostream>
 
 
-Shooter::Shooter(){
+Shooter::Shooter(Swerve& s) : swerve(s) {
     m_flywheelMaster.SetNeutralMode(NeutralMode::Coast);
     m_flywheelSlave.SetNeutralMode(NeutralMode::Coast);
     m_hood.SetNeutralMode(NeutralMode::Coast);
@@ -192,9 +193,15 @@ Shooter::Aim(){
     
     // frc::SmartDashboard::PutNumber("turret position", m_turret.GetSelectedSensorPosition());
 
+    //DOES MOVING WHILE SHOOTING
+    settings = mvsht.calculate();
+
     // Set Turret movement
     double x_off = m_limelight->getXOff()+4.3;
-    double output = -m_turretController.Calculate(x_off);
+    double output = -m_turretController.Calculate(x_off + settings.xoff_offset);
+    frc::SmartDashboard::PutNumber("turret pid output", output);
+    frc::SmartDashboard::PutNumber("turret pid error", m_turretController.GetPositionError());
+    
     output = output > 0  && output > 0.38 ? 0.38: output;
     output = output < 0 && output < -0.38 ? -0.38: output;
     if(m_turret.GetSelectedSensorPosition() > ShooterConstants::turretMax &&
@@ -211,19 +218,38 @@ Shooter::Aim(){
         m_turret.Set(output);
     }
 
-    // Set Flywheel Velocity
-    m_flywheelMaster.Set(ControlMode::Velocity, m_speed);
-    m_flywheelSlave.Set(ControlMode::Velocity, -m_speed);
-    // frc::SmartDashboard::PutNumber("flywheel speed", m_flywheelMaster.GetSelectedSensorVelocity());
-    // frc::SmartDashboard::PutNumber("hood angle", m_hood.GetSelectedSensorPosition());
+    m_flywheelMaster.Set(ControlMode::Velocity, settings.flywheel_speed);
+    m_flywheelSlave.Set(ControlMode::Velocity, -settings.flywheel_speed);
     
-    // Set Hood Position
-    m_hood.Set(ControlMode::Position, m_angle);
+    m_hood.Set(ControlMode::Position, settings.hood_angle);
     if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
         m_hood.Set(ControlMode::PercentOutput, 0.0);
     }
-    //frc::SmartDashboard::PutNumber("yOff", m_limelight->getYOff());
-    //frc::SmartDashboard::PutNumber("xOff", m_limelight->getXOff());
+
+    frc::SmartDashboard::PutNumber("Flywheel speed", settings.flywheel_speed);
+    frc::SmartDashboard::PutNumber("Hood angle", settings.hood_angle);
+    frc::SmartDashboard::PutNumber("Turret xoff + offset ", x_off + settings.xoff_offset);
+
+    m_speed = settings.flywheel_speed;
+    m_angle = settings.hood_angle;
+
+
+
+    // // Set Flywheel Velocity
+    // m_flywheelMaster.Set(ControlMode::Velocity, m_speed);
+    // m_flywheelSlave.Set(ControlMode::Velocity, -m_speed);
+    // // frc::SmartDashboard::PutNumber("flywheel speed", m_flywheelMaster.GetSelectedSensorVelocity());
+    // // frc::SmartDashboard::PutNumber("hood angle", m_hood.GetSelectedSensorPosition());
+    
+    // // Set Hood Position
+    // m_hood.Set(ControlMode::Position, m_angle);
+    // if(m_hood.GetSupplyCurrent() >= ShooterConstants::zeroingcurrent){
+    //     m_hood.Set(ControlMode::PercentOutput, 0.0);
+    // }
+    // //frc::SmartDashboard::PutNumber("yOff", m_limelight->getYOff());
+    // //frc::SmartDashboard::PutNumber("xOff", m_limelight->getXOff());
+
+
 }
 
 
@@ -326,7 +352,8 @@ bool
 Shooter::Aimed(){
     bool flywheelReady = abs(m_flywheelMaster.GetSelectedSensorVelocity() - m_speed) < 400;
     bool hoodReady = abs(m_hood.GetSelectedSensorPosition() - m_angle) < 100; // make this interval smaller
-    bool turretReady = abs(m_limelight->getXOff()+4.3) < 2.5;
+    bool turretReady = abs(m_limelight->getXOff()+4.3 + settings.xoff_offset) < 5;
+    frc::SmartDashboard::PutNumber("turret ready calc", m_limelight->getXOff()+4.3 + settings.xoff_offset);
     frc::SmartDashboard::PutBoolean("flywheelReady", flywheelReady);
     frc::SmartDashboard::PutBoolean("hoodReady", hoodReady);
     frc::SmartDashboard::PutBoolean("turretReady", turretReady);

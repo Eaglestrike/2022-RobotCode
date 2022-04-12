@@ -11,6 +11,8 @@
 #include <unordered_map>
 #include <rev/ColorSensorV3.h>
 #include <rev/ColorMatch.h>
+#include "MoveShoot.h"
+#include "Swerve.h"
 
 
 class Shooter{
@@ -26,7 +28,7 @@ class Shooter{
             BadIdea
         };
 
-        Shooter();
+        Shooter(Swerve& swerve);
         ~Shooter();
         void DisableMotors();
         void Periodic();
@@ -109,4 +111,11 @@ class Shooter{
 
         double angle_scale_factor = 1.0;
         double speed_scale_factor = 1.0;
+
+        frc::Pose2d auto1{units::meter_t{0}, units::meter_t{0}, frc::Rotation2d{units::degree_t{0}}};
+
+        Swerve& swerve;
+        MoveShoot mvsht{*m_limelight, swerve, auto1};
+        MoveShoot::Settings settings;
+
 };

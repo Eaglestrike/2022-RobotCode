@@ -5,6 +5,36 @@
 #include <units/velocity.h>
 #include <units/angle.h>
 #include <frc/geometry/Rotation2d.h>
+#include "PhysicsSim.h"
+
+static const DataLogger::DataFields datalog_fields = {
+  {"swerve.fl.raw_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fl.calib_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fl.target_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fl.target_speed", DataLogger::DataType::FLOAT64},
+
+  {"swerve.fr.raw_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fr.calib_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fr.target_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fr.target_speed", DataLogger::DataType::FLOAT64},
+  
+  {"swerve.bl.raw_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.bl.calib_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.bl.target_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.bl.target_speed", DataLogger::DataType::FLOAT64},
+
+  {"swerve.br.raw_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.br.calib_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.br.target_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.br.target_speed", DataLogger::DataType::FLOAT64},
+
+  {"swerve.teleop.dx", DataLogger::DataType::FLOAT64},
+  {"swerve.teleop.dy", DataLogger::DataType::FLOAT64},
+  {"swerve.teleop.dtheta", DataLogger::DataType::FLOAT64},
+  
+  {"navx.yaw", DataLogger::DataType::FLOAT64}
+
+};
 
 
 void 
@@ -17,27 +47,21 @@ Robot::RobotInit() {
   m_autoMode.AddOption("2", mode2);
   m_autoMode.AddOption("3", mode3);
   frc::SmartDashboard::PutData("Auto Mode", &m_autoMode);
-
-  m_fl_pid.EnableContinuousInput(-180, 180);
-  m_fr_pid.EnableContinuousInput(-180, 180);
-  m_rl_pid.EnableContinuousInput(-180, 180);
-  m_rr_pid.EnableContinuousInput(-180, 180);
-
-  m_fl_pid.SetIntegratorRange(-0.5, 0.5);
-  m_fr_pid.SetIntegratorRange(-0.5, 0.5);
-  m_rl_pid.SetIntegratorRange(-0.5, 0.5);
-  m_rr_pid.SetIntegratorRange(-0.5, 0.5);
   
   camera = frc::CameraServer::GetInstance()->StartAutomaticCapture();
   
-  try{
-    navx = new AHRS(frc::SPI::Port::kMXP);
-  } catch(const std::exception& e){
-    std::cout << e.what() <<std::endl;
-  }
+  // try{
+  //   navx = new AHRS(frc::SPI::Port::kMXP);
+  // } catch(const std::exception& e){
+  //   std::cout << e.what() <<std::endl;
+  // }
 
   // m_swerve.debug(*navx);
   m_climbing = false;
+
+ //logger = new DataLogger("/home/lvuser/robotlog.log", datalog_fields);
+ logger = new DataLogger("~/Downloads/alt", datalog_fields);
+ swerve.logger = logger;
 }
 
 
@@ -45,6 +69,13 @@ void
 Robot::RobotPeriodic() {
 }
 
+void Robot::SimulationInit() {
+  PhysicsSim::GetInstance().AddTalonFXList(swerve.getTalons());
+}
+
+void Robot::SimulationPeriodic() {
+  PhysicsSim::GetInstance().Run();
+}
 
 void 
 Robot::AutonomousInit() {
@@ -67,7 +98,7 @@ Robot::AutonomousInit() {
   m_intake.setState(Intake::State::IDLE);
   m_shooter.Zero();
   PDH.ClearStickyFaults();
-  navx->Reset();
+  //navx->Reset();
   m_shooter.enablelimelight();
   //This might not work??
   
@@ -120,7 +151,7 @@ Robot::TeleopInit() {
   }
 
   m_time = 0;
-  navx->Reset();
+  //navx->Reset();
 
   m_shooter.setState(Shooter::State::IDLE);
   m_shooter.enablelimelight();
@@ -140,148 +171,104 @@ Robot::TeleopInit() {
 
 void 
 Robot::TeleopPeriodic() {
+
+  auto& dx = logger->get_float64("swerve.teleop.dx");
+  auto& dy = logger->get_float64("swerve.teleop.dy");
+  auto& dtheta = logger->get_float64("swerve.teleop.dtheta");
+
   m_time += m_timeStep;
-  double x1, y1, x2;
-  x1 = l_joy.GetRawAxis(0) * 0.7;
-  y1 = l_joy.GetRawAxis(1);
-  x2 = r_joy.GetRawAxis(0);
-  x1 = abs(x1) < 0.05 ? 0.0: x1;
-  y1 = abs(y1) < 0.05 ? 0.0: y1;
-  x2 = abs(x2) < 0.05 ? 0.0: x2;
 
   // Translate linear and angular velocities from joysticks
   // to [dx, dy, dtheta] state-space form.
   // NOTE: The robot coordinate system is +x move forward,
   // and +y points towards the left.
-  const auto dx = -l_joy.GetY();
-  const auto dy = l_joy.GetX();
-  const auto dtheta = r_joy.GetX();
+  dx = -l_joy.GetX();
+  dy = -l_joy.GetY();
+  dtheta = r_joy.GetX();
+  dx = abs(dx) < 0.2 ? 0.0: dx;
+  dy = abs(dy) < 0.2 ? 0.0: dy;
+  dtheta = abs(dtheta) < 0.05 ? 0.0: dtheta;
 
-  // The desired field relative speed here is dx meters per second
-  // toward the opponent's alliance station wall, and dy meters per
-  // second toward the left field boundary. The desired rotation
-  // is dtheta counterclockwise. The current robot angle is navx->GetYaw() degrees.
-  frc::ChassisSpeeds speeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-    dx, dy, units::radians_per_second_t(dtheta),
-    frc::Rotation2d(units::degree_t(navx->GetYaw())));
+  joy_val_to_mps(dx);
+  joy_val_to_mps(dy);
+  joy_rot_to_rps(dtheta);
 
-  // Convert to module states. Here, we can use C++17's structured
-  // bindings feature to automatically split up the array into its
-  // individual SwerveModuleState components.
-  auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds);
-
-  // Optimize the wheel module yaw
-  const double fl_yaw = m_fl_canCoder.GetAbsolutePosition();
-  const double fr_yaw = m_fr_canCoder.GetAbsolutePosition();
-  const double rl_yaw = m_rl_canCoder.GetAbsolutePosition();
-  const double rr_yaw = m_rr_canCoder.GetAbsolutePosition();
-  auto fl_opt = frc::SwerveModuleState::Optimize(fl, units::degree_t(fl_yaw));
-  auto fr_opt = frc::SwerveModuleState::Optimize(fr, units::degree_t(fr_yaw));
-  auto rl_opt = frc::SwerveModuleState::Optimize(rl, units::degree_t(rl_yaw));
-  auto rr_opt = frc::SwerveModuleState::Optimize(rr, units::degree_t(rr_yaw));
-
-  // Finally command each swerve motor
-  m_fl_angleMotor.Set(
-    std::clamp(
-      m_fl_pid.Calculate(fl_yaw, fl_opt.angle.Degrees().value()),
-      -1.0, 1.0)
-  );
-  m_fl_speedMotor.Set(
-    std::clamp(fl_opt.speed.value(), -1.0, 1.0)
-  );
-  m_fr_angleMotor.Set(
-    std::clamp(
-      m_fr_pid.Calculate(fr_yaw, fr_opt.angle.Degrees().value()),
-      -1.0, 1.0)
-  );
-  m_fr_speedMotor.Set(
-    std::clamp(fr_opt.speed.value(), -1.0, 1.0)
-  );
-  m_rl_angleMotor.Set(
-    std::clamp(
-      m_rl_pid.Calculate(rl_yaw, rl_opt.angle.Degrees().value()),
-      -1.0, 1.0)
-  );
-  m_rl_speedMotor.Set(
-    std::clamp(rl_opt.speed.value(), -1.0, 1.0)
-  );
-  m_rr_angleMotor.Set(
-    std::clamp(
-      m_rr_pid.Calculate(rr_yaw, rr_opt.angle.Degrees().value()),
-      -1.0, 1.0)
-  );
-  m_rr_speedMotor.Set(
-    std::clamp(rr_opt.speed.value(), -1.0, 1.0)
-  );
+  swerve.Periodic(
+    units::meters_per_second_t{dx},
+    units::meters_per_second_t{dy},
+    units::radians_per_second_t{dtheta},
+    units::degree_t{/*navx->GetYaw()*/0});
   
   // m_swerve.Drive(-x1*0.6, -y1, -x2, navx->GetYaw(), true);
   
-  //Climbing
-  if(m_climbing){
-    if(xbox.GetRawButtonPressed(2)){
-      m_climber.ExtendsecondStage();
-    }
-    else if(xbox.GetRawButtonPressed(3)){
-      m_climber.ExtendfirstStage();
+  // //Climbing
+  // if(m_climbing){
+  //   if(xbox.GetRawButtonPressed(2)){
+  //     m_climber.ExtendsecondStage();
+  //   }
+  //   else if(xbox.GetRawButtonPressed(3)){
+  //     m_climber.ExtendfirstStage();
       
-    }
-    else if(xbox.GetRightBumper()){
-      out = 0;
-      m_climber.armExtension(out);
-    }
-    else if(abs(xbox.GetRawAxis(1)) > 0.1){
-      out = xbox.GetRawAxis(1);
-      if(abs(out) < 0.3){
-        out = 0;
-      }
-      m_climber.armExtension(out);
-    }
-  } else {
-    //Teleop Operation
-    //Intake
-    if(r_joy.GetTrigger()){
-      m_intake.setState(Intake::State::RUN);
-      m_shooter.setState(Shooter::State::LOAD);
-    }
-    //Shoot
-    else if(l_joy.GetTrigger()){
-      m_shooter.setState(Shooter::State::SHOOT);
-    }
-    //Manual turret movement
-    else if(abs(xbox.GetRawAxis(4)) > 0.2 ){
-      m_shooter.Manual(xbox.GetRawAxis(4));
-      m_shooter.setState(Shooter::State::MANUAL);
-    }
-    //back button will enable climb
-    else if(xbox.GetBackButtonPressed()){
-      m_climbing = true;
-      m_climber.disableBrake();
-    }
-    //button A will reset robot yaw or outtake
-    else if(xbox.GetStartButtonPressed()){
-      // navx->Reset();
-      std::cout << "set pid" << std::endl;
-      m_shooter.setPID();
-      // m_shooter.Calibrate();
-    }
-    else if(xbox.GetRawButton(1)){
-      m_intake.setState(Intake::State::UNJAM);
-      m_shooter.setState(Shooter::BadIdea);
-    }
-    else if(l_joy.GetPOV() != -1){
-      // std::cout << "peek" << std::endl;
-      m_shooter.peekTurret(navx->GetYaw(), l_joy.GetPOV());
-    }
-    else {
-      m_shooter.setState(Shooter::State::IDLE);
-      m_intake.setState(Intake::State::IDLE);
-    }
-    m_intake.Periodic(); 
-    m_shooter.Periodic();
+  //   }
+  //   else if(xbox.GetRightBumper()){
+  //     out = 0;
+  //     m_climber.armExtension(out);
+  //   }
+  //   else if(abs(xbox.GetRawAxis(1)) > 0.1){
+  //     out = xbox.GetRawAxis(1);
+  //     if(abs(out) < 0.3){
+  //       out = 0;
+  //     }
+  //     m_climber.armExtension(out);
+  //   }
+  // } else {
+  //   //Teleop Operation
+  //   //Intake
+  //   if(r_joy.GetTrigger()){
+  //     m_intake.setState(Intake::State::RUN);
+  //     m_shooter.setState(Shooter::State::LOAD);
+  //   }
+  //   //Shoot
+  //   else if(l_joy.GetTrigger()){
+  //     m_shooter.setState(Shooter::State::SHOOT);
+  //   }
+  //   //Manual turret movement
+  //   else if(abs(xbox.GetRawAxis(4)) > 0.2 ){
+  //     m_shooter.Manual(xbox.GetRawAxis(4));
+  //     m_shooter.setState(Shooter::State::MANUAL);
+  //   }
+  //   //back button will enable climb
+  //   else if(xbox.GetBackButtonPressed()){
+  //     m_climbing = true;
+  //     m_climber.disableBrake();
+  //   }
+  //   //button A will reset robot yaw or outtake
+  //   else if(xbox.GetStartButtonPressed()){
+  //     // navx->Reset();
+  //     std::cout << "set pid" << std::endl;
+  //     m_shooter.setPID();
+  //     // m_shooter.Calibrate();
+  //   }
+  //   else if(xbox.GetRawButton(1)){
+  //     m_intake.setState(Intake::State::UNJAM);
+  //     m_shooter.setState(Shooter::BadIdea);
+  //   }
+  //   else if(l_joy.GetPOV() != -1){
+  //     // std::cout << "peek" << std::endl;
+  //     m_shooter.peekTurret(navx->GetYaw(), l_joy.GetPOV());
+  //   }
+  //   else {
+  //     m_shooter.setState(Shooter::State::IDLE);
+  //     m_intake.setState(Intake::State::IDLE);
+  //   }
+  //   m_intake.Periodic(); 
+  //   m_shooter.Periodic();
     
-  }
-  // frc::SmartDashboard::PutNumber("Yaw", navx->GetYaw());
-  // frc::SmartDashboard::PutNumber("POV", l_joy.GetPOV());
+  // }
+  // // frc::SmartDashboard::PutNumber("Yaw", navx->GetYaw());
+  // // frc::SmartDashboard::PutNumber("POV", l_joy.GetPOV());
+
+  logger->publish();
 
 }
 

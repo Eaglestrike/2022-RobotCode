@@ -1,4 +1,5 @@
 #include <Odometry.h>
+#include <iostream>
 
 //Constructor
 Odometry::Odometry(){}
@@ -36,8 +37,8 @@ Odometry::updateOdometry(double BR_A, double BR_V,
 
     m_FWD_new = m_FWD * cos(theta * PI/180) + m_STR * sin(theta * PI/180);
     m_STR_new = m_STR * cos(theta * PI/180) - m_FWD * sin(theta * PI/180);
-    // frc::SmartDashboard::PutNumber("m_FWD", m_FWD_new);
-    // frc::SmartDashboard::PutNumber("m_STR", m_STR_new);
+     frc::SmartDashboard::PutNumber("m_x", m_FWD_new * 54.864);
+     frc::SmartDashboard::PutNumber("m_y", m_STR_new * 54.864);
     
     //From Velocity to Position
     m_prevtimeStep = m_timeStep;
