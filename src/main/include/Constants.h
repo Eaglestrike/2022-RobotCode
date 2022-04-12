@@ -27,30 +27,33 @@ DriveConstants{
     const double Width = 29;
     const double Length = 29;
 
+    const double countsPerRev = 2.0;
+
     //Absolute Encoder offsets
-    const double FLOFF = -108.5;
-    const double FROFF = 157.0;
-    const double BLOFF = 7.91;
-    const double BROFF = -18.98;
+    //Poblem: I think there are multiple encoder values that correspond to motor being straight up. idk what to do abt that
+    const double FLOFF = -1.5;
+    const double FROFF = -1.5;
+    const double BLOFF = -1.73;
+    const double BROFF = -1.65;
 
     //Ports for Back Right Swerve Module - SwerveDrive.h
-    const int BRanglePort = 17;
-    const int BRspeedPort = 3;
+    const int BRanglePort = 21;
+    const int BRspeedPort = 22;
     const int BRencoder = 8;
 
     //Ports for Back Left Swerve Module - SwerveDrive.h
-    const int BLanglePort = 16;
-    const int BLspeedPort = 15;
+    const int BLanglePort = 1;
+    const int BLspeedPort = 2;
     const int BLencoder = 42;
 
     //Ports for Front Right Swerve Module - SwerveDrive.h
-    const int FRanglePort = 14;
-    const int FRspeedPort = 13;
+    const int FRanglePort = 31;
+    const int FRspeedPort = 32;
     const int FRencoder = 62;
 
     //Ports for Front Left Swerve Module - SwerveDrive.h
-    const int FLanglePort = 12;
-    const int FLspeedPort = 11;
+    const int FLanglePort = 11;
+    const int FLspeedPort = 12;
     const int FLencoder = 10;
 
     //Wheeldrive 
@@ -63,6 +66,14 @@ DriveConstants{
     const double Pinit = 0.008;
     const double Iinit = 0.001;
     const double Dinit = 0.0001;
+
+    const double Ps = 0;
+    const double Is = 0;
+    const double Ds = 0;
+
+    const double Pa = 0;
+    const double Ia = 0;
+    const double Da = 0;
 
     //Swerve Controller
     const double fwdstrP = 0.58;
