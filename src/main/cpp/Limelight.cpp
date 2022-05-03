@@ -2,7 +2,7 @@
   January 2022, Andrew Kim, Created.
   
   Purpose: 
-  For the limelight
+  Class for interfacing with the limelight, some util functions
 
   Can get the x, y offsetts.
   Calculate distance has been fixed and units are in meters
@@ -18,8 +18,8 @@ Limelight::Limelight(){
 }
 
 
-// Return the distance. 
-// This will have to change if the limelight location is changed
+// Return the distance to the goal 
+// This will have to change if the limelight location (height mainly) is changed
 double
 Limelight::calculateDistance(){
     // return (GeneralConstants::goalHeight - GeneralConstants::cameraHeight)
@@ -28,14 +28,14 @@ Limelight::calculateDistance(){
 }
 
 
-//Return the X offset
+//Return the X offset to the target
 double
 Limelight::getXOff(){
     return network_table->GetNumber("tx", 10000.0);
 }
 
 
-//Return the y offset
+//Return the y offset to the target
 double
 Limelight::getYOff(){
     return network_table->GetNumber("ty", 10000.0);

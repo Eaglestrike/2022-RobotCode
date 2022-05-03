@@ -54,7 +54,7 @@ Intake::Periodic(){
 }
 
 
-//Deploy the Intake
+//Deploy the Intake (extend it)
 void
 Intake::Deploy(){
     pneumatics.Set(true);
@@ -81,7 +81,7 @@ Intake::Retract(){
 }
 
 
-//Unjam the Intake
+//Unjam the Intake (run it in reverse)
 void
 Intake::Unjam(){
     m_intakeMotor.Set(ControlMode::PercentOutput, -0.39);
@@ -94,6 +94,7 @@ Intake::setState(State newstate){
     m_state = newstate;
 }
 
+//toggle intake extend/retract
 void
 Intake::toggle(){
     pneumatics.Toggle();

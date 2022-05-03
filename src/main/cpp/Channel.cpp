@@ -8,6 +8,8 @@
   Hardware is incorporated within the Intake
 */
 
+//Nothing in this class is ever called
+
 
 #include <Channel.h>
 #include <iostream>
@@ -30,7 +32,7 @@ Channel::Periodic(){
         case State::RUN:
             Run();
             break;
-        case State::Badidea:
+        case State::Badidea: 
             Reverse();
             break;
         default:

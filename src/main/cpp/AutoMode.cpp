@@ -17,7 +17,7 @@ AutoMode::AutoMode(){
 }
 
 
-//Initializes the auto indexer
+//Initializes the auto indexer. index is number action, start at first (index=0) action
 void
 AutoMode::ResetAuto(){
     index = 0;
@@ -25,6 +25,7 @@ AutoMode::ResetAuto(){
 
 
 // For auto chooser before the match
+// set appropriate actions, times, and trajectory waypoints for the auto mode
 void
 AutoMode::SetMode(int autoMode){
     if(autoMode == 1){
@@ -54,10 +55,10 @@ AutoMode::SetMode(int autoMode){
 void
 AutoMode::Periodic(double time){
     frc::SmartDashboard::PutNumber("index", index);
-    if(index == times.size() -1 || time <= times[index]){
+    if(index == times.size() -1 || time <= times[index]){ //done all actions or not done with current action
         return;
     } else {
-        index ++;
+        index ++; //go on to next action
     }
 }
 

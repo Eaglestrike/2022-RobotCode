@@ -2,7 +2,7 @@
   January 2022, Andrew Kim, Created.
   
   Purpose: 
-  Shooter file
+  Controls the shooter (including the channel)
   Incoporates limelight & channel
 
   Sets flywheel, turret, and hood motors to proper positions
@@ -14,7 +14,8 @@
 #include <Shooter.h>
 #include <iostream>
 
-
+//sets motor configurations
+//initializes data hash map values (input is limelight y offset, output is flywheel angle and speed)
 Shooter::Shooter(){
     m_flywheelMaster.SetNeutralMode(NeutralMode::Coast);
     m_flywheelSlave.SetNeutralMode(NeutralMode::Coast);
@@ -145,10 +146,12 @@ Shooter::~Shooter(){
 
 
 //Periodic Function is called every 20 milliseconds
+//call appropriate action functions based on state
 void
 Shooter::Periodic(bool autonomous, double navX){
 
     m_autonomous = autonomous;
+    //if target has gone past turret limits, set state to swivel so it'll swivel around to see it again
     if (m_swivelLeft || m_swivelRight) {
         setState(State::SWIVEL);
     }
@@ -182,7 +185,7 @@ Shooter::Periodic(bool autonomous, double navX){
             break;
         case State::MANUAL:
             break;
-        case State::BadIdea:
+        case State::BadIdea: //love the maturity (this was for outtake)
             // m_channel.setState(Channel::State::Badidea);
             break;
         case State::Tarmac:
@@ -201,6 +204,8 @@ Shooter::Periodic(bool autonomous, double navX){
         return;
     }
 
+    //the rest of this is for continuous aiming
+
     turretPosition = m_turret.GetSelectedSensorPosition();
     limelightXOff = m_limelight->getXOff();
     limelightYOff = m_limelight->getYOff();
@@ -214,7 +219,7 @@ Shooter::Periodic(bool autonomous, double navX){
     // aim at the target 
     double x_off = limelightXOff+2.0+thetaOff;
     double output = -m_turretController.Calculate(x_off);
-    // limit the rate at which we spin.
+    // limit motor output
     output = output > 0  && output > 0.38 ? 0.38: output;
     output = output < 0 && output < -0.38 ? -0.38: output;
 
@@ -224,7 +229,7 @@ Shooter::Periodic(bool autonomous, double navX){
         return;
     }   
 
-    MovementOffsetCalculation(getFieldAng(navX));
+    MovementOffsetCalculation(getFieldAng(navX)); //for shooting while moving
     
     // if we're trying to rotate past the limit, swing around and start SWIVEL state.
     if(turretPosition > ShooterConstants::turretMax &&
@@ -246,6 +251,8 @@ Shooter::Periodic(bool autonomous, double navX){
 }
 
 
+//assumes target is at other limit (so like 0 -> 360 type deal), goes to that
+//idk how he came up with the numbers but it seems to work so I'd trust them
 void Shooter::Swivel(){
     // frc::SmartDashboard::PutBoolean("leftSwivel", m_swivelLeft);
     // frc::SmartDashboard::PutBoolean("rightSwivel", m_swivelRight);
@@ -271,6 +278,7 @@ void Shooter::Swivel(){
 
 
 // Ball Ejection when it is the wrong color
+//will get shot slowly out shooter
 void Shooter::EjectBall() {
         m_speed = 3000;
         m_angle = -100;
@@ -286,7 +294,7 @@ void Shooter::EjectBall() {
 void
 Shooter::Aim(){
 
-    //  If the ball is ballColor, eject it...
+    //  If the ball is the wrong color, eject it...
     if(m_colorMatcher.MatchClosestColor(m_colorSensor.GetColor(), m_confidence) == m_ballColor){
       EjectBall();
       return;
@@ -294,9 +302,9 @@ Shooter::Aim(){
 
     //Check if the limelight sees the target  
     double point = m_limelight->getYOff();
-    // Comment this for shooter recalibration
+    // Comment this out if we're getting new shooter points
 
-    // dataMap is the calibration for elevation for the hood.
+    // dataMap is the calibration for elevation for the hood and flywheel (the hood position & flywheel speed for limelight angle).
     // auto data = m_dataMap.find(point);
     double point1, point2;
     if(withinRange(m_dataPoints, point, point1, point2)){
@@ -309,7 +317,7 @@ Shooter::Aim(){
             angle2 = data2.first;
             speed2 = data2.second;
 
-            // interpolate
+            //linear piecewise interpolation
             double interval = point1 - point2;
             double xdiff = point - point1;
             m_angle = (((angle2 - angle1)/interval * xdiff) + angle1) * m_angle_scale_factor;
@@ -327,7 +335,7 @@ Shooter::Aim(){
     
     // frc::SmartDashboard::PutNumber("turret position", m_turret.GetSelectedSensorPosition());
 
-    // Set Turret movement
+    // Set Turret movement for auto mode
     if(m_autonomous){
         // std::cout << "does it get here?" << std::endl;
         
@@ -350,7 +358,8 @@ Shooter::Aim(){
         m_turret.Set(output);
         // }
     }
-    // We can see the target, spin up the flywheel
+
+    // Can see the target, set flywheel and hood appropriately
     // Set Flywheel Velocity
     m_flywheelMaster.Set(ControlMode::Velocity, m_speed);
     m_flywheelSlave.Set(ControlMode::Velocity, -m_speed);
@@ -366,7 +375,7 @@ Shooter::Aim(){
     
 }
 
-
+//sets turret to position that allows robot to climb
 void
 Shooter::Climb(){
     m_turret.Set(ControlMode::Position, -30000);
@@ -374,7 +383,7 @@ Shooter::Climb(){
 
 
 // Deprecated function
-// Hard point shooter values
+// Hard coded to shoot from specified distance
 void
 Shooter::EdgeofTarmac(){
     // Intended to dump the balls into the low bucket.
@@ -403,6 +412,7 @@ Shooter::EdgeofTarmac(){
 
 // Binary search for shooter point values
 // Return true if the point is within out data Map
+//since p1 and p2 are references, the doubles passed in will be set to the correct values 
 bool
 Shooter::withinRange(std::vector<double>& array, double p, double& p1, double& p2){
     int left =0;
@@ -431,7 +441,7 @@ Shooter::withinRange(std::vector<double>& array, double p, double& p1, double& p
 void
 Shooter::Shoot(){
     if(Aimed()){
-        Load();
+        Load(); //run the channel appropriate for ball color & state
     }
 }
 
@@ -472,8 +482,9 @@ Shooter::Load(){
     if(m_state == State::SHOOT || m_state == State::Tarmac){
         m_kicker.Set(ControlMode::PercentOutput, 0.25);
     } 
-    else if(m_state == State::LOAD){
-        if(!m_photogate.Get() && !m_photogate2.Get()){
+    else if(m_state == State::LOAD){ //intaking not shooting
+        //if a ball gets far enough in the channel, stop to prevent it getting stuck in the flywheel
+        if(!m_photogate.Get() && !m_photogate2.Get()){ 
             m_kicker.Set(ControlMode::PercentOutput, 0.0);
             // m_channel.setState(Channel::State::IDLE);
         } 
@@ -481,6 +492,7 @@ Shooter::Load(){
             // m_channel.setState(Channel::State::RUN);
             m_kicker.Set(ControlMode::PercentOutput, 0.0);
         }
+        //okay to keep moving balls through channel
         else if(!m_photogate2.Get() && m_photogate.Get()){
             m_kicker.Set(ControlMode::PercentOutput, 0.2);
             // m_channel.setState(Channel::State::RUN);
@@ -500,7 +512,7 @@ Shooter::setState(State newState){
 }
 
 
-//Check if the turret, flywheel, and hood is aimed
+//Check if the turret, flywheel, and hood is aimed (so we won't shoot if we aren't aimed)
 bool
 Shooter::Aimed(){
     bool flywheelReady = abs(m_flywheelMaster.GetSelectedSensorVelocity() - m_speed) < 300;
@@ -541,7 +553,7 @@ Shooter::Calibrate(){
 }
 
 
-//Set PID values
+//Helper function to tune shooter PID
 void
 Shooter::setPID(){
     // double F = frc::SmartDashboard::GetNumber("F", 0.0);
@@ -673,14 +685,14 @@ Shooter::peekTurret(double navX, double POV){
 }
 
 
-// If you would like to turn your limelight on
+// Turn on limelight LEDs
 void
 Shooter::enablelimelight(){
     m_limelight->setLEDMode("ON");
 }
 
 
-// For getting odometry object
+//sets odometry to passed in odometry object
 void
 Shooter::GetOdom(Odometry *odom){
     m_odom = odom;
@@ -707,7 +719,7 @@ Shooter::MovementOffsetCalculation(double angle){
         (m_goalOffset.second * m_goalOffset.second));
     double a = 0 - angle - turnTheta;
 
-    double sus = 0;
+    double sus = 0; //really
 
     // Check for robot movement
     if(abs(m_goalOffset.first) > std::numeric_limits<double>::epsilon()

@@ -18,6 +18,7 @@ SwerveDrive::SwerveDrive(){}
 
 
 //Drive function contains Swerve Inverse Kinematics
+//this math is not necessary to understand
 void 
 SwerveDrive::Drive(double x1, double y1, double x2, double rot, bool fieldOrient){
     double r = sqrt(m_L*m_L + m_W*m_W);
@@ -137,6 +138,8 @@ SwerveDrive::TrajectoryFollow(double rot, size_t waypointIndex){
 }
 
 
+//generating trajectories for auto modes
+
 //Function for generating trajectory_1
 //Conversion from ft to meters 0.304801
 void
@@ -205,13 +208,13 @@ SwerveDrive::GetXPosition(){
     return m_odometry.getX();
 }
 
-
+//Get y component of robot velocity
 double
 SwerveDrive::GetYSpeed(){
     return m_odometry.getYSpeed();
 }
 
-
+//Get x component of robot velocity
 double
 SwerveDrive::GetXSpeed(){
     return m_odometry.getXSpeed();
@@ -232,7 +235,7 @@ SwerveDrive::SetDriveControllerPID(){
     m_swerveController.setPID();
 }
 
-
+//Set pid for rotation
 void
 SwerveDrive::SetDriveControllerROTPID(){
     m_swerveController.setRotPID();
@@ -287,6 +290,8 @@ SwerveDrive::debug(AHRS &navx){
 
 
 // Copy odometry object
+//THIS DOES NOT COPY THE ODOMETRY OBJECT IT JUST RETURNS A REFERENCE
+//I could get rid of the "copy odometry object" comment but I'm too petty and I want to keep it around to laugh at
 Odometry* 
 SwerveDrive::copy(){
     return &m_odometry;

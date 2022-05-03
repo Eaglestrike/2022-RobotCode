@@ -16,6 +16,7 @@ Odometry::Odometry(){}
 
 
 //Updates the Odometry Robot location
+//understanding this math is not necessary
 void
 Odometry::updateOdometry(double BR_A, double BR_V,
             double BL_A, double BL_V,
@@ -63,26 +64,27 @@ Odometry::updateOdometry(double BR_A, double BR_V,
 }
 
 
-//Return X position
+//Return X position of robot
 double
 Odometry::getX(){
     return m_x;
 }
 
 
-//Return Y position
+//Return Y position of robot
 double
 Odometry::getY(){
     return m_y;
 }
 
 
+//get robot's velocity component in the y direction
 double
 Odometry::getYSpeed(){
     return m_FWD_new;
 }
 
-
+//get robot's velocity component in the x direction
 double
 Odometry::getXSpeed(){
     return m_STR_new;

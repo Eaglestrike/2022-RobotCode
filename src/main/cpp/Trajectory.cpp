@@ -15,6 +15,7 @@
 
 
 //Waypoint constructor
+//takes in desired position, velocity, and rotation
 Trajectory::Waypoint::Waypoint(double y, double x, double velocity,
     double rotation){
         m_x = x;

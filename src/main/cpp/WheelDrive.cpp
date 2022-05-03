@@ -13,6 +13,7 @@
 
 
 //Constructor for each swerve modules
+//set motor configuration
 WheelDrive::WheelDrive(int angleMotorPort, int speedMotorPort,
     int encoder)
     : angleMotor(angleMotorPort, "Drivebase"), speedMotor(speedMotorPort, "Drivebase"),

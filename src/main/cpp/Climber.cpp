@@ -12,12 +12,14 @@
 #include "Climber.h"
 
 //Constructor
+//set motor and pneumatic configurations
 Climber::Climber(){
     // climbStage1.Set(true);
     // climbStage2.Set(true);
-    gearboxMaster.SetSafetyEnabled(false);
+    gearboxMaster.SetSafetyEnabled(false); 
     gearboxSlave.SetSafetyEnabled(false);
 
+    //don't send over unimportant information very often 
     gearboxMaster.SetStatusFramePeriod(StatusFrameEnhanced::Status_12_Feedback1, 100);
     gearboxSlave.SetStatusFramePeriod(StatusFrameEnhanced::Status_12_Feedback1, 100);
 
@@ -58,9 +60,9 @@ Climber::Idle(){
 
 
 //Initialization function
+//sets pneumatics to starting robot position, resets motor positions
 void
 Climber::Initialize(){
-    //One will have to be true
     climbStage1.Set(false);
     climbStage2.Set(true);
     gearboxMaster.SetSelectedSensorPosition(0);
@@ -89,7 +91,8 @@ Climber::Calibrate(){
 }
 
 
-// Extend the motors based on the user input
+// Turn motors with direction & percent output proportional to joystick input
+// moves arms up and down
 void
 Climber::armExtension(double input){
     gearboxMaster.Set(ControlMode::PercentOutput, 0.5*input);
@@ -98,7 +101,7 @@ Climber::armExtension(double input){
 }
 
 
-// Toggle one pnuematic
+// Toggle first stage pneumatic
 void
 Climber::ExtendfirstStage(){
     //climbStage1.Set(true);
@@ -106,29 +109,32 @@ Climber::ExtendfirstStage(){
 }
 
 
-// Toggle one pnuematic
+// Toggle second stage pneumatic
 void
 Climber::ExtendsecondStage(){
     climbStage2.Toggle();
 }
 
 
+//unused
 void
 Climber::RetractfirstStage(){
     climbStage1.Set(false);
 }
 
-
+//unused
 void
 Climber::RetractsecondStage(){
     climbStage2.Set(false);
 }
 
+//unused
 void
 Climber::disableBrake(){
     diskBrake.Set(true);
 }
 
+//unused
 void
 Climber::whenDisabled(){
     climbStage1.Set(true);

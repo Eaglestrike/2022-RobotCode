@@ -12,9 +12,9 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 
-// Runs when robot is enabled
-// Set the color bias, autonomous mode, and set navx
-// Add camera server to smartdashboard
+// Runs once when robot is enabled
+// Sets which color we are (so we know which balls to eject), autonomous mode, and initialize navx
+// Add camera server to smartdashboard so we can see the robot's camera feed
 void 
 Robot::RobotInit() {
   m_chooser.SetDefaultOption("Blue", blueAlliance);
@@ -40,14 +40,14 @@ Robot::RobotInit() {
 }
 
 
-// Runs once every call
+// Runs every 20 ms in every mode
 void 
 Robot::RobotPeriodic() {
 }
 
 
 // Runs once at the start of autonomous mode
-// Generate chosen trajectory
+// Generate trajectory for appropriate robot path (depends on auto mode)
 // Zero & reset appropriate hardware & motors
 void 
 Robot::AutonomousInit() {
@@ -77,8 +77,8 @@ Robot::AutonomousInit() {
 }
 
 
-// Runs during the Autonomous modes
-// Using automode
+// Called every 20 ms during autonomous period
+// Calls appropriate subsystem functions based on state
 void 
 Robot::AutonomousPeriodic() {
   m_time += m_timeStep;
@@ -116,8 +116,8 @@ Robot::AutonomousPeriodic() {
 }
 
 
-// Right before teleop mode this function runs once
-// Set the color bias, reset shooter & intake states
+// Runs once at start of teleop
+// Sets color bias for shooter, reset shooter & intake states to idle
 // Clear sticky faults on hardware
 void
 Robot::TeleopInit() {
@@ -138,6 +138,7 @@ Robot::TeleopInit() {
   m_swerve.Initialize();
 
   //REMOVE THIS WHEN AT COMPETITION!
+  //should only be zeroed once, this is so that we don't have to run auto every time to test teleop
   // m_shooter.Zero();
   
   PDH.ClearStickyFaults();
@@ -148,11 +149,13 @@ Robot::TeleopInit() {
 }
 
 
-// Runs during teleop
+// Called every 20 ms during teleop
 void 
 Robot::TeleopPeriodic() {
   
   m_time += m_timeStep;
+
+  //Get joystick values, apply deadband (if the abs val is < 0.05 it's probably wind or smth)
   double x1, y1, x2;
   x1 = l_joy.GetRawAxis(0);
   y1 = l_joy.GetRawAxis(1);
@@ -162,15 +165,19 @@ Robot::TeleopPeriodic() {
   x2 = abs(x2) < 0.05 ? 0.0: x2;
   double yaw = navx->GetYaw();
   
-  
+  //swerve functions, so that robot drive will respond to joystick inputs
   m_swerve.Drive(-x1, -y1, -x2, yaw, true);
-  m_swerve.UpdateOdometry(yaw);
+  m_swerve.UpdateOdometry(yaw); 
 
   // frc::SmartDashboard::PutNumber("yaw", navx->GetYaw());
   // frc::SmartDashboard::PutNumber("X",m_swerve.GetXPosition());
   // frc::SmartDashboard::PutNumber("Y",m_swerve.GetYPosition());
   // frc::SmartDashboard::PutNumber("X speed", m_swerve.GetXSpeed());
   // frc::SmartDashboard::PutNumber("Y speed", m_swerve.GetYSpeed());
+
+
+  //below is the state machine. "state" is which button(s) pressed, robot performs appropriate actins
+  //note that since they are else if, the robot is only doing one of these at a time 
 
   if(xbox.GetBackButtonPressed()){
       m_climbing = !m_climbing;
@@ -179,7 +186,7 @@ Robot::TeleopPeriodic() {
       m_time_climb = 0;
   }
   //Climbing
-  if(m_climbing){
+  if(m_climbing){ //are we in climbing mode or not
     m_time_climb +=m_timeStep;
     if(m_time_climb < 0.75){
       m_shooter.Climb();
@@ -212,7 +219,7 @@ Robot::TeleopPeriodic() {
       navx->Reset();
     }
 
-    // Intake
+    // Intake 
     else if(r_joy.GetTrigger()){
       m_intake.setState(Intake::State::RUN);
       m_shooter.setState(Shooter::State::LOAD);
@@ -236,7 +243,7 @@ Robot::TeleopPeriodic() {
       m_shooter.setState(Shooter::BadIdea);
     }
 
-    // toggle intake pnuematics
+    // toggle intake pnuematics (move intake up/down)
     else if(xbox.GetRawButtonPressed(2)){
       m_intake.toggle();
     }
@@ -246,11 +253,12 @@ Robot::TeleopPeriodic() {
     //   m_shooter.setState(Shooter::State::Tarmac);
     // }
 
-    else {
+    else { //make sure shooter and intake aren't intaking if buttons aren't pressed
       // m_shooter.Manual(0);
       m_shooter.setState(Shooter::State::IDLE);
       m_intake.setState(Intake::State::IDLE);
     }
+    //call periodic functions so that subsystems will follow actions appropriate to their states
     m_intake.Periodic(); 
     m_shooter.Periodic(false, yaw);
   }
