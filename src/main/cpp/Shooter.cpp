@@ -719,7 +719,7 @@ Shooter::MovementOffsetCalculation(double angle){
         (m_goalOffset.second * m_goalOffset.second));
     double a = 0 - angle - turnTheta;
 
-    double sus = 0; //really
+    double sus = 0; //high quality variable name
 
     // Check for robot movement
     if(abs(m_goalOffset.first) > std::numeric_limits<double>::epsilon()
