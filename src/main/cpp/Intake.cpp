@@ -27,7 +27,6 @@ Intake::Periodic(){
     switch(m_state){
         case State::IDLE:
             Stop();
-            // Retract();
             break;
         case State::RUN:
             Run();
@@ -99,8 +98,3 @@ void
 Intake::toggle(){
     pneumatics.Toggle();
 }
-
-
-// void Intake::motorFrame(FramePeriod& frameperiod){
-//     frameperiod.addTalon(m_intakeMotor);
-// }

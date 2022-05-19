@@ -1,14 +1,4 @@
-/* History:
-  January 2022, Andrew Kim, Created.
-  
-  Purpose: 
-  Class for interfacing with the limelight, some util functions
-
-  Can get the x, y offsetts.
-  Calculate distance has been fixed and units are in meters
-*/
-
-
+//actually I made the limelight class
 #include "Limelight.h"
 
 
@@ -17,16 +7,7 @@ Limelight::Limelight(){
     network_table->PutNumber("pipeline", PIPELINE);
 }
 
-
-// Return the distance to the goal 
-// This will have to change if the limelight location (height mainly) is changed
-double
-Limelight::calculateDistance(){
-    // return (GeneralConstants::goalHeight - GeneralConstants::cameraHeight)
-    //     / tan(GeneralConstants::cameraPitch + getYOff()*3.14159/180.0);
-    return 2.1 / tan((40+getYOff())*3.1415/180);
-}
-
+//moved distance calculator to shooter calc
 
 //Return the X offset to the target
 double

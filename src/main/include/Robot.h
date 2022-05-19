@@ -12,22 +12,18 @@
 #include <string>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
-#include <WheelDrive.h>
-#include <SwerveDrive.h>
 #include <frc/Joystick.h>
 #include <frc/XboxController.h>
 #include <frc/PowerDistribution.h>
 #include <AHRS.h>
 #include <frc/Timer.h>
-#include <Trajectory.h>
 #include <Constants.h>
 #include <frc/Compressor.h>
 #include "Intake.h"
 #include "Shooter.h"
 #include "Climber.h"
-#include "AutoMode.h"
 #include "cameraserver/CameraServer.h"
-#include "Odometry.h"
+#include "Swerve.h"
 
 
 frc::Joystick l_joy{OIConstants::l_joy_port};
@@ -58,12 +54,18 @@ class Robot : public frc::TimedRobot {
 
  private:
 
-  AutoMode m_auto;
-  SwerveDrive m_swerve;
+  //subject to adjustment
+  void joy_val_to_mps(double& val) { val *= 4; }
+  void joy_rot_to_rps(double& rot) { rot *= 3*2*M_PI; }
+
+  void climbFSM();
+
+  //TODO: auto executor
+  Swerve m_swerve{navx};
   Intake m_intake;
-  Shooter m_shooter;
+  Shooter m_shooter{m_swerve};
   Climber m_climber;
-  Odometry *odom;
+  frc::Pose2d initPose; //this will need to be set as part of auto
 
   double out;
   bool m_climbing = false;

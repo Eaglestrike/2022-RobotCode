@@ -1,17 +1,8 @@
-/* History:
-  January 2022, Andrew Kim, Created.
-  
-  Purpose: 
-  Limelight header file
-
-  Initializes appriopriate functions and network tables etc.. 
-*/
-
-
 #pragma once
 
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableInstance.h"
+#include <frc/geometry/Pose2d.h>
 #include "Constants.h"
 #include <math.h>
 
@@ -19,7 +10,6 @@
 class Limelight{
     public:
         Limelight();
-        double calculateDistance();
         double getXOff();
         double getYOff();
         bool targetAquired();
@@ -32,5 +22,5 @@ class Limelight{
         std::shared_ptr<nt::NetworkTable> network_table;
         std::string table_name = "limelight";
 
-        const int PIPELINE = 0;
+        const int PIPELINE = 0; //can change if we want non-default pipeline
 };
