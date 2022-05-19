@@ -70,7 +70,7 @@ double ShooterCalc::y_offset_to_dist(double y_offset) {
 
 
 //for odometry: the position of the goal is (0, 0)
-//getXVel and getYVel really need to be verified
+//https://www.desmos.com/calculator/bilvmnobux
 
 /**
  * Takes in robot's x and y velocity components (field oriented) and output's the robot's velocity tangential to the goal
@@ -80,9 +80,12 @@ double ShooterCalc::y_offset_to_dist(double y_offset) {
  * @returns the robot's velocity tangential to the goal
 **/
 double ShooterCalc::getXVel(double rvx, double rvy, frc::Pose2d rcoords) {
-    double angle_from_rvy = 90 - acos(-rcoords.Y().value() / sqrt(rcoords.X().value()*rcoords.X().value() + rcoords.Y().value()*rcoords.Y().value()));
-    double angle_from_rvx = angle_from_rvy - 90;
-    return rvy*cos(angle_from_rvy) + rvx*cos(angle_from_rvx);
+    //cross product of robot velocity and unit velocity to goal
+    double d = sqrt(rcoords.X().value()*rcoords.X().value()* + rcoords.Y().value()*rcoords.Y().value());
+    double ux = -rcoords.X().value() / d;
+    double uy = -rcoords.Y().value() / d;
+    double cross = rvx*ux - rvy*uy;
+    return cross;
 
 }
 
@@ -94,9 +97,12 @@ double ShooterCalc::getXVel(double rvx, double rvy, frc::Pose2d rcoords) {
  * @returns the robot's velocity toward to the goal
 **/
 double ShooterCalc::getYVel(double rvx, double rvy, frc::Pose2d rcoords) {
-    double angle_from_rvy = acos(-rcoords.Y().value() / sqrt(rcoords.X().value()*rcoords.X().value() + rcoords.Y().value()*rcoords.Y().value()));
-    double angle_from_rvx = angle_from_rvy + 90;
-    return rvy*cos(angle_from_rvy) + rvx*cos(angle_from_rvx);
+    //dot product of robot velocity and unit vector to goal
+    double d = sqrt(rcoords.X().value()*rcoords.X().value()* + rcoords.Y().value()*rcoords.Y().value());
+    double ux = -rcoords.X().value() / d;
+    double uy = -rcoords.Y().value() / d;
+    double dot = rvx*ux + rvy*uy;
+    return dot;
 }
 
 /**
