@@ -88,9 +88,6 @@ Shooter::Periodic(bool autonomous){
             break;
         case State::MANUAL:
             break;
-        case State::BadIdea: 
-            // m_channel.setState(Channel::State::Badidea);
-            break;
        case State::HOOD:
             zeroHood();
             break;

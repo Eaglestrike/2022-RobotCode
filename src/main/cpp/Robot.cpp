@@ -154,7 +154,7 @@ Robot::TeleopPeriodic() {
 
     // Intake 
     else if(r_joy.GetTrigger()){
-      m_intake.setState(Intake::State::RUN);
+     // m_intake.setState(Intake::State::RUN); //will this cause a problem if the channel should not run?
       m_shooter.setState(Shooter::State::LOAD);
     }
 
@@ -174,7 +174,6 @@ Robot::TeleopPeriodic() {
     // Button A will outtake
     else if(xbox.GetRawButton(1)){
       m_intake.setState(Intake::State::UNJAM);
-      m_shooter.setState(Shooter::BadIdea);
     }
 
     // toggle intake pnuematics (move intake up/down)

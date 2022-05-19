@@ -25,7 +25,6 @@ class Shooter{
             LOAD,
             SWIVEL,
             MANUAL,
-            BadIdea,
             HOOD
         };
 
