@@ -19,7 +19,7 @@
 
 class Swerve {
     public:
-        Swerve(AHRS * nx);
+        Swerve(AHRS * nx, DataLogger* logger);
         void Periodic(units::meters_per_second_t joy_x, units::meters_per_second_t joy_y, 
         units::radians_per_second_t joy_theta, units::degree_t navx_yaw);
         void DisabledPeriodic(wpi::array<frc::SwerveModuleState, 4> * moduleStates);
@@ -33,8 +33,6 @@ class Swerve {
     std::vector<TalonFX *> getTalons(); //for simulation
 
     private:
-
-    DataLogger * logger{nullptr};
 
     AHRS * navx;
 
@@ -89,4 +87,6 @@ class Swerve {
      frc::ChassisSpeeds speeds;
 
      frc::SwerveDriveOdometry<4> * odometry; //will need to be initialized later with selected robot start pose
+
+     DataLogger* m_logger;
 };

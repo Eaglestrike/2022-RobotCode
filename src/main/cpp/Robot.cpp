@@ -2,6 +2,34 @@
 #include <iostream>
 #include <frc/smartdashboard/SmartDashboard.h>
 
+static const DataLogger::DataFields datalog_fields = {
+  {"swerve.fl.raw_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fl.calib_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fl.target_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fl.target_speed", DataLogger::DataType::FLOAT64},
+
+  {"swerve.fr.raw_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fr.calib_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fr.target_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fr.target_speed", DataLogger::DataType::FLOAT64},
+  
+  {"swerve.bl.raw_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.bl.calib_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.bl.target_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.bl.target_speed", DataLogger::DataType::FLOAT64},
+
+  {"swerve.br.raw_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.br.calib_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.br.target_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.br.target_speed", DataLogger::DataType::FLOAT64},
+
+  {"swerve.teleop.dx", DataLogger::DataType::FLOAT64},
+  {"swerve.teleop.dy", DataLogger::DataType::FLOAT64},
+  {"swerve.teleop.dtheta", DataLogger::DataType::FLOAT64},
+  
+  {"navx.yaw", DataLogger::DataType::FLOAT64}
+
+};
 
 // Runs once when robot is enabled
 // Sets which color we are (so we know which balls to eject), autonomous mode, and initialize navx
@@ -23,7 +51,11 @@ Robot::RobotInit() {
   } catch(const std::exception& e){
     std::cout << e.what() <<std::endl;
   }
+
+  logger = new DataLogger("/home/lvuser/robotlog.log", datalog_fields);
   m_climbing = false;
+
+  m_swerve{navx, logger}; // TODO: need pointer?
 }
 
 
