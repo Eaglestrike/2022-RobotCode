@@ -76,7 +76,7 @@ Robot::AutonomousPeriodic() {
 // Clear sticky faults on hardware
 void
 Robot::TeleopInit() {
-  m_climber.Initialize();
+ // m_climber.Initialize();
 
   if(m_chooser.GetSelected() == blueAlliance){
     m_shooter.setColor(true);
@@ -93,16 +93,16 @@ Robot::TeleopInit() {
 
   //REMOVE THIS WHEN AT COMPETITION!
   //should only be zeroed once, this is so that we don't have to run auto every time to test teleop
-  m_shooter.Zero();
+  //m_shooter.Zero();
 
   //REMOVE THIS AT COMPETITION!
   m_swerve.initializeOdometry(frc::Rotation2d{units::degree_t{navx->GetYaw()}}, initPose);
   
   PDH.ClearStickyFaults();
-  m_intake.Deploy();
-  m_shooter.Periodic(false);
+ // m_intake.Deploy();
+  //m_shooter.Periodic(false);
   m_intake.Periodic();
-  m_climber.Initialize();
+ // m_climber.Initialize();
 }
 
 
@@ -130,6 +130,8 @@ Robot::TeleopPeriodic() {
     units::meters_per_second_t{dy},
     units::radians_per_second_t{dtheta},
     units::degree_t{navx->GetYaw()});
+
+  return; //for swerve testing, don't want to do other stuff
 
 
   //below is the state machine. "state" is which button(s) pressed, robot performs appropriate actins
@@ -234,7 +236,9 @@ void
 Robot::DisabledInit() {}
 
 void 
-Robot::DisabledPeriodic() {}
+Robot::DisabledPeriodic() {
+  m_swerve.DisabledPeriodic(nullptr);
+}
 
 
 #ifndef RUNNING_FRC_TESTS

@@ -24,6 +24,11 @@ Swerve::Swerve(AHRS * nx) {
     m_fr_angleMotor.SetSelectedSensorPosition(0);
     m_rl_angleMotor.SetSelectedSensorPosition(0);
     m_rr_angleMotor.SetSelectedSensorPosition(0);
+
+    m_fl_angleMotor.SetInverted(true);
+    m_fr_angleMotor.SetInverted(true);
+    m_rl_angleMotor.SetInverted(true);
+    m_rr_angleMotor.SetInverted(true);
 }
 
 void Swerve::initializeOdometry(frc::Rotation2d gyroAngle, frc::Pose2d initPose) {
@@ -72,46 +77,55 @@ units::degree_t navx_yaw) {
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds);
 
 
+  // //raw reported encoder reading, convrted to degrees
+  // auto& fl_raw_yaw = logger->get_float64("swerve.fl.raw_yaw");
+  // auto& fr_raw_yaw = logger->get_float64("swerve.fr.raw_yaw");
+  // auto& bl_raw_yaw = logger->get_float64("swerve.bl.raw_yaw");
+  // auto& br_raw_yaw = logger->get_float64("swerve.br.raw_yaw");
 
-  auto& fl_raw_yaw = logger->get_float64("swerve.fl.raw_yaw");
-  fl_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition()); //m_fl_canCoder.GetAbsolutePosition();
-  auto& fr_raw_yaw = logger->get_float64("swerve.fr.raw_yaw");
-  fr_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_fr_canCoder.GetAbsolutePosition();
-  auto& bl_raw_yaw = logger->get_float64("swerve.bl.raw_yaw");
-  bl_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_rl_canCoder.GetAbsolutePosition();
-  auto& br_raw_yaw = logger->get_float64("swerve.br.raw_yaw");
-  br_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_rr_canCoder.GetAbsolutePosition();
+
+  double fl_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition()); //m_fl_canCoder.GetAbsolutePosition();
+  double fr_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_fr_canCoder.GetAbsolutePosition();
+  double bl_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_rl_canCoder.GetAbsolutePosition();
+  double br_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_rr_canCoder.GetAbsolutePosition();
 
   frc::SmartDashboard::PutNumber("fl raw yaw", fl_raw_yaw);
   frc::SmartDashboard::PutNumber("fr raw yaw", fr_raw_yaw);
   frc::SmartDashboard::PutNumber("bl raw yaw", bl_raw_yaw);
   frc::SmartDashboard::PutNumber("br raw yaw", br_raw_yaw);
 
-  auto& fl_yaw = logger->get_float64("swerve.fl.calib_yaw");
-  auto& fr_yaw = logger->get_float64("swerve.fr.calib_yaw");
-  auto& rl_yaw = logger->get_float64("swerve.bl.calib_yaw");
-  auto& rr_yaw = logger->get_float64("swerve.br.calib_yaw");
+  //angle + offset, converted to degrees & modulated
+  // auto& fl_yaw = logger->get_float64("swerve.fl.calib_yaw");
+  // auto& fr_yaw = logger->get_float64("swerve.fr.calib_yaw");
+  // auto& rl_yaw = logger->get_float64("swerve.bl.calib_yaw");
+  // auto& rr_yaw = logger->get_float64("swerve.br.calib_yaw");
 
-   // Optimize the wheel module yaw
-  fl_yaw = frc::InputModulus(fl_raw_yaw + DriveConstants::FLOFF, -180.0, 180.0);
-  fr_yaw = frc::InputModulus(fr_raw_yaw + DriveConstants::FROFF, -180.0, 180.0);
-  rl_yaw = frc::InputModulus(bl_raw_yaw + DriveConstants::BLOFF, -180.0, 180.0);
-  rr_yaw = frc::InputModulus(br_raw_yaw + DriveConstants::BROFF, -180.0, 180.0);
+  //  // Optimize the wheel module yaw
+  double fl_yaw = frc::InputModulus(fl_raw_yaw + DriveConstants::FLOFF, -180.0, 180.0);
+  double fr_yaw = frc::InputModulus(fr_raw_yaw + DriveConstants::FROFF, -180.0, 180.0);
+  double rl_yaw = frc::InputModulus(bl_raw_yaw + DriveConstants::BLOFF, -180.0, 180.0);
+  double rr_yaw = frc::InputModulus(br_raw_yaw + DriveConstants::BROFF, -180.0, 180.0);
+
+  frc::SmartDashboard::PutNumber("fl yaw reading", fl_yaw);
+  frc::SmartDashboard::PutNumber("fr yaw reading", fr_yaw);
+  frc::SmartDashboard::PutNumber("bl yaw reading", rl_yaw);
+  frc::SmartDashboard::PutNumber("br yaw reading", rr_yaw);
+  
   auto fl_opt = frc::SwerveModuleState::Optimize(fl, units::degree_t(fl_yaw));
   auto fr_opt = frc::SwerveModuleState::Optimize(fr, units::degree_t(fr_yaw));
   auto rl_opt= frc::SwerveModuleState::Optimize(bl, units::degree_t(rl_yaw));
   auto rr_opt = frc::SwerveModuleState::Optimize(br, units::degree_t(rr_yaw));
 
+  //target angle & speed for swerve modules
+  // logger->get_float64("swerve.fl.target_yaw") = fl_opt.angle.Degrees().value();
+  // logger->get_float64("swerve.fr.target_yaw") = fr_opt.angle.Degrees().value();
+  // logger->get_float64("swerve.bl.target_yaw") = rl_opt.angle.Degrees().value();
+  // logger->get_float64("swerve.br.target_yaw") = rr_opt.angle.Degrees().value();
 
-  logger->get_float64("swerve.fl.target_yaw") = fl_opt.angle.Degrees().value();
-  logger->get_float64("swerve.fr.target_yaw") = fr_opt.angle.Degrees().value();
-  logger->get_float64("swerve.bl.target_yaw") = rl_opt.angle.Degrees().value();
-  logger->get_float64("swerve.br.target_yaw") = rr_opt.angle.Degrees().value();
-
-  logger->get_float64("swerve.fl.target_speed") = fl_opt.speed.value();
-  logger->get_float64("swerve.fr.target_speed") = fr_opt.speed.value();
-  logger->get_float64("swerve.bl.target_speed") = rl_opt.speed.value();
-  logger->get_float64("swerve.br.target_speed") = rr_opt.speed.value();
+  // logger->get_float64("swerve.fl.target_speed") = fl_opt.speed.value();
+  // logger->get_float64("swerve.fr.target_speed") = fr_opt.speed.value();
+  // logger->get_float64("swerve.bl.target_speed") = rl_opt.speed.value();
+  // logger->get_float64("swerve.br.target_speed") = rr_opt.speed.value();
 
   frc::SmartDashboard::PutNumber("fl opt angle", fl_opt.angle.Degrees().value());
   frc::SmartDashboard::PutNumber("fl opt speed", fl_opt.speed.value());
@@ -122,10 +136,6 @@ units::degree_t navx_yaw) {
   frc::SmartDashboard::PutNumber("br opt angle", rr_opt.angle.Degrees().value());
   frc::SmartDashboard::PutNumber("br opt speed", rr_opt.speed.value());
 
-  frc::SmartDashboard::PutNumber("fl yaw reading", fl_yaw);
-  frc::SmartDashboard::PutNumber("fr yaw reading", fr_yaw);
-  frc::SmartDashboard::PutNumber("bl yaw reading", rl_yaw);
-  frc::SmartDashboard::PutNumber("br yaw reading", rr_yaw);
 
  //Finally command each swerve motor
   m_fl_angleMotor.Set(
@@ -160,6 +170,52 @@ units::degree_t navx_yaw) {
   m_rr_speedMotor.Set(
     0.5*std::clamp(rr_opt.speed.value(), -1.0, 1.0)
  );
+}
+
+//for debugging. Prints states of swerve modules without running motors. Takes in optional swerve module states
+void Swerve::DisabledPeriodic(wpi::array<frc::SwerveModuleState, 4> * moduleStates) {
+
+  //raw encoder reading
+  //todo: make sure that for each motor, goes from 180 to -180 and loops once per rotation
+  double fl_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition()); //m_fl_canCoder.GetAbsolutePosition();
+  double fr_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_fr_canCoder.GetAbsolutePosition();
+  double bl_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_rl_canCoder.GetAbsolutePosition();
+  double br_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_rr_canCoder.GetAbsolutePosition();
+
+  frc::SmartDashboard::PutNumber("fl raw yaw", fl_raw_yaw);
+  frc::SmartDashboard::PutNumber("fr raw yaw", fr_raw_yaw);
+  frc::SmartDashboard::PutNumber("bl raw yaw", bl_raw_yaw);
+  frc::SmartDashboard::PutNumber("br raw yaw", br_raw_yaw);
+
+  //apply offset (THIS SHOULD MAKE ALL MODULES REPORT SAME ANGLE)
+  //todo: make sure that they all read the same at the same position
+  double fl_yaw = frc::InputModulus(fl_raw_yaw + DriveConstants::FLOFF, -180.0, 180.0);
+  double fr_yaw = frc::InputModulus(fr_raw_yaw + DriveConstants::FROFF, -180.0, 180.0);
+  double rl_yaw = frc::InputModulus(bl_raw_yaw + DriveConstants::BLOFF, -180.0, 180.0);
+  double rr_yaw = frc::InputModulus(br_raw_yaw + DriveConstants::BROFF, -180.0, 180.0);
+
+  frc::SmartDashboard::PutNumber("fl yaw reading", fl_yaw);
+  frc::SmartDashboard::PutNumber("fr yaw reading", fr_yaw);
+  frc::SmartDashboard::PutNumber("bl yaw reading", rl_yaw);
+  frc::SmartDashboard::PutNumber("br yaw reading", rr_yaw);
+
+  // check if empty array
+  if (moduleStates == nullptr) {
+    return;
+  }
+  auto [fl, fr, bl, br] = *moduleStates;
+
+  auto fl_opt = frc::SwerveModuleState::Optimize(fl, units::degree_t(fl_yaw));
+  auto fr_opt = frc::SwerveModuleState::Optimize(fr, units::degree_t(fr_yaw));
+  auto rl_opt= frc::SwerveModuleState::Optimize(bl, units::degree_t(rl_yaw));
+  auto rr_opt = frc::SwerveModuleState::Optimize(br, units::degree_t(rr_yaw));
+
+  //check that these are right (should be equivilant to module states)
+  frc::SmartDashboard::PutNumber("fl opt angle", fl_opt.angle.Degrees().value());
+  frc::SmartDashboard::PutNumber("fr opt angle", fr_opt.angle.Degrees().value());
+  frc::SmartDashboard::PutNumber("bl opt angle", rl_opt.angle.Degrees().value());
+  frc::SmartDashboard::PutNumber("br opt angle", rr_opt.angle.Degrees().value());
+
 }
 
 

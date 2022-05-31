@@ -22,6 +22,7 @@ class Swerve {
         Swerve(AHRS * nx);
         void Periodic(units::meters_per_second_t joy_x, units::meters_per_second_t joy_y, 
         units::radians_per_second_t joy_theta, units::degree_t navx_yaw);
+        void DisabledPeriodic(wpi::array<frc::SwerveModuleState, 4> * moduleStates);
 
         frc::ChassisSpeeds getSpeeds();
         frc::Pose2d getPose() { return odometry->GetPose(); }
