@@ -54,8 +54,6 @@ class Robot : public frc::TimedRobot {
 
  private:
 
-  DataLogger* logger;
-
   //subject to adjustment
   void joy_val_to_mps(double& val) { val *= 4; }
   void joy_rot_to_rps(double& rot) { rot *= 3*2*M_PI; }
@@ -63,7 +61,7 @@ class Robot : public frc::TimedRobot {
   void climbFSM();
 
   //TODO: auto executor
-  Swerve m_swerve;
+  Swerve m_swerve{navx};
   Intake m_intake;
   Shooter m_shooter{m_swerve};
   Climber m_climber;
@@ -83,5 +81,4 @@ class Robot : public frc::TimedRobot {
   int mode3 = 3;
   int mode5 = 5;
   int m_autoSelelected;
-
 };

@@ -4,7 +4,7 @@
 //wrapper class for wpilib swerve
 //currently a mess cause I was trying to debug it
 
-Swerve::Swerve(AHRS * nx, DataLogger* logger) : m_logger{logger} {
+Swerve::Swerve(AHRS * nx) {
     navx = nx;
 
     m_fl_pid.EnableContinuousInput(-180, 180);
@@ -95,10 +95,10 @@ units::degree_t navx_yaw) {
   frc::SmartDashboard::PutNumber("br raw yaw", br_raw_yaw);
 
   //angle + offset, converted to degrees & modulated
-  auto& fl_yaw = m_logger->get_float64("swerve.fl.calib_yaw");
-  auto& fr_yaw = m_logger->get_float64("swerve.fr.calib_yaw");
-  auto& rl_yaw = m_logger->get_float64("swerve.bl.calib_yaw");
-  auto& rr_yaw = m_logger->get_float64("swerve.br.calib_yaw");
+  // auto& fl_yaw = logger->get_float64("swerve.fl.calib_yaw");
+  // auto& fr_yaw = logger->get_float64("swerve.fr.calib_yaw");
+  // auto& rl_yaw = logger->get_float64("swerve.bl.calib_yaw");
+  // auto& rr_yaw = logger->get_float64("swerve.br.calib_yaw");
 
   //  // Optimize the wheel module yaw
   double fl_yaw = frc::InputModulus(fl_raw_yaw + DriveConstants::FLOFF, -180.0, 180.0);
@@ -170,8 +170,6 @@ units::degree_t navx_yaw) {
   m_rr_speedMotor.Set(
     0.5*std::clamp(rr_opt.speed.value(), -1.0, 1.0)
  );
-
-//  m_logger->publish(); // TODO: do in swerve periodic or robot periodic?!!??!
 }
 
 //for debugging. Prints states of swerve modules without running motors. Takes in optional swerve module states
