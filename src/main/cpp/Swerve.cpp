@@ -83,10 +83,10 @@ units::degree_t navx_yaw) {
   // auto& br_raw_yaw = m_logger->get_float64("swerve.br.raw_yaw");
 
 
-  double fl_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition()); //m_fl_canCoder.GetAbsolutePosition();
-  double fr_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_fr_canCoder.GetAbsolutePosition();
-  double bl_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_rl_canCoder.GetAbsolutePosition();
-  double br_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_rr_canCoder.GetAbsolutePosition();
+  double fl_raw_yaw =  ticksToDeg(m_fl_canCoder.GetAbsolutePosition());
+  double fr_raw_yaw =  ticksToDeg(m_fr_canCoder.GetAbsolutePosition());
+  double bl_raw_yaw =  ticksToDeg(m_rl_canCoder.GetAbsolutePosition());
+  double br_raw_yaw =  ticksToDeg(m_rr_canCoder.GetAbsolutePosition());
 
   frc::SmartDashboard::PutNumber("fl raw yaw", fl_raw_yaw);
   frc::SmartDashboard::PutNumber("fr raw yaw", fr_raw_yaw);

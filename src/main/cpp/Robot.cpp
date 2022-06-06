@@ -33,6 +33,7 @@ static const DataLogger::DataFields datalog_fields = {
 // Add camera server to smartdashboard so we can see the robot's camera feed
 void 
 Robot::RobotInit() {
+
   m_chooser.SetDefaultOption("Blue", blueAlliance);
   m_chooser.AddOption("RED", redAlliance);
   frc::SmartDashboard::PutData("Alliance Color", &m_chooser);
