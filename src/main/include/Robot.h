@@ -24,6 +24,7 @@
 #include "Climber.h"
 #include "cameraserver/CameraServer.h"
 #include "Swerve.h"
+#include "DataLogger.h"
 
 
 frc::Joystick l_joy{OIConstants::l_joy_port};
@@ -35,8 +36,6 @@ cs::UsbCamera camera;
 double m_time = 0;
 double m_time_climb = 0;
 double m_timeStep = GeneralConstants::timeStep;
-
-AHRS *navx;
 
 class Robot : public frc::TimedRobot {
  public:
@@ -60,8 +59,11 @@ class Robot : public frc::TimedRobot {
 
   void climbFSM();
 
+  AHRS *m_navx;
+  DataLogger *m_logger;
+
   //TODO: auto executor
-  Swerve m_swerve{navx};
+  Swerve m_swerve{m_navx, m_logger};
   Intake m_intake;
   Shooter m_shooter{m_swerve};
   Climber m_climber;
