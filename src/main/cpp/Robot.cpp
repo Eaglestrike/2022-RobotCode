@@ -142,6 +142,8 @@ Robot::TeleopInit() {
 // Called every 20 ms during teleop
 void 
 Robot::TeleopPeriodic() {
+
+  m_logger->publish(); //should probably go at the end, just putting here to avoid premature returns
   
   m_time += m_timeStep;
 
