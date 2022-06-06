@@ -2,6 +2,31 @@
 #include <iostream>
 #include <frc/smartdashboard/SmartDashboard.h>
 
+static const DataLogger::DataFields datalog_fields = {
+  {"swerve.fl.raw_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fl.calib_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fl.target_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fl.target_speed", DataLogger::DataType::FLOAT64},
+
+  {"swerve.fr.raw_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fr.calib_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fr.target_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.fr.target_speed", DataLogger::DataType::FLOAT64},
+  
+  {"swerve.bl.raw_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.bl.calib_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.bl.target_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.bl.target_speed", DataLogger::DataType::FLOAT64},
+  {"swerve.br.raw_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.br.calib_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.br.target_yaw", DataLogger::DataType::FLOAT64},
+  {"swerve.br.target_speed", DataLogger::DataType::FLOAT64},
+  {"swerve.teleop.dx", DataLogger::DataType::FLOAT64},
+  {"swerve.teleop.dy", DataLogger::DataType::FLOAT64},
+  {"swerve.teleop.dtheta", DataLogger::DataType::FLOAT64}, 
+  {"navx.yaw", DataLogger::DataType::FLOAT64}
+};
+
 
 // Runs once when robot is enabled
 // Sets which color we are (so we know which balls to eject), autonomous mode, and initialize navx
@@ -19,10 +44,17 @@ Robot::RobotInit() {
   camera = frc::CameraServer::GetInstance()->StartAutomaticCapture();
   
   try{
-    navx = new AHRS(frc::SPI::Port::kMXP);
+    m_navx = new AHRS(frc::SPI::Port::kMXP);
   } catch(const std::exception& e){
     std::cout << e.what() <<std::endl;
   }
+
+  try {
+    m_logger = new DataLogger("/home/lvuser/robotlog.log", datalog_fields); 
+  } catch (const std::exception& e){
+    std::cout << e.what() << std::endl;
+  }
+
   m_climbing = false;
 }
 
@@ -42,7 +74,7 @@ Robot::AutonomousInit() {
   //call periodic method of appropriate auto
 
   m_shooter.Zero();
-  m_swerve.initializeOdometry(frc::Rotation2d{units::degree_t{navx->GetYaw()}}, initPose);
+  m_swerve.initializeOdometry(frc::Rotation2d{units::degree_t{m_navx->GetYaw()}}, initPose);
   //initialize auto 
   m_time = 0;
   //do i need swerve initialization?
@@ -52,7 +84,7 @@ Robot::AutonomousInit() {
   m_shooter.enablelimelight();
   
   PDH.ClearStickyFaults();
-  navx->Reset();
+  m_navx->Reset();
   m_shooter.enablelimelight();
 }
 
@@ -62,7 +94,7 @@ Robot::AutonomousInit() {
 void 
 Robot::AutonomousPeriodic() {
   m_time += m_timeStep;
-  double yaw = navx->GetYaw();
+  double yaw = m_navx->GetYaw();
 
   //auto FSM periodic
 
@@ -85,7 +117,7 @@ Robot::TeleopInit() {
   }
 
   m_time = 0;
-  navx->Reset();
+  m_navx->Reset();
 
   m_shooter.setState(Shooter::State::IDLE);
  m_shooter.enablelimelight();
@@ -96,7 +128,7 @@ Robot::TeleopInit() {
   //m_shooter.Zero();
 
   //REMOVE THIS AT COMPETITION!
-  m_swerve.initializeOdometry(frc::Rotation2d{units::degree_t{navx->GetYaw()}}, initPose);
+  m_swerve.initializeOdometry(frc::Rotation2d{units::degree_t{m_navx->GetYaw()}}, initPose);
   
   PDH.ClearStickyFaults();
  // m_intake.Deploy();
@@ -129,7 +161,7 @@ Robot::TeleopPeriodic() {
     units::meters_per_second_t{dx},
     units::meters_per_second_t{dy},
     units::radians_per_second_t{dtheta},
-    units::degree_t{navx->GetYaw()});
+    units::degree_t{m_navx->GetYaw()});
 
   return; //for swerve testing, don't want to do other stuff
 
@@ -151,7 +183,7 @@ Robot::TeleopPeriodic() {
     // Reset gryoscope yaw value
     //Start button on joystick will reset robot yaw
     if(xbox.GetStartButtonPressed()){
-      navx->Reset();
+      m_navx->Reset();
     }
 
     // Intake 
