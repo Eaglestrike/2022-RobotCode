@@ -36,6 +36,7 @@ void Swerve::initializeOdometry(frc::Rotation2d gyroAngle, frc::Pose2d initPose)
 }
 
 //I'll have to put more thought into the navx angle offset, but I'll just add it to the module angle for now
+//i think the ticks to degrees thing is still valid here?? TODO: come back to this when testing odometry
 frc::ChassisSpeeds Swerve::getSpeeds() {
   wpi::array<frc::SwerveModuleState, 4> moduleStates{wpi::empty_array};
 
@@ -83,10 +84,10 @@ units::degree_t navx_yaw) {
   // auto& br_raw_yaw = m_logger->get_float64("swerve.br.raw_yaw");
 
 
-  double fl_raw_yaw =  ticksToDeg(m_fl_canCoder.GetAbsolutePosition());
-  double fr_raw_yaw =  ticksToDeg(m_fr_canCoder.GetAbsolutePosition());
-  double bl_raw_yaw =  ticksToDeg(m_rl_canCoder.GetAbsolutePosition());
-  double br_raw_yaw =  ticksToDeg(m_rr_canCoder.GetAbsolutePosition());
+  double fl_raw_yaw = m_fl_canCoder.GetAbsolutePosition();
+  double fr_raw_yaw = m_fr_canCoder.GetAbsolutePosition();
+  double bl_raw_yaw = m_rl_canCoder.GetAbsolutePosition();
+  double br_raw_yaw = m_rr_canCoder.GetAbsolutePosition();
 
   frc::SmartDashboard::PutNumber("fl raw yaw", fl_raw_yaw);
   frc::SmartDashboard::PutNumber("fr raw yaw", fr_raw_yaw);
@@ -174,17 +175,30 @@ units::degree_t navx_yaw) {
 //for debugging. Prints states of swerve modules without running motors. Takes in optional swerve module states
 void Swerve::DisabledPeriodic(wpi::array<frc::SwerveModuleState, 4> * moduleStates) {
 
+  // m_logger->get_float32("swerve.fl.raw_ticks") = m_fl_canCoder.GetAbsolutePosition();
+  // m_logger->get_float32("swerve.fr.raw_ticks") = m_fr_canCoder.GetAbsolutePosition();
+  // m_logger->get_float32("swerve.bl.raw_ticks") = m_rl_canCoder.GetAbsolutePosition();
+  // m_logger->get_float32("swerve.br.raw_ticks") = m_rr_canCoder.GetAbsolutePosition();
+
+  frc::SmartDashboard::PutNumber("fl raw ticks", m_fl_canCoder.GetAbsolutePosition());
+  frc::SmartDashboard::PutNumber("fr raw ticks", m_fr_canCoder.GetAbsolutePosition());
+  frc::SmartDashboard::PutNumber("bl raw ticks", m_rl_canCoder.GetAbsolutePosition());
+  frc::SmartDashboard::PutNumber("br raw ticks", m_rr_canCoder.GetAbsolutePosition());
+
+
   //raw encoder reading
   //todo: make sure that for each motor, goes from 180 to -180 and loops once per rotation
-  double fl_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition()); //m_fl_canCoder.GetAbsolutePosition();
-  double fr_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_fr_canCoder.GetAbsolutePosition();
-  double bl_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_rl_canCoder.GetAbsolutePosition();
-  double br_raw_yaw =  ticksToDeg(m_fl_angleMotor.GetSelectedSensorPosition());//m_rr_canCoder.GetAbsolutePosition();
+  double fl_raw_yaw = m_fl_canCoder.GetAbsolutePosition();
+  double fr_raw_yaw = m_fr_canCoder.GetAbsolutePosition();
+  double bl_raw_yaw = m_rl_canCoder.GetAbsolutePosition();
+  double br_raw_yaw = m_rr_canCoder.GetAbsolutePosition();
 
   frc::SmartDashboard::PutNumber("fl raw yaw", fl_raw_yaw);
   frc::SmartDashboard::PutNumber("fr raw yaw", fr_raw_yaw);
   frc::SmartDashboard::PutNumber("bl raw yaw", bl_raw_yaw);
   frc::SmartDashboard::PutNumber("br raw yaw", br_raw_yaw);
+
+  //std::cout << "here\n";
 
   //apply offset (THIS SHOULD MAKE ALL MODULES REPORT SAME ANGLE)
   //todo: make sure that they all read the same at the same position

@@ -39,10 +39,10 @@ DriveConstants{
     const double Length = 29;
 
     //Absolute Encoder offsets
-    const double FLOFF = -108.5;
-    const double FROFF = 157.0;
-    const double BLOFF = 7.91;
-    const double BROFF = -18.98;
+    const double FLOFF = -12.4;
+    const double FROFF = -28.2;
+    const double BLOFF = 29.9;
+    const double BROFF = -29.0;
 
     //Ports for Back Right Swerve Module - SwerveDrive.h
     const int BRanglePort = 17;

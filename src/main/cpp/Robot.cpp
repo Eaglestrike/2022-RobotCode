@@ -12,6 +12,11 @@ static const DataLogger::DataFields datalog_fields = {
   {"swerve.fr.calib_yaw", DataLogger::DataType::FLOAT64},
   {"swerve.fr.target_yaw", DataLogger::DataType::FLOAT64},
   {"swerve.fr.target_speed", DataLogger::DataType::FLOAT64},
+
+  {"swerve.fl.raw_ticks", DataLogger::DataType::FLOAT64},
+  {"swerve.fr.raw_ticks", DataLogger::DataType::FLOAT64},
+  {"swerve.bl.raw_ticks", DataLogger::DataType::FLOAT64},
+  {"swerve.br.raw_ticks", DataLogger::DataType::FLOAT64},
   
   {"swerve.bl.raw_yaw", DataLogger::DataType::FLOAT64},
   {"swerve.bl.calib_yaw", DataLogger::DataType::FLOAT64},
