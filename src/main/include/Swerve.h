@@ -42,6 +42,10 @@ class Swerve {
         return frc::InputModulus(ticks, -1024.0, 1024.0) / 1024.0 * 180.0; //SHOULD result in being between -180 and 180
     }
 
+    void SetPID();
+
+    double aPrevError_, aIntegralError_, dPrevError_, dIntegralError_;
+
     //converts raw talon velocity to meters per second
     //raw velocity units are ticks per 100ms
     units::meters_per_second_t talonVelToMps(double vel) {

@@ -20,6 +20,9 @@ GeneralConstants{
     const double goalHeight = 2.641;
     const double cameraHeight = 0.5;
     const double cameraPitch = 42;
+
+    const double Kdt = 0.02;
+    const double MAX_VOLTAGE = 12;
 }
 
 
@@ -39,10 +42,10 @@ DriveConstants{
     const double Length = 29;
 
     //Absolute Encoder offsets
-    const double FLOFF = -12.4;
-    const double FROFF = -28.2;
-    const double BLOFF = 29.9;
-    const double BROFF = -29.0;
+    const double FLOFF = 107.9;
+    const double FROFF = -161.6;
+    const double BLOFF = -10.5 + 180;
+    const double BROFF = 18.0 + 180;
 
     //Ports for Back Right Swerve Module - SwerveDrive.h
     const int BRanglePort = 17;
@@ -68,12 +71,9 @@ DriveConstants{
     constexpr double MAX_VOLTS = 1.0;
     const double speedGearRatio = 1/6.12;
     const double angleGearRatio = 1/12.8;
-    const double P = 0.005;
-    const double I = 0.001;
-    const double D = 0.0002;
-    const double Pinit = 0.008;
-    const double Iinit = 0.001;
-    const double Dinit = 0.0001;
+    const double P = 0.08;
+    const double I = 0.1;
+    const double D = 0.0;
 
     //Swerve Controller
     const double fwdstrP = 0.58;

@@ -56,7 +56,8 @@ Robot::RobotInit() {
   }
 
   try {
-    m_logger = new DataLogger("/home/lvuser/robotlog.log", datalog_fields); 
+    std::string path = "/home/lvuser/robotlog.log";
+    m_logger = new DataLogger(path, datalog_fields); 
   } catch (const std::exception& e){
     std::cout << e.what() << std::endl;
   }
@@ -149,7 +150,7 @@ void
 Robot::TeleopPeriodic() {
 
   m_logger->publish(); //should probably go at the end, just putting here to avoid premature returns
-  
+   
   m_time += m_timeStep;
 
   //Get joystick values, apply deadband (if the abs val is < 0.05 it's probably wind or smth)
@@ -166,8 +167,8 @@ Robot::TeleopPeriodic() {
   joy_rot_to_rps(dtheta);
 
   m_swerve.Periodic(
-    units::meters_per_second_t{dx},
     units::meters_per_second_t{dy},
+    units::meters_per_second_t{dx},
     units::radians_per_second_t{dtheta},
     units::degree_t{m_navx->GetYaw()});
 

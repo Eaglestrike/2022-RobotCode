@@ -2,6 +2,8 @@
 // Created by Sammy Guo on 3/20/22.
 //
 
+#pragma once
+
 #ifndef DATA_LOGGER_DATALOGGER_HPP
 #define DATA_LOGGER_DATALOGGER_HPP
 
