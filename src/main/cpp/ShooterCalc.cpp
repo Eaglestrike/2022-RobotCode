@@ -10,7 +10,7 @@ using namespace std;
 pair<int, int> ShooterCalc::distance_to_settings(double dist) {
     double s1, s2, a1, a2, d1, d2;
     for (pair<double, pair<int, int>> p : dist_to_settings) {
-        if (p.first >= dist) { //this is upper bound
+        if (p.first >= dist) { //this is upper bound (TODO: replace with c++ upper bound function?)
             d2 = p.first;
             s2 = p.second.second;
             a2 = p.second.first;
@@ -62,13 +62,6 @@ double ShooterCalc::distance_to_time(double dist) {
     return t1 + (t2 - t1)*((dist-d1)/(d2-d1));
 }
 
-//given limelight's y offset, calculates distance to goal
-//I could move this to the limelight class, but for now I think it's simpler to leave it here
-double ShooterCalc::y_offset_to_dist(double y_offset) {
-    return ((HUB_HEIGHT - CAM_HEIGHT) / tan ( (CAM_ANGLE + y_offset) * M_PI / 180.0 ));
-}
-
-
 //for odometry: the position of the goal is (0, 0)
 //https://www.desmos.com/calculator/bilvmnobux
 
@@ -104,6 +97,14 @@ double ShooterCalc::getYVel(double rvx, double rvy, frc::Pose2d rcoords) {
     double dot = rvx*ux + rvy*uy;
     return dot;
 }
+
+
+//keeping this here for table initialization purposes but I kinda hate this (TODO: redo table with distances?)
+//I could move this to the limelight class, but for now I think it's simpler to leave it here
+double ShooterCalc::y_offset_to_dist(double y_offset) {
+    return ((HUB_HEIGHT - CAM_HEIGHT) / tan ( (CAM_ANGLE + y_offset) * M_PI / 180.0 ));
+}
+
 
 /**
  * The constructor. fills up table
@@ -159,7 +160,7 @@ ShooterCalc::ShooterCalc(Limelight& l, Swerve& s) : limelight(l), swerve(s) {
  * @returns the calculated settings object
 **/
 ShooterCalc::Settings ShooterCalc::calculate() {
-    double dist = y_offset_to_dist(limelight.getYOff());
+    double dist = limelight.getDist();
     double time = distance_to_time(dist);
 
     frc::ChassisSpeeds speeds = swerve.getSpeeds();

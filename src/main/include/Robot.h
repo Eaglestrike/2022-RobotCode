@@ -61,11 +61,12 @@ class Robot : public frc::TimedRobot {
 
   AHRS *m_navx;
   DataLogger *m_logger;
+  Limelight *m_limelight;
 
   //TODO: auto executor
   Swerve m_swerve{m_navx, m_logger};
   Intake m_intake;
-  Shooter m_shooter{m_swerve};
+  Shooter m_shooter{m_swerve, m_limelight};
   Climber m_climber;
   frc::Pose2d initPose; //this will need to be set as part of auto
 

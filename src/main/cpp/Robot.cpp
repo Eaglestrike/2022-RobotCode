@@ -48,6 +48,8 @@ Robot::RobotInit() {
   frc::SmartDashboard::PutData("Auto Mode", &m_autoMode);
   
   camera = frc::CameraServer::GetInstance()->StartAutomaticCapture();
+
+  m_limelight = new Limelight();
   
   try{
     m_navx = new AHRS(frc::SPI::Port::kMXP);
@@ -128,6 +130,7 @@ Robot::TeleopInit() {
 
   m_shooter.setState(Shooter::State::IDLE);
  m_shooter.enablelimelight();
+ m_shooter.zeroTurret();
   m_intake.setState(Intake::State::IDLE);
 
   //REMOVE THIS WHEN AT COMPETITION!
@@ -171,6 +174,10 @@ Robot::TeleopPeriodic() {
     units::meters_per_second_t{dx},
     units::radians_per_second_t{dtheta},
     units::degree_t{m_navx->GetYaw()});
+
+    m_limelight->getPose(m_navx->GetYaw(), m_shooter.getTurretAngle());
+    m_limelight->getAdjustedX();
+
 
   return; //for swerve testing, don't want to do other stuff
 

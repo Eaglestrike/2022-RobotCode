@@ -28,7 +28,7 @@ class Shooter{
             HOOD
         };
 
-        Shooter(Swerve& s);
+        Shooter(Swerve& s, Limelight* l);
         ~Shooter();
         void Periodic(bool autonomous);
         void Aim();
@@ -48,9 +48,17 @@ class Shooter{
         void enablelimelight();
         void EdgeofTarmac();
         void zeroHood();
-        void EjectBall();        
+        void EjectBall();   
+
+        double getTurretAngle() {
+            return frc::InputModulus(m_turret.GetSelectedSensorPosition(), -turret_ticks_per_rev, turret_ticks_per_rev) 
+                / turret_ticks_per_rev * 180.0; //SHOULD result in being between -180 and 180 
+        }    
+        void zeroTurret() {m_turret.SetSelectedSensorPosition(0); } 
 
     private:
+
+        double turret_ticks_per_rev = 20000; //TODO: find out
 
         void TurretAim(double offset);
         //TalonFX in ticks - 0 - 20,000
@@ -74,7 +82,7 @@ class Shooter{
 
         State m_state;
 
-        Limelight * m_limelight = new Limelight();
+        Limelight * m_limelight;
 
         ShooterCalc calc{*m_limelight, swerve};
         ShooterCalc::Settings settings; //have a global settings object to be accessed in different places
