@@ -45,19 +45,37 @@ void Swerve::initializeOdometry(frc::Rotation2d gyroAngle, frc::Pose2d initPose)
 //I'll have to put more thought into the navx angle offset, but I'll just add it to the module angle for now
 //i think the ticks to degrees thing is still valid here?? TODO: come back to this when testing odometry
 frc::ChassisSpeeds Swerve::getSpeeds() {
-  wpi::array<frc::SwerveModuleState, 4> moduleStates{wpi::empty_array};
+  wpi::array<frc::SwerveModuleState, 4> moduleStates(wpi::empty_array);
 
-  moduleStates[0] = {talonVelToMps(m_fl_speedMotor.GetSelectedSensorVelocity()), 
-    frc::Rotation2d{units::degree_t{m_fl_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}}};
+  std::cout << "initialized array\n";
 
-  moduleStates[1] = {talonVelToMps(m_fr_speedMotor.GetSelectedSensorVelocity()), 
-    frc::Rotation2d{units::degree_t{m_fr_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}}};
+  moduleStates[0] = frc::SwerveModuleState{};
+  std::cout << "initialized module\n";
+  moduleStates[0].speed = talonVelToMps(m_fl_speedMotor.GetSelectedSensorVelocity());
+  std::cout << "initialized speed\n";
+  //fails on the angle
+  moduleStates[0].angle = frc::Rotation2d{units::degree_t{m_fl_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
+  std::cout << "initialized angle\n";
 
-  moduleStates[2] = {talonVelToMps(m_rl_speedMotor.GetSelectedSensorVelocity()), 
-    frc::Rotation2d{units::degree_t{m_rl_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}}};
+  std::cout << "initialized module 0\n";
 
-  moduleStates[3] = {talonVelToMps(m_rr_speedMotor.GetSelectedSensorVelocity()), 
-    frc::Rotation2d{units::degree_t{m_rr_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}}};
+  moduleStates[1] = frc::SwerveModuleState{};
+  moduleStates[1].speed = talonVelToMps(m_fr_speedMotor.GetSelectedSensorVelocity());
+  moduleStates[1].angle = frc::Rotation2d{units::degree_t{m_fr_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
+    
+    std::cout << "initialized module 1\n";
+
+  moduleStates[2] = frc::SwerveModuleState{};
+  moduleStates[2].speed = talonVelToMps(m_rl_speedMotor.GetSelectedSensorVelocity());
+  moduleStates[2].angle = frc::Rotation2d{units::degree_t{m_rl_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
+
+    std::cout << "initialized module 2\n";
+
+  moduleStates[3] = frc::SwerveModuleState{};
+  moduleStates[3].speed = talonVelToMps(m_rr_speedMotor.GetSelectedSensorVelocity());
+  moduleStates[3].angle = frc::Rotation2d{units::degree_t{m_rr_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
+
+    std::cout << "initialized module 3\n";
   
   return m_kinematics.ToChassisSpeeds(moduleStates);
 }
@@ -69,10 +87,10 @@ units::degree_t navx_yaw) {
 
   if (abs(dy.value()) < 0.35) dy = units::meters_per_second_t{0};
 
-  frc::SmartDashboard::PutNumber("Dx", dx.value());
-  frc::SmartDashboard::PutNumber("Dy", dy.value());
-  frc::SmartDashboard::PutNumber("Dtheta", dtheta.value());
-  frc::SmartDashboard::PutNumber("navx yaw", navx_yaw.value());
+  // frc::SmartDashboard::PutNumber("Dx", dx.value());
+  // frc::SmartDashboard::PutNumber("Dy", dy.value());
+  // frc::SmartDashboard::PutNumber("Dtheta", dtheta.value());
+  // frc::SmartDashboard::PutNumber("navx yaw", navx_yaw.value());
 
 
   // The desired field relative speed here is dx meters per second
@@ -102,10 +120,10 @@ units::degree_t navx_yaw) {
   double bl_raw_yaw = m_rl_canCoder.GetAbsolutePosition();
   double br_raw_yaw = m_rr_canCoder.GetAbsolutePosition();
 
-  frc::SmartDashboard::PutNumber("fl raw yaw", fl_raw_yaw);
-  frc::SmartDashboard::PutNumber("fr raw yaw", fr_raw_yaw);
-  frc::SmartDashboard::PutNumber("bl raw yaw", bl_raw_yaw);
-  frc::SmartDashboard::PutNumber("br raw yaw", br_raw_yaw);
+  // frc::SmartDashboard::PutNumber("fl raw yaw", fl_raw_yaw);
+  // frc::SmartDashboard::PutNumber("fr raw yaw", fr_raw_yaw);
+  // frc::SmartDashboard::PutNumber("bl raw yaw", bl_raw_yaw);
+  // frc::SmartDashboard::PutNumber("br raw yaw", br_raw_yaw);
 
   //angle + offset, converted to degrees & modulated
   // auto& fl_yaw = m_logger->get_float64("swerve.fl.calib_yaw");
@@ -119,10 +137,10 @@ units::degree_t navx_yaw) {
   double rl_yaw = frc::InputModulus(bl_raw_yaw + DriveConstants::BLOFF, -180.0, 180.0);
   double rr_yaw = frc::InputModulus(br_raw_yaw + DriveConstants::BROFF, -180.0, 180.0);
 
-  frc::SmartDashboard::PutNumber("fl yaw reading", fl_yaw);
-  frc::SmartDashboard::PutNumber("fr yaw reading", fr_yaw);
-  frc::SmartDashboard::PutNumber("bl yaw reading", rl_yaw);
-  frc::SmartDashboard::PutNumber("br yaw reading", rr_yaw);
+  // frc::SmartDashboard::PutNumber("fl yaw reading", fl_yaw);
+  // frc::SmartDashboard::PutNumber("fr yaw reading", fr_yaw);
+  // frc::SmartDashboard::PutNumber("bl yaw reading", rl_yaw);
+  // frc::SmartDashboard::PutNumber("br yaw reading", rr_yaw);
   
   auto fl_opt = frc::SwerveModuleState::Optimize(fl, units::degree_t(fl_yaw));
   auto fr_opt = frc::SwerveModuleState::Optimize(fr, units::degree_t(fr_yaw));
@@ -140,14 +158,14 @@ units::degree_t navx_yaw) {
   // m_logger->get_float64("swerve.bl.target_speed") = rl_opt.speed.value();
   // m_logger->get_float64("swerve.br.target_speed") = rr_opt.speed.value();
 
-  frc::SmartDashboard::PutNumber("fl opt angle", fl_opt.angle.Degrees().value());
-  frc::SmartDashboard::PutNumber("fl opt speed", fl_opt.speed.value());
-  frc::SmartDashboard::PutNumber("fr opt angle", fr_opt.angle.Degrees().value());
-  frc::SmartDashboard::PutNumber("fr opt speed", fr_opt.speed.value());
-  frc::SmartDashboard::PutNumber("bl opt angle", rl_opt.angle.Degrees().value());
-  frc::SmartDashboard::PutNumber("bl opt speed", rl_opt.speed.value());
-  frc::SmartDashboard::PutNumber("br opt angle", rr_opt.angle.Degrees().value());
-  frc::SmartDashboard::PutNumber("br opt speed", rr_opt.speed.value());
+  // frc::SmartDashboard::PutNumber("fl opt angle", fl_opt.angle.Degrees().value());
+  // frc::SmartDashboard::PutNumber("fl opt speed", fl_opt.speed.value());
+  // frc::SmartDashboard::PutNumber("fr opt angle", fr_opt.angle.Degrees().value());
+  // frc::SmartDashboard::PutNumber("fr opt speed", fr_opt.speed.value());
+  // frc::SmartDashboard::PutNumber("bl opt angle", rl_opt.angle.Degrees().value());
+  // frc::SmartDashboard::PutNumber("bl opt speed", rl_opt.speed.value());
+  // frc::SmartDashboard::PutNumber("br opt angle", rr_opt.angle.Degrees().value());
+  // frc::SmartDashboard::PutNumber("br opt speed", rr_opt.speed.value());
 
   //SetPID();
   

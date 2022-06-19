@@ -51,6 +51,7 @@ class Shooter{
         void EjectBall();   
 
         double getTurretAngle() {
+            //return m_turret.GetSelectedSensorPosition();
             return frc::InputModulus(m_turret.GetSelectedSensorPosition(), -turret_ticks_per_rev, turret_ticks_per_rev) 
                 / turret_ticks_per_rev * 180.0; //SHOULD result in being between -180 and 180 
         }    
@@ -58,7 +59,7 @@ class Shooter{
 
     private:
 
-        double turret_ticks_per_rev = 20000; //TODO: find out
+        double turret_ticks_per_rev = 31000; //TODO: find out
 
         void TurretAim(double offset);
         //TalonFX in ticks - 0 - 20,000

@@ -34,8 +34,8 @@ class Limelight{
 
         //in meters. should be pretty close?
         //TODO: confirm measurements, make separate namespace in constants
-        const double TURRET_ANGLE_OFFSET = 5.0; //todo: confirm
+        const double TURRET_ANGLE_OFFSET = 0.0; //todo: confirm
         const double HUB_HEIGHT = 2.7178; 
         const double CAM_HEIGHT = 0.52324;
-        const double CAM_ANGLE = 50; //50 degrees I think
+        const double CAM_ANGLE = 40; //40 degrees I think
 };

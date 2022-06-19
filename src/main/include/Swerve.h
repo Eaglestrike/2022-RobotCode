@@ -49,7 +49,7 @@ class Swerve {
     //converts raw talon velocity to meters per second
     //raw velocity units are ticks per 100ms
     units::meters_per_second_t talonVelToMps(double vel) {
-        double wheel_radius = 0.05; //TODO: find actual wheel radius/circumference
+        double wheel_radius = 0.05;
         double meters_per_rev = wheel_radius*2*M_PI; //wheel circumberence
         double ticks_per_rev = 2048;
         return units::meters_per_second_t{vel / 0.1 * (meters_per_rev / ticks_per_rev)};
@@ -59,10 +59,10 @@ class Swerve {
         // Swerve module system
     // SwerveDrive m_swerve;
     // Locations for the swerve drive modules relative to the robot center.
-    frc::Translation2d m_frontLeftLocation{0.381_m, 0.381_m};
-    frc::Translation2d m_frontRightLocation{0.381_m, -0.381_m};
-    frc::Translation2d m_backLeftLocation{-0.381_m, 0.381_m};
-    frc::Translation2d m_backRightLocation{-0.381_m, -0.381_m};
+    frc::Translation2d m_frontLeftLocation{0.3683_m, 0.3683_m};
+    frc::Translation2d m_frontRightLocation{0.3683_m, -0.3683_m};
+    frc::Translation2d m_backLeftLocation{-0.3683_m, 0.3683_m};
+    frc::Translation2d m_backRightLocation{-0.3683_m, -0.3683_m};
 
     // Creating my kinematics object using the module locations.
     frc::SwerveDriveKinematics<4> m_kinematics{

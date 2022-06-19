@@ -45,7 +45,7 @@ void Limelight::adjustAngles(double& ax, double& ay)
     double z = cos(flippedY);
     
     //TODO: confirm?
-    double rotAng = 90-CAM_ANGLE * M_PI / 180;
+    double rotAng = CAM_ANGLE * M_PI / 180;
 
     //rotate
     double rotatedY = y * cos(rotAng) - z * sin(rotAng);
@@ -82,17 +82,17 @@ double Limelight::getAdjustedX()
 
 //coordinates: gonna assume angle is zero when robot facing directly away
 frc::Pose2d Limelight::getPose(double navx, double turretAngle) {
-    double distance = getDist() + 0.6096;
-    double robotGoalAngle_ = (180 - (turretAngle + getAdjustedX() + TURRET_ANGLE_OFFSET)); 
-    double angleToGoal = navx + robotGoalAngle_ + 90;
+    double distance = getDist();// + 0.6096; //todo: add back in later
+    double robotGoalAngle_ = -(turretAngle + getAdjustedX()); 
+    double angleToGoal = navx + robotGoalAngle_;
     double x = -distance * cos(angleToGoal * M_PI / 180);
     double y = -distance * sin(angleToGoal * M_PI / 180);
 
-    frc::SmartDashboard::PutNumber("distance", distance);
-    frc::SmartDashboard::PutNumber("robotGoalAngle", robotGoalAngle_);
-    frc::SmartDashboard::PutNumber("angleToGoal", angleToGoal);
-    frc::SmartDashboard::PutNumber("Pose x", x);
-    frc::SmartDashboard::PutNumber("Pose y", y);
+   // frc::SmartDashboard::PutNumber("distance", distance);
+    // frc::SmartDashboard::PutNumber("robotGoalAngle", robotGoalAngle_);
+    // frc::SmartDashboard::PutNumber("angleToGoal", angleToGoal);
+    // frc::SmartDashboard::PutNumber("Pose x", x);
+    // frc::SmartDashboard::PutNumber("Pose y", y);
 
     return frc::Pose2d{units::meter_t{x}, units::meter_t{y}, frc::Rotation2d{units::degree_t{navx}}};
 }
@@ -101,7 +101,7 @@ double Limelight::getDist() {
     double x = getXOff();
     double y = getYOff();
     adjustAngles(x, y);
-    return ((HUB_HEIGHT - CAM_HEIGHT) / tan ( (CAM_ANGLE + y) * M_PI / 180.0 ));
+    return (HUB_HEIGHT - CAM_HEIGHT) / tan(y * M_PI / 180);
 }
 
 
@@ -110,12 +110,12 @@ double Limelight::getDist() {
 void
 Limelight::setLEDMode(std::string mode){
     if(mode == "OFF"){
-        network_table->PutNumber("ledMode", 1);
+        network_table->PutNumber("ledMode", 1.0);
     }
     if(mode == "BLINK"){
-        network_table->PutNumber("ledMode", 2);
+        network_table->PutNumber("ledMode", 2.0);
     }
     if(mode == "ON"){
-        network_table->PutNumber("ledMode", 3);
+        network_table->PutNumber("ledMode", 3.0);
     }
 }

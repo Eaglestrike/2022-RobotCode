@@ -2,37 +2,6 @@
 #include <iostream>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-static const DataLogger::DataFields datalog_fields = {
-  {"swerve.fl.raw_yaw", DataLogger::DataType::FLOAT64},
-  {"swerve.fl.calib_yaw", DataLogger::DataType::FLOAT64},
-  {"swerve.fl.target_yaw", DataLogger::DataType::FLOAT64},
-  {"swerve.fl.target_speed", DataLogger::DataType::FLOAT64},
-
-  {"swerve.fr.raw_yaw", DataLogger::DataType::FLOAT64},
-  {"swerve.fr.calib_yaw", DataLogger::DataType::FLOAT64},
-  {"swerve.fr.target_yaw", DataLogger::DataType::FLOAT64},
-  {"swerve.fr.target_speed", DataLogger::DataType::FLOAT64},
-
-  {"swerve.fl.raw_ticks", DataLogger::DataType::FLOAT64},
-  {"swerve.fr.raw_ticks", DataLogger::DataType::FLOAT64},
-  {"swerve.bl.raw_ticks", DataLogger::DataType::FLOAT64},
-  {"swerve.br.raw_ticks", DataLogger::DataType::FLOAT64},
-  
-  {"swerve.bl.raw_yaw", DataLogger::DataType::FLOAT64},
-  {"swerve.bl.calib_yaw", DataLogger::DataType::FLOAT64},
-  {"swerve.bl.target_yaw", DataLogger::DataType::FLOAT64},
-  {"swerve.bl.target_speed", DataLogger::DataType::FLOAT64},
-  {"swerve.br.raw_yaw", DataLogger::DataType::FLOAT64},
-  {"swerve.br.calib_yaw", DataLogger::DataType::FLOAT64},
-  {"swerve.br.target_yaw", DataLogger::DataType::FLOAT64},
-  {"swerve.br.target_speed", DataLogger::DataType::FLOAT64},
-  {"swerve.teleop.dx", DataLogger::DataType::FLOAT64},
-  {"swerve.teleop.dy", DataLogger::DataType::FLOAT64},
-  {"swerve.teleop.dtheta", DataLogger::DataType::FLOAT64}, 
-  {"navx.yaw", DataLogger::DataType::FLOAT64}
-};
-
-
 // Runs once when robot is enabled
 // Sets which color we are (so we know which balls to eject), autonomous mode, and initialize navx
 // Add camera server to smartdashboard so we can see the robot's camera feed
@@ -49,7 +18,7 @@ Robot::RobotInit() {
   
   camera = frc::CameraServer::GetInstance()->StartAutomaticCapture();
 
-  m_limelight = new Limelight();
+//  m_limelight = new Limelight();
   
   try{
     m_navx = new AHRS(frc::SPI::Port::kMXP);
@@ -57,14 +26,8 @@ Robot::RobotInit() {
     std::cout << e.what() <<std::endl;
   }
 
-  try {
-    std::string path = "/home/lvuser/robotlog.log";
-    m_logger = new DataLogger(path, datalog_fields); 
-  } catch (const std::exception& e){
-    std::cout << e.what() << std::endl;
-  }
-
   m_climbing = false;
+
 }
 
 
@@ -117,8 +80,7 @@ Robot::AutonomousPeriodic() {
 // Clear sticky faults on hardware
 void
 Robot::TeleopInit() {
- // m_climber.Initialize();
-
+ 
   if(m_chooser.GetSelected() == blueAlliance){
     m_shooter.setColor(true);
   } else {
@@ -145,6 +107,7 @@ Robot::TeleopInit() {
   //m_shooter.Periodic(false);
   m_intake.Periodic();
  // m_climber.Initialize();
+
 }
 
 
@@ -175,9 +138,12 @@ Robot::TeleopPeriodic() {
     units::radians_per_second_t{dtheta},
     units::degree_t{m_navx->GetYaw()});
 
-    m_limelight->getPose(m_navx->GetYaw(), m_shooter.getTurretAngle());
-    m_limelight->getAdjustedX();
+    // frc::ChassisSpeeds speeds = m_swerve.getSpeeds();
+    // frc::SmartDashboard::PutNumber("x speed", speeds.vx.value());
+    // frc::SmartDashboard::PutNumber("y speed", speeds.vy.value());
 
+    // m_logger->get_float64("x_vel") = speeds.vx.value();
+    // m_logger->get_float64("y_vel") = speeds.vy.value();
 
   return; //for swerve testing, don't want to do other stuff
 
@@ -285,7 +251,7 @@ Robot::DisabledInit() {}
 
 void 
 Robot::DisabledPeriodic() {
-  m_swerve.DisabledPeriodic(nullptr);
+ // m_swerve.DisabledPeriodic(nullptr);
 }
 
 
