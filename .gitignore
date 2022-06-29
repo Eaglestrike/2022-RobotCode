@@ -5,6 +5,9 @@
 # Prerequisites
 *.d
 
+#logger cache
+__pycache__/
+
 # Compiled Object files
 *.slo
 *.lo

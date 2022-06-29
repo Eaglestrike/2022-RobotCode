@@ -20,11 +20,20 @@ Robot::RobotInit() {
 
 //  m_limelight = new Limelight();
   
-  try{
-    m_navx = new AHRS(frc::SPI::Port::kMXP);
-  } catch(const std::exception& e){
-    std::cout << e.what() <<std::endl;
-  }
+  // try{
+  //   m_navx = new AHRS(frc::SPI::Port::kMXP);
+  // } catch(const std::exception& e){
+  //   std::cout << e.what() <<std::endl;
+  // }
+
+  
+  // try {
+  //   m_logger = new DataLogger(path, datalog_fields);
+  // } catch (const std::exception& e){
+  //   std::cout << e.what() <<std::endl;
+  // }
+
+
 
   m_climbing = false;
 
@@ -106,7 +115,7 @@ Robot::TeleopInit() {
  // m_intake.Deploy();
   //m_shooter.Periodic(false);
   m_intake.Periodic();
- // m_climber.Initialize();
+  m_climber.Initialize();
 
 }
 
@@ -137,6 +146,29 @@ Robot::TeleopPeriodic() {
     units::meters_per_second_t{dx},
     units::radians_per_second_t{dtheta},
     units::degree_t{m_navx->GetYaw()});
+
+    frc::Pose2d pose = m_limelight->getPose(m_navx->GetYaw(), m_shooter.getTurretAngle());
+    frc::SmartDashboard::PutNumber("Pose x", pose.X().value());
+    frc::SmartDashboard::PutNumber("Pose y", pose.Y().value());
+
+    // //A
+    // if (xbox.GetRawButton(1)) {
+    //   m_swerve.test1ms();
+    // }
+    // else if (xbox.GetRawButton(2)) {
+    //   m_swerve.test2_5ms();
+    // }
+    // else if (xbox.GetRawButton(3)) {
+    //   m_swerve.test4ms();
+    // }
+    // else {
+    //    m_swerve.Periodic(
+    //   units::meters_per_second_t{0},
+    //   units::meters_per_second_t{0},
+    //   units::radians_per_second_t{0},
+    //   units::degree_t{m_navx->GetYaw()});
+    // }
+
 
     // frc::ChassisSpeeds speeds = m_swerve.getSpeeds();
     // frc::SmartDashboard::PutNumber("x speed", speeds.vx.value());

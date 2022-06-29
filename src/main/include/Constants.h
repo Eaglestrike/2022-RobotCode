@@ -71,9 +71,14 @@ DriveConstants{
     constexpr double MAX_VOLTS = 1.0;
     const double speedGearRatio = 1/6.12;
     const double angleGearRatio = 1/12.8;
+
     const double P = 0.08;
     const double I = 0.1;
     const double D = 0.0;
+
+    const double sP = 0.08;
+    const double sI = 0.1;
+    const double sD = 0.0;
 
     //Swerve Controller
     const double fwdstrP = 0.58;

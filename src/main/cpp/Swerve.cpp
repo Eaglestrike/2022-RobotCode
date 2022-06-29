@@ -47,39 +47,111 @@ void Swerve::initializeOdometry(frc::Rotation2d gyroAngle, frc::Pose2d initPose)
 frc::ChassisSpeeds Swerve::getSpeeds() {
   wpi::array<frc::SwerveModuleState, 4> moduleStates(wpi::empty_array);
 
-  std::cout << "initialized array\n";
-
   moduleStates[0] = frc::SwerveModuleState{};
-  std::cout << "initialized module\n";
   moduleStates[0].speed = talonVelToMps(m_fl_speedMotor.GetSelectedSensorVelocity());
-  std::cout << "initialized speed\n";
-  //fails on the angle
-  moduleStates[0].angle = frc::Rotation2d{units::degree_t{m_fl_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
-  std::cout << "initialized angle\n";
-
-  std::cout << "initialized module 0\n";
+  moduleStates[0].angle = frc::Rotation2d{units::angle::degree_t{m_fl_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
 
   moduleStates[1] = frc::SwerveModuleState{};
   moduleStates[1].speed = talonVelToMps(m_fr_speedMotor.GetSelectedSensorVelocity());
-  moduleStates[1].angle = frc::Rotation2d{units::degree_t{m_fr_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
+  moduleStates[1].angle = frc::Rotation2d{units::angle::degree_t{m_fr_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
     
-    std::cout << "initialized module 1\n";
-
   moduleStates[2] = frc::SwerveModuleState{};
   moduleStates[2].speed = talonVelToMps(m_rl_speedMotor.GetSelectedSensorVelocity());
-  moduleStates[2].angle = frc::Rotation2d{units::degree_t{m_rl_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
-
-    std::cout << "initialized module 2\n";
+  moduleStates[2].angle = frc::Rotation2d{units::angle::degree_t{m_rl_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
 
   moduleStates[3] = frc::SwerveModuleState{};
   moduleStates[3].speed = talonVelToMps(m_rr_speedMotor.GetSelectedSensorVelocity());
-  moduleStates[3].angle = frc::Rotation2d{units::degree_t{m_rr_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
-
-    std::cout << "initialized module 3\n";
+  moduleStates[3].angle = frc::Rotation2d{units::angle::degree_t{m_rr_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
   
   return m_kinematics.ToChassisSpeeds(moduleStates);
 }
 
+
+//4 m/s is 2500
+//2.5 m/s is 1600
+//1 m/s is 700
+
+void Swerve::test1ms() {
+  double fl_yaw = frc::InputModulus(m_fl_canCoder.GetAbsolutePosition() + DriveConstants::FLOFF, -180.0, 180.0);
+  m_fl_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_fl_pid.Calculate(fl_yaw, 0), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+  m_fl_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_fl_speed_pid.Calculate(m_fl_speedMotor.GetSelectedSensorVelocity(), 700), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+
+  double fr_yaw = frc::InputModulus(m_fr_canCoder.GetAbsolutePosition() + DriveConstants::FROFF, -180.0, 180.0);
+  m_fr_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_fr_pid.Calculate(fr_yaw, 0), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+  m_fr_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_fr_speed_pid.Calculate(m_fr_speedMotor.GetSelectedSensorVelocity(), 700), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+
+  double rl_yaw = frc::InputModulus(m_rl_canCoder.GetAbsolutePosition() + DriveConstants::FLOFF, -180.0, 180.0);
+  m_rl_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_rl_pid.Calculate(rl_yaw, 0), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+  m_rl_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_rl_speed_pid.Calculate(m_rl_speedMotor.GetSelectedSensorVelocity(), 700), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+
+  double rr_yaw = frc::InputModulus(m_rr_canCoder.GetAbsolutePosition() + DriveConstants::FLOFF, -180.0, 180.0);
+  m_rr_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_rr_pid.Calculate(rr_yaw, 0), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+  m_rr_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_rr_speed_pid.Calculate(m_rr_speedMotor.GetSelectedSensorVelocity(), 700), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+
+}
+
+void Swerve::test2_5ms() {
+  double fl_yaw = frc::InputModulus(m_fl_canCoder.GetAbsolutePosition() + DriveConstants::FLOFF, -180.0, 180.0);
+  m_fl_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_fl_pid.Calculate(fl_yaw, 0), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+  m_fl_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_fl_speed_pid.Calculate(m_fl_speedMotor.GetSelectedSensorVelocity(), 1600), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+
+  double fr_yaw = frc::InputModulus(m_fr_canCoder.GetAbsolutePosition() + DriveConstants::FROFF, -180.0, 180.0);
+  m_fr_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_fr_pid.Calculate(fr_yaw, 0), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+  m_fr_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_fr_speed_pid.Calculate(m_fr_speedMotor.GetSelectedSensorVelocity(), 1600), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+
+  double rl_yaw = frc::InputModulus(m_rl_canCoder.GetAbsolutePosition() + DriveConstants::FLOFF, -180.0, 180.0);
+  m_rl_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_rl_pid.Calculate(rl_yaw, 0), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+  m_rl_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_rl_speed_pid.Calculate(m_rl_speedMotor.GetSelectedSensorVelocity(), 1600), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+
+  double rr_yaw = frc::InputModulus(m_rr_canCoder.GetAbsolutePosition() + DriveConstants::FLOFF, -180.0, 180.0);
+  m_rr_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_rr_pid.Calculate(rr_yaw, 0), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+  m_rr_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_rr_speed_pid.Calculate(m_rr_speedMotor.GetSelectedSensorVelocity(), 1600), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+
+  
+}
+
+void Swerve::test4ms() {
+   double fl_yaw = frc::InputModulus(m_fl_canCoder.GetAbsolutePosition() + DriveConstants::FLOFF, -180.0, 180.0);
+  m_fl_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_fl_pid.Calculate(fl_yaw, 0), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+  m_fl_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_fl_speed_pid.Calculate(m_fl_speedMotor.GetSelectedSensorVelocity(), 2500), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+
+  double fr_yaw = frc::InputModulus(m_fr_canCoder.GetAbsolutePosition() + DriveConstants::FROFF, -180.0, 180.0);
+  m_fr_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_fr_pid.Calculate(fr_yaw, 0), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+  m_fr_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_fr_speed_pid.Calculate(m_fr_speedMotor.GetSelectedSensorVelocity(), 2500), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+
+  double rl_yaw = frc::InputModulus(m_rl_canCoder.GetAbsolutePosition() + DriveConstants::FLOFF, -180.0, 180.0);
+  m_rl_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_rl_pid.Calculate(rl_yaw, 0), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+  m_rl_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_rl_speed_pid.Calculate(m_rl_speedMotor.GetSelectedSensorVelocity(), 2500), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+
+  double rr_yaw = frc::InputModulus(m_rr_canCoder.GetAbsolutePosition() + DriveConstants::FLOFF, -180.0, 180.0);
+  m_rr_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_rr_pid.Calculate(rr_yaw, 0), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+  m_rr_angleMotor.SetVoltage(
+  units::volt_t{std::clamp( m_rr_speed_pid.Calculate(m_rr_speedMotor.GetSelectedSensorVelocity(), 2500), -GeneralConstants::MAX_VOLTAGE, GeneralConstants::MAX_VOLTAGE)});
+
+}
 
 
 void Swerve::Periodic(units::meters_per_second_t dx, units::meters_per_second_t dy, units::radians_per_second_t dtheta, 

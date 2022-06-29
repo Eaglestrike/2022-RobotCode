@@ -82,11 +82,11 @@ double Limelight::getAdjustedX()
 
 //coordinates: gonna assume angle is zero when robot facing directly away
 frc::Pose2d Limelight::getPose(double navx, double turretAngle) {
-    double distance = getDist();// + 0.6096; //todo: add back in later
+    double distance = getDist() + 0.686;
     double robotGoalAngle_ = -(turretAngle + getAdjustedX()); 
     double angleToGoal = navx + robotGoalAngle_;
-    double x = -distance * cos(angleToGoal * M_PI / 180);
-    double y = -distance * sin(angleToGoal * M_PI / 180);
+    double y = -distance * cos(angleToGoal * M_PI / 180);
+    double x = distance * sin(angleToGoal * M_PI / 180);
 
    // frc::SmartDashboard::PutNumber("distance", distance);
     // frc::SmartDashboard::PutNumber("robotGoalAngle", robotGoalAngle_);

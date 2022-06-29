@@ -91,7 +91,7 @@ class Robot : public frc::TimedRobot {
 
   void climbFSM();
 
-  AHRS *m_navx;
+  AHRS *m_navx = new AHRS(frc::SPI::Port::kMXP);
 
   std::string path = "/home/lvuser/robotlog.log";
   DataLogger *m_logger = new DataLogger(path, datalog_fields);
@@ -99,7 +99,7 @@ class Robot : public frc::TimedRobot {
   Limelight *m_limelight = new Limelight();
 
   //TODO: auto executor
-  Swerve m_swerve{m_navx, m_logger};
+  Swerve m_swerve{m_navx, m_logger}; //TODO: make pointers
   Intake m_intake;
   Shooter m_shooter{m_swerve, m_limelight};
   Climber m_climber;

@@ -30,7 +30,12 @@ class Swerve {
         void initializeOdometry(frc::Rotation2d gyroAngle, frc::Pose2d initPose);
         void updateOdometry(frc::Rotation2d robotAngle, frc::Pose2d robotPose) { odometry->ResetPosition(robotPose, robotAngle); }
 
-    std::vector<TalonFX *> getTalons(); //for simulation
+        std::vector<TalonFX *> getTalons(); //for simulation
+
+        void test1ms();
+        void test2_5ms();
+        void test4ms();
+
 
     private:
 
@@ -89,6 +94,12 @@ class Swerve {
     frc2::PIDController m_fr_pid{DriveConstants::P , DriveConstants::I, DriveConstants::D};
     frc2::PIDController m_rl_pid{DriveConstants::P , DriveConstants::I, DriveConstants::D};
     frc2::PIDController m_rr_pid{DriveConstants::P , DriveConstants::I, DriveConstants::D};
+
+    frc2::PIDController m_fl_speed_pid{DriveConstants::sP , DriveConstants::sI, DriveConstants::sD};
+    frc2::PIDController m_fr_speed_pid{DriveConstants::sP , DriveConstants::sI, DriveConstants::sD};
+    frc2::PIDController m_rl_speed_pid{DriveConstants::sP , DriveConstants::sI, DriveConstants::sD};
+    frc2::PIDController m_rr_speed_pid{DriveConstants::sP , DriveConstants::sI, DriveConstants::sD};
+
 
      frc::ChassisSpeeds speeds;
 
