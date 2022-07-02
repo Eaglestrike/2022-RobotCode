@@ -19,7 +19,7 @@ class ShooterCalc  {
             double xoff_offset;
         };
 
-        ShooterCalc(Limelight& l, Swerve& s);
+        ShooterCalc(Limelight* l, Swerve* s);
         Settings calculate();
         //should I move this to a different class? Swerve or Limelight?
         void getPoseViaLimelight(); //TODO: write
@@ -34,8 +34,8 @@ class ShooterCalc  {
         map<double, pair<int, int>> dist_to_settings; //angle is first, speed is second
         map<double, double> dist_to_time;
 
-        Limelight& limelight;
-        Swerve& swerve;
+        Limelight* limelight;
+        Swerve* swerve;
 
         //in meters. should be pretty close?
         //TODO: confirm measurements

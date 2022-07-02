@@ -54,19 +54,19 @@ Robot::AutonomousInit() {
 
   //call periodic method of appropriate auto
 
-  m_shooter.Zero();
-  m_swerve.initializeOdometry(frc::Rotation2d{units::degree_t{m_navx->GetYaw()}}, initPose);
+  m_shooter->Zero();
+  m_swerve->initializeOdometry(frc::Rotation2d{units::degree_t{m_navx->GetYaw()}}, initPose);
   //initialize auto 
   m_time = 0;
   //do i need swerve initialization?
   m_intake.Deploy();
-  m_shooter.setState(Shooter::State::IDLE);
+  m_shooter->setState(Shooter::State::IDLE);
   m_intake.setState(Intake::State::IDLE);
-  m_shooter.enablelimelight();
+  m_shooter->enablelimelight();
   
   PDH.ClearStickyFaults();
   m_navx->Reset();
-  m_shooter.enablelimelight();
+  m_shooter->enablelimelight();
 }
 
 
@@ -80,7 +80,7 @@ Robot::AutonomousPeriodic() {
   //auto FSM periodic
 
   m_intake.Periodic();
-  m_shooter.Periodic(true);
+  m_shooter->Periodic(true);
 }
 
 
@@ -91,29 +91,29 @@ void
 Robot::TeleopInit() {
  
   if(m_chooser.GetSelected() == blueAlliance){
-    m_shooter.setColor(true);
+    m_shooter->setColor(true);
   } else {
-    m_shooter.setColor(false);
+    m_shooter->setColor(false);
   }
 
   m_time = 0;
   m_navx->Reset();
 
-  m_shooter.setState(Shooter::State::IDLE);
- m_shooter.enablelimelight();
- m_shooter.zeroTurret();
+  m_shooter->setState(Shooter::State::IDLE);
+ m_shooter->enablelimelight();
+ m_shooter->zeroTurret();
   m_intake.setState(Intake::State::IDLE);
 
   //REMOVE THIS WHEN AT COMPETITION!
   //should only be zeroed once, this is so that we don't have to run auto every time to test teleop
-  //m_shooter.Zero();
+  //m_shooter->Zero();
 
   //REMOVE THIS AT COMPETITION!
-  m_swerve.initializeOdometry(frc::Rotation2d{units::degree_t{m_navx->GetYaw()}}, initPose);
+  m_swerve->initializeOdometry(frc::Rotation2d{units::degree_t{m_navx->GetYaw()}}, initPose);
   
   PDH.ClearStickyFaults();
  // m_intake.Deploy();
-  //m_shooter.Periodic(false);
+  //m_shooter->Periodic(false);
   m_intake.Periodic();
   m_climber.Initialize();
 
@@ -141,28 +141,28 @@ Robot::TeleopPeriodic() {
   joy_val_to_mps(dy);
   joy_rot_to_rps(dtheta);
 
-  m_swerve.Periodic(
+  m_swerve->Periodic(
     units::meters_per_second_t{dy},
     units::meters_per_second_t{dx},
     units::radians_per_second_t{dtheta},
     units::degree_t{m_navx->GetYaw()});
 
-    frc::Pose2d pose = m_limelight->getPose(m_navx->GetYaw(), m_shooter.getTurretAngle());
+    frc::Pose2d pose = m_limelight->getPose(m_navx->GetYaw(), m_shooter->getTurretAngle());
     frc::SmartDashboard::PutNumber("Pose x", pose.X().value());
     frc::SmartDashboard::PutNumber("Pose y", pose.Y().value());
 
     // //A
     // if (xbox.GetRawButton(1)) {
-    //   m_swerve.test1ms();
+    //   m_swerve->test1ms();
     // }
     // else if (xbox.GetRawButton(2)) {
-    //   m_swerve.test2_5ms();
+    //   m_swerve->test2_5ms();
     // }
     // else if (xbox.GetRawButton(3)) {
-    //   m_swerve.test4ms();
+    //   m_swerve->test4ms();
     // }
     // else {
-    //    m_swerve.Periodic(
+    //    m_swerve->Periodic(
     //   units::meters_per_second_t{0},
     //   units::meters_per_second_t{0},
     //   units::radians_per_second_t{0},
@@ -170,7 +170,7 @@ Robot::TeleopPeriodic() {
     // }
 
 
-    // frc::ChassisSpeeds speeds = m_swerve.getSpeeds();
+    // frc::ChassisSpeeds speeds = m_swerve->getSpeeds();
     // frc::SmartDashboard::PutNumber("x speed", speeds.vx.value());
     // frc::SmartDashboard::PutNumber("y speed", speeds.vy.value());
 
@@ -203,20 +203,20 @@ Robot::TeleopPeriodic() {
     // Intake 
     else if(r_joy.GetTrigger()){
      // m_intake.setState(Intake::State::RUN); //will this cause a problem if the channel should not run?
-      m_shooter.setState(Shooter::State::LOAD);
+      m_shooter->setState(Shooter::State::LOAD);
     }
 
     //Shoot
     else if(l_joy.GetTrigger()){
-      m_shooter.setState(Shooter::State::SHOOT);
+      m_shooter->setState(Shooter::State::SHOOT);
       m_intake.setState(Intake::State::RUN);
     }
 
     //back button will enable climb
     //is raw button 4 the back button?
     else if(xbox.GetRawButton(4)){
-      m_shooter.setState(Shooter::State::CLIMB);
-      m_shooter.zeroHood();
+      m_shooter->setState(Shooter::State::CLIMB);
+      m_shooter->zeroHood();
     }
     
     // Button A will outtake
@@ -231,17 +231,17 @@ Robot::TeleopPeriodic() {
 
     // Hard point shooting location at edge of tarmac
     // else if (xbox.GetRawButton(4)){
-    //   m_shooter.setState(Shooter::State::Tarmac);
+    //   m_shooter->setState(Shooter::State::Tarmac);
     // }
 
     else { //make sure shooter and intake aren't intaking if buttons aren't pressed
-      // m_shooter.Manual(0);
-      m_shooter.setState(Shooter::State::IDLE);
+      // m_shooter->Manual(0);
+      m_shooter->setState(Shooter::State::IDLE);
       m_intake.setState(Intake::State::IDLE);
     }
     //call periodic functions so that subsystems will follow actions appropriate to their states
     m_intake.Periodic(); 
-    m_shooter.Periodic(false);
+    m_shooter->Periodic(false);
   }
   
 }
@@ -249,7 +249,7 @@ Robot::TeleopPeriodic() {
 void Robot::climbFSM() {
     m_time_climb +=m_timeStep;
     if(m_time_climb < 0.75){
-      m_shooter.Climb();
+      m_shooter->Climb();
     }
     else if(xbox.GetRawButtonPressed(2)){
       m_climber.ExtendsecondStage();
@@ -262,11 +262,11 @@ void Robot::climbFSM() {
       m_climber.armExtension(out);
     }
     else if(abs(xbox.GetRawAxis(4)) > 0.2 ){
-      m_shooter.Manual(xbox.GetRawAxis(4));
-      m_shooter.setState(Shooter::State::MANUAL);
+      m_shooter->Manual(xbox.GetRawAxis(4));
+      m_shooter->setState(Shooter::State::MANUAL);
     }
     else {
-      m_shooter.Manual(0);
+      m_shooter->Manual(0);
       m_climber.armExtension(0);
     }
 }
@@ -283,7 +283,7 @@ Robot::DisabledInit() {}
 
 void 
 Robot::DisabledPeriodic() {
- // m_swerve.DisabledPeriodic(nullptr);
+ // m_swerve->DisabledPeriodic(nullptr);
 }
 
 
