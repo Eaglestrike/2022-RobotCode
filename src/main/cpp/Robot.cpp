@@ -2,6 +2,38 @@
 #include <iostream>
 #include <frc/smartdashboard/SmartDashboard.h>
 
+static const DataLogger::DataFields datalog_fields = {
+  // {"swerve.fl.raw_yaw", DataLogger::DataType::FLOAT64},
+  // {"swerve.fl.calib_yaw", DataLogger::DataType::FLOAT64},
+  // {"swerve.fl.target_yaw", DataLogger::DataType::FLOAT64},
+  // {"swerve.fl.target_speed", DataLogger::DataType::FLOAT64},
+
+  // {"swerve.fr.raw_yaw", DataLogger::DataType::FLOAT64},
+  // {"swerve.fr.calib_yaw", DataLogger::DataType::FLOAT64},
+  // {"swerve.fr.target_yaw", DataLogger::DataType::FLOAT64},
+  // {"swerve.fr.target_speed", DataLogger::DataType::FLOAT64},
+
+  // {"swerve.fl.raw_ticks", DataLogger::DataType::FLOAT64},
+  // {"swerve.fr.raw_ticks", DataLogger::DataType::FLOAT64},
+  // {"swerve.bl.raw_ticks", DataLogger::DataType::FLOAT64},
+  // {"swerve.br.raw_ticks", DataLogger::DataType::FLOAT64},
+  
+  // {"swerve.bl.raw_yaw", DataLogger::DataType::FLOAT64},
+  // {"swerve.bl.calib_yaw", DataLogger::DataType::FLOAT64},
+  // {"swerve.bl.target_yaw", DataLogger::DataType::FLOAT64},
+  // {"swerve.bl.target_speed", DataLogger::DataType::FLOAT64},
+  // {"swerve.br.raw_yaw", DataLogger::DataType::FLOAT64},
+  // {"swerve.br.calib_yaw", DataLogger::DataType::FLOAT64},
+  // {"swerve.br.target_yaw", DataLogger::DataType::FLOAT64},
+  // {"swerve.br.target_speed", DataLogger::DataType::FLOAT64},
+  // {"swerve.teleop.dx", DataLogger::DataType::FLOAT64},
+  // {"swerve.teleop.dy", DataLogger::DataType::FLOAT64},
+  // {"swerve.teleop.dtheta", DataLogger::DataType::FLOAT64}, 
+  // {"navx.yaw", DataLogger::DataType::FLOAT64}
+     {"x_vel", DataLogger::DataType::FLOAT64},
+     {"y_vel", DataLogger::DataType::FLOAT64} 
+};
+
 // Runs once when robot is enabled
 // Sets which color we are (so we know which balls to eject), autonomous mode, and initialize navx
 // Add camera server to smartdashboard so we can see the robot's camera feed
@@ -18,22 +50,36 @@ Robot::RobotInit() {
   
   camera = frc::CameraServer::GetInstance()->StartAutomaticCapture();
 
-//  m_limelight = new Limelight();
+  try {
+    m_limelight = new Limelight();
+  } catch (const std::exception& e) {
+    std::cout << e.what() << std::endl;
+  }
   
-  // try{
-  //   m_navx = new AHRS(frc::SPI::Port::kMXP);
-  // } catch(const std::exception& e){
-  //   std::cout << e.what() <<std::endl;
-  // }
+  try {
+    m_navx = new AHRS(frc::SPI::Port::kMXP);
+  } catch(const std::exception& e) {
+    std::cout << e.what() <<std::endl;
+  }
 
-  
-  // try {
-  //   m_logger = new DataLogger(path, datalog_fields);
-  // } catch (const std::exception& e){
-  //   std::cout << e.what() <<std::endl;
-  // }
+  std::string path = "/home/lvuser/robotlog.log";
+  try {
+    m_logger = new DataLogger(path, datalog_fields);
+  } catch (const std::exception& e){
+    std::cout << e.what() <<std::endl;
+  }
 
+  try {
+    m_swerve = new Swerve(m_navx, m_logger);
+  } catch (const std::exception& e) {
+    std::cout << e.what() << std::endl;
+  }
 
+  try {
+    m_shooter = new Shooter(m_swerve, m_limelight);
+  } catch (const std::exception& e) {
+    std::cout << e.what() << std::endl;
+  }
 
   m_climbing = false;
 
