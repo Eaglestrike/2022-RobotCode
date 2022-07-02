@@ -332,6 +332,13 @@ Robot::DisabledPeriodic() {
  // m_swerve->DisabledPeriodic(nullptr);
 }
 
+Robot::~Robot() {
+  delete m_limelight;
+  delete m_navx;
+  delete m_logger;
+  delete m_swerve;
+  delete m_shooter;
+}
 
 #ifndef RUNNING_FRC_TESTS
 int main() {
