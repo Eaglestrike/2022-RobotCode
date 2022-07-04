@@ -3,7 +3,7 @@
 
 //sets motor configurations
 //initializes data hash map values (input is limelight y offset, output is flywheel angle and speed)
-Shooter::Shooter(Swerve& s, Limelight* l) : swerve(s) {
+Shooter::Shooter(Swerve* s, Limelight* l) : swerve(s) {
     m_limelight = l;
 
     m_flywheelMaster.SetNeutralMode(NeutralMode::Coast);

@@ -37,38 +37,6 @@ double m_time = 0;
 double m_time_climb = 0;
 double m_timeStep = GeneralConstants::timeStep;
 
- static const DataLogger::DataFields datalog_fields = {
-  // {"swerve.fl.raw_yaw", DataLogger::DataType::FLOAT64},
-  // {"swerve.fl.calib_yaw", DataLogger::DataType::FLOAT64},
-  // {"swerve.fl.target_yaw", DataLogger::DataType::FLOAT64},
-  // {"swerve.fl.target_speed", DataLogger::DataType::FLOAT64},
-
-  // {"swerve.fr.raw_yaw", DataLogger::DataType::FLOAT64},
-  // {"swerve.fr.calib_yaw", DataLogger::DataType::FLOAT64},
-  // {"swerve.fr.target_yaw", DataLogger::DataType::FLOAT64},
-  // {"swerve.fr.target_speed", DataLogger::DataType::FLOAT64},
-
-  // {"swerve.fl.raw_ticks", DataLogger::DataType::FLOAT64},
-  // {"swerve.fr.raw_ticks", DataLogger::DataType::FLOAT64},
-  // {"swerve.bl.raw_ticks", DataLogger::DataType::FLOAT64},
-  // {"swerve.br.raw_ticks", DataLogger::DataType::FLOAT64},
-  
-  // {"swerve.bl.raw_yaw", DataLogger::DataType::FLOAT64},
-  // {"swerve.bl.calib_yaw", DataLogger::DataType::FLOAT64},
-  // {"swerve.bl.target_yaw", DataLogger::DataType::FLOAT64},
-  // {"swerve.bl.target_speed", DataLogger::DataType::FLOAT64},
-  // {"swerve.br.raw_yaw", DataLogger::DataType::FLOAT64},
-  // {"swerve.br.calib_yaw", DataLogger::DataType::FLOAT64},
-  // {"swerve.br.target_yaw", DataLogger::DataType::FLOAT64},
-  // {"swerve.br.target_speed", DataLogger::DataType::FLOAT64},
-  // {"swerve.teleop.dx", DataLogger::DataType::FLOAT64},
-  // {"swerve.teleop.dy", DataLogger::DataType::FLOAT64},
-  // {"swerve.teleop.dtheta", DataLogger::DataType::FLOAT64}, 
-  // {"navx.yaw", DataLogger::DataType::FLOAT64}
-     {"x_vel", DataLogger::DataType::FLOAT64},
-     {"y_vel", DataLogger::DataType::FLOAT64} 
-};
-
 class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override;
@@ -81,7 +49,7 @@ class Robot : public frc::TimedRobot {
   void DisabledPeriodic() override;
   void TestInit() override;
   void TestPeriodic() override;
-
+  ~Robot() override;
 
  private:
 
@@ -91,17 +59,16 @@ class Robot : public frc::TimedRobot {
 
   void climbFSM();
 
-  AHRS *m_navx = new AHRS(frc::SPI::Port::kMXP);
+  AHRS *m_navx;
 
-  std::string path = "/home/lvuser/robotlog.log";
-  DataLogger *m_logger = new DataLogger(path, datalog_fields);
+  DataLogger *m_logger;
   
-  Limelight *m_limelight = new Limelight();
+  Limelight *m_limelight;
 
   //TODO: auto executor
-  Swerve m_swerve{m_navx, m_logger}; //TODO: make pointers
+  Swerve *m_swerve; 
   Intake m_intake;
-  Shooter m_shooter{m_swerve, m_limelight};
+  Shooter *m_shooter;
   Climber m_climber;
   frc::Pose2d initPose; //this will need to be set as part of auto
 

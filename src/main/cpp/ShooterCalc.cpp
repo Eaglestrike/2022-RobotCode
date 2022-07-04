@@ -111,7 +111,7 @@ double ShooterCalc::y_offset_to_dist(double y_offset) {
  * @param l the limelight this class is referencing
  * @param s the swerve object this class is referencing
 **/
-ShooterCalc::ShooterCalc(Limelight& l, Swerve& s) : limelight(l), swerve(s) {
+ShooterCalc::ShooterCalc(Limelight* l, Swerve* s) : limelight(l), swerve(s) {
     
     //most recent settings, may need re-tuning
     dist_to_settings[y_offset_to_dist(-20.0)] = {-1800, 12000};
@@ -160,13 +160,13 @@ ShooterCalc::ShooterCalc(Limelight& l, Swerve& s) : limelight(l), swerve(s) {
  * @returns the calculated settings object
 **/
 ShooterCalc::Settings ShooterCalc::calculate() {
-    double dist = limelight.getDist();
+    double dist = limelight->getDist();
     double time = distance_to_time(dist);
 
-    frc::ChassisSpeeds speeds = swerve.getSpeeds();
+    frc::ChassisSpeeds speeds = swerve->getSpeeds();
 
-    double RVX = getXVel(speeds.vx.value(), speeds.vy.value(), swerve.getPose());
-    double RVY = getYVel(speeds.vx.value(), speeds.vy.value(), swerve.getPose());
+    double RVX = getXVel(speeds.vx.value(), speeds.vy.value(), swerve->getPose());
+    double RVY = getYVel(speeds.vx.value(), speeds.vy.value(), swerve->getPose());
 
     frc::SmartDashboard::PutNumber("Robot X velocity", RVX);
     frc::SmartDashboard::PutNumber("Robot Y velocity", RVY);

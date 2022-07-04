@@ -28,7 +28,7 @@ class Shooter{
             HOOD
         };
 
-        Shooter(Swerve& s, Limelight* l);
+        Shooter(Swerve* s, Limelight* l);
         ~Shooter();
         void Periodic(bool autonomous);
         void Aim();
@@ -65,7 +65,7 @@ class Shooter{
         //TalonFX in ticks - 0 - 20,000
         //in rpm - 0 -6000
         
-        Swerve& swerve; 
+        Swerve* swerve; 
 
         WPI_TalonFX m_flywheelMaster{ShooterConstants::shootMotorPortMaster, "rio"};
         WPI_TalonFX m_flywheelSlave{ShooterConstants::shootMotorPortSlave, "rio"};
@@ -85,7 +85,7 @@ class Shooter{
 
         Limelight * m_limelight;
 
-        ShooterCalc calc{*m_limelight, swerve};
+        ShooterCalc calc{m_limelight, swerve};
         ShooterCalc::Settings settings; //have a global settings object to be accessed in different places
 
         // Channel m_channel;
