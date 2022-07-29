@@ -25,6 +25,7 @@ class Limelight{
 
         std::pair<double, double> pixelsToAngle(double px, double py);
         std::tuple<double, double, double> angleToCoords(double ax, double ay, double targetHeight);
+        void sortCorners(std::vector<std::pair<double, double> >& rectCorners);
 
     private:
         void ReadPeriodicIn();

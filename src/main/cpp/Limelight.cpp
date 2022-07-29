@@ -195,3 +195,42 @@ std::tuple<double, double, double> angleToCoords(double ax, double ay, double ta
     
     return std::tuple(x, y, z);
 }
+
+struct AngleComparator {
+    std::pair<double, double> centerPoint;
+    AngleComparator(std::pair<double, double> centerPoint_) : centerPoint(centerPoint_) {};
+
+    bool operator ()(const std::pair<double, double>& a, const std::pair<double, double>& b) {
+        double angleA = atan2(centerPoint.second - a.second, centerPoint.first - a.first) * 180 / M_PI;
+        double angleB = atan2(centerPoint.second - b.second, centerPoint.first - b.first) * 180 / M_PI;
+
+        // TODO: adjust angles as needed to end up with final sorted array as follows:
+        // [topLeft, topRight, bottomRight, bottomLeft]
+
+        return angleA < angleB;
+    }
+};
+
+void sortCorners(std::vector<std::pair<double, double> >& rectCorners) {
+    // sorts corners in place
+    // rectCorners is a vector with 4 pairs -> each pair is a coordinate (x, y)
+    
+    // based on: https://stackoverflow.com/questions/22385776/how-to-best-sort-the-corners-of-a-rectangle-without-knowing-the-width-or-height
+    // and https://github.com/Mechanical-Advantage/RobotCode2022/blob/main/src/main/java/frc/robot/subsystems/vision/Vision.java
+
+    // calculate center point
+    double totalX = 0;
+    double totalY = 0;
+    for (int i = 0; i < rectCorners.size(); i++) {
+        totalX += rectCorners[i].first;
+        totalY += rectCorners[i].second;
+    }
+
+    std::pair<double, double> centerPoint(totalX / rectCorners.size(), totalY / rectCorners.size());
+
+    // sort by angle between center and point
+    sort(rectCorners.begin(), rectCorners.end(), AngleComparator(centerPoint));
+    // TODO: test this ^^
+
+    // TODO: switch last two values of array?
+}
