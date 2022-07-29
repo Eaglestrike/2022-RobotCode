@@ -119,3 +119,69 @@ Limelight::setLEDMode(std::string mode){
         network_table->PutNumber("ledMode", 3.0);
     }
 }
+
+// Pixels to Angles
+// returns the angle from the camera to the pixel
+std::pair<double, double> pixelsToAngle(double px, double py) {
+    // From here: https://docs.limelightvision.io/en/latest/theory.html#from-pixels-to-angles
+    const double H_FOV = 54;
+    const double V_FOV = 41;
+    const double IMG_WIDTH = 320;
+    const double IMG_HEIGHT = 240;
+
+    // normalized x and y
+    double nx = (1/(IMG_WIDTH/2)) * (px - 159.5);
+    double ny = (1/(IMG_HEIGHT/2)) * (119.5 - py);
+
+    // view plane width/height
+    double vpw = 2.0 * tan(H_FOV/2);
+    double vph = 2.0 * tan(V_FOV/2);
+
+    // view plane coordinates
+    double x = vpw/2 * nx;
+    double y = vph/2 * ny;
+
+    // calc angles
+    double ax = atan2(1, x); 
+    double ay = atan2(1, y);
+
+    std::pair ans(ax, ay);
+    return ans;
+}
+
+// angles to actual x, y, z of point
+std::tuple<double, double, double> angleToCoords(double ax, double ay, double targetHeight) {
+    // From: https://www.chiefdelphi.com/t/calculating-distance-to-vision-target/387183/6
+    // and https://www.chiefdelphi.com/t/what-does-limelight-skew-actually-measure/381167/7 
+
+    // ax and ay are the angles from the camera to the point 
+    // make sure x rotation is around y-axis
+    // make sure y rotation is around x-axis
+    double x = tan(ax);
+    double y = tan(ay);
+    double z = 1;
+
+    double length = sqrt(x*x + y*y + z*z);
+
+    // get normalized x, y, and z values
+    x = x/length;
+    y = y/length;
+    z = z/length;
+
+    // apply transformations to 3d vector (compensate for pitch) -> rotate down by camera pitch
+    // TODO: Look into finding libraries for this??
+    // multiply [x, y, z] vector by rotation matrix around x-axis
+
+    // denormalize coordinates via known height
+    double scale = (targetHeight - GeneralConstants::cameraHeight) / y;    
+
+    x *= scale;
+    y *= scale;
+    z *= scale;
+
+    x += GeneralConstants::cameraHeight;
+    y += GeneralConstants::cameraHeight;
+    z += GeneralConstants::cameraHeight;
+    
+    return std::tuple(x, y, z);
+}

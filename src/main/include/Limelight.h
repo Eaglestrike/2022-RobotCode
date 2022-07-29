@@ -22,6 +22,9 @@ class Limelight{
         void adjustAngles(double& ax, double& ay);
         double getAdjustedX();
 
+        std::pair<double, double> pixelsToAngle(double px, double py);
+        std::tuple<double, double, double> angleToCoords(double ax, double ay, double targetHeight);
+
     private:
         void ReadPeriodicIn();
         // void adjustAngles(double& ax, double& ay);
