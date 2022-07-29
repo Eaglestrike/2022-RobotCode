@@ -18,6 +18,9 @@ GeneralConstants{
 
     //In meters
     const double goalHeight = 2.641;
+    // TODO: check these values vv
+    const double targetHeightUpper = 2.641;
+    const double targetHeightLower = targetHeightUpper - 0.0508;
     const double cameraHeight = 0.5;
     const double cameraPitch = 42;
 

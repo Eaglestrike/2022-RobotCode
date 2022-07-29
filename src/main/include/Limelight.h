@@ -14,7 +14,7 @@ class Limelight{
         double getXOff();
         double getYOff();
         bool targetAquired();
-        std::vector<double> getCorners();
+        std::vector<std::vector<std::pair<double, double> > > getCorners();
         void setLEDMode(std::string mode);
         double getDist();
         frc::Pose2d getPose(double navx, double turretAngle);
@@ -26,6 +26,7 @@ class Limelight{
         std::pair<double, double> pixelsToAngle(double px, double py);
         std::tuple<double, double, double> angleToCoords(double ax, double ay, double targetHeight);
         void sortCorners(std::vector<std::pair<double, double> >& rectCorners);
+        std::vector<std::tuple<double, double, double> > getCoords();
 
     private:
         void ReadPeriodicIn();

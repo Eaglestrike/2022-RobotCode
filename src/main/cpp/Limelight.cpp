@@ -35,10 +35,26 @@ Limelight::targetAquired(){
 }
 
 // get corners
-std::vector<double> Limelight::getCorners() {
+std::vector<std::vector<std::pair<double, double> > > 
+Limelight::getCorners() {
     std::vector<double> corners = network_table->GetEntry("tcornxy").GetDoubleArray(std::vector<double>());
 
-    return corners;
+    std::vector<std::vector<std::pair<double, double> > > ans = std::vector<std::vector<std::pair<double, double> > >();
+    
+    // TODO: redo because only outputs top left, bottom right -> get working with custom vision pipeline
+    // format this array (vector of vectors of pairs)
+    // pairs are coordinates (x, y), vectors represent one rectangle, output holds rectangles
+    for (int i = 0; i < corners.size(); i += 8) {
+        std::vector<std::pair<double, double>> rectVector = std::vector<std::pair<double, double>>();
+        for (int j = i; j < i + 8; j += 2) {
+            rectVector.push_back(std::pair(corners[j], corners[j+1]));
+        }
+        ans.push_back(rectVector);
+    }
+
+    // TODO: refactor to use structs?
+
+    return ans;
 }
 
 void Limelight::adjustAngles(double& ax, double& ay)
@@ -129,7 +145,8 @@ Limelight::setLEDMode(std::string mode){
 
 // Pixels to Angles
 // returns the angle from the camera to the pixel
-std::pair<double, double> pixelsToAngle(double px, double py) {
+std::pair<double, double> 
+Limelight::pixelsToAngle(double px, double py) {
     // From here: https://docs.limelightvision.io/en/latest/theory.html#from-pixels-to-angles
     const double H_FOV = 54;
     const double V_FOV = 41;
@@ -157,7 +174,8 @@ std::pair<double, double> pixelsToAngle(double px, double py) {
 }
 
 // angles to actual x, y, z of point
-std::tuple<double, double, double> angleToCoords(double ax, double ay, double targetHeight) {
+std::tuple<double, double, double> 
+Limelight::angleToCoords(double ax, double ay, double targetHeight) {
     // From: https://www.chiefdelphi.com/t/calculating-distance-to-vision-target/387183/6
     // and https://www.chiefdelphi.com/t/what-does-limelight-skew-actually-measure/381167/7 
 
@@ -211,7 +229,8 @@ struct AngleComparator {
     }
 };
 
-void sortCorners(std::vector<std::pair<double, double> >& rectCorners) {
+void 
+Limelight::sortCorners(std::vector<std::pair<double, double> >& rectCorners) {
     // sorts corners in place
     // rectCorners is a vector with 4 pairs -> each pair is a coordinate (x, y)
     
@@ -233,4 +252,34 @@ void sortCorners(std::vector<std::pair<double, double> >& rectCorners) {
     // TODO: test this ^^
 
     // TODO: switch last two values of array?
+
+    // output: corners are sorted in following order: [top1, top2, bottom1, bottom2]
+}
+
+std::vector<std::tuple<double, double, double> > 
+Limelight::getCoords() {
+    std::vector<std::vector<std::pair<double, double> > > corners = getCorners();
+
+    std::vector<std::tuple<double, double, double> > coords = std::vector<std::tuple<double, double, double> > ();
+
+    for (int i = 0; i < corners.size(); i++) {
+        sortCorners(corners[i]);
+
+        // if (corners[i].size() != 4) {
+        //     std::cout << "Something went wrong... rectangle array corners is: " << corners[i].size();
+        // }
+
+        for (int j = 0; j < corners[i].size(); j++) {
+            std::pair<double, double> anglePair = pixelsToAngle(corners[i][j].first, corners[i][j].second);
+            coords.push_back(
+                angleToCoords(
+                    anglePair.first, 
+                    anglePair.second, 
+                    j < 2 ? GeneralConstants::targetHeightUpper : GeneralConstants::targetHeightLower
+                )
+            );
+        }
+    }
+
+    return coords;
 }
