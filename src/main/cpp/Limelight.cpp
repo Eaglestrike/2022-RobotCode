@@ -169,8 +169,11 @@ std::tuple<double, double, double> angleToCoords(double ax, double ay, double ta
     z = z/length;
 
     // apply transformations to 3d vector (compensate for pitch) -> rotate down by camera pitch
-    // TODO: Look into finding libraries for this??
     // multiply [x, y, z] vector by rotation matrix around x-axis
+    double theta = -GeneralConstants::cameraPitch * M_PI / 180; // for testing
+    x = x*1 + y*0 + z*0; // technically not necessary, but just for understandability
+    y = x*0 + y*cos(theta) + z*(-sin(theta));
+    z = x*0 + y*sin(theta) + z*cos(theta);
 
     // denormalize coordinates via known height
     double scale = (targetHeight - GeneralConstants::cameraHeight) / y;    
