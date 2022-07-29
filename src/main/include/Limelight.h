@@ -14,6 +14,7 @@ class Limelight{
         double getXOff();
         double getYOff();
         bool targetAquired();
+        std::vector<double> getCorners();
         void setLEDMode(std::string mode);
         double getDist();
         frc::Pose2d getPose(double navx, double turretAngle);

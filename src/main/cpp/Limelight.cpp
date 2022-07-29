@@ -34,6 +34,13 @@ Limelight::targetAquired(){
     }
 }
 
+// get corners
+std::vector<double> Limelight::getCorners() {
+    std::vector<double> corners = network_table->GetEntry("tcornxy").GetDoubleArray(std::vector<double>());
+
+    return corners;
+}
+
 void Limelight::adjustAngles(double& ax, double& ay)
 {
     double flippedY = (90 - ay) * M_PI / 180;
