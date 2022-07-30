@@ -151,31 +151,34 @@ Robot::TeleopPeriodic() {
     frc::SmartDashboard::PutNumber("Pose x", pose.X().value());
     frc::SmartDashboard::PutNumber("Pose y", pose.Y().value());
 
-    // //A
-    // if (xbox.GetRawButton(1)) {
-    //   m_swerve.test1ms();
-    // }
-    // else if (xbox.GetRawButton(2)) {
-    //   m_swerve.test2_5ms();
-    // }
-    // else if (xbox.GetRawButton(3)) {
-    //   m_swerve.test4ms();
-    // }
-    // else {
-    //    m_swerve.Periodic(
-    //   units::meters_per_second_t{0},
-    //   units::meters_per_second_t{0},
-    //   units::radians_per_second_t{0},
-    //   units::degree_t{m_navx->GetYaw()});
-    // }
+    //A
+    if (xbox.GetRawButton(1)) {
+      m_swerve.test1ms();
+      m_swerve.SetModulesStraight();
+    }
+    else if (xbox.GetRawButton(2)) {
+      m_swerve.test2_5ms();
+      m_swerve.SetModulesStraight();
+    }
+    else if (xbox.GetRawButton(3)) {
+      m_swerve.test4ms();
+      m_swerve.SetModulesStraight();
+    }
+    else {
+       m_swerve.Periodic(
+    units::meters_per_second_t{dy},
+    units::meters_per_second_t{dx},
+    units::radians_per_second_t{dtheta},
+    units::degree_t{m_navx->GetYaw()});
+    }
 
 
-    // frc::ChassisSpeeds speeds = m_swerve.getSpeeds();
-    // frc::SmartDashboard::PutNumber("x speed", speeds.vx.value());
-    // frc::SmartDashboard::PutNumber("y speed", speeds.vy.value());
+    frc::ChassisSpeeds speeds = m_swerve.getSpeeds();
+    frc::SmartDashboard::PutNumber("x speed", speeds.vx.value());
+    frc::SmartDashboard::PutNumber("y speed", speeds.vy.value());
 
-    // m_logger->get_float64("x_vel") = speeds.vx.value();
-    // m_logger->get_float64("y_vel") = speeds.vy.value();
+    m_logger->get_float64("x_vel") = speeds.vx.value();
+    m_logger->get_float64("y_vel") = speeds.vy.value();
 
   return; //for swerve testing, don't want to do other stuff
 
