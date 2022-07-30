@@ -218,21 +218,23 @@ struct AngleComparator {
     AngleComparator(LLCoordinate centerPoint_) : centerPoint(centerPoint_) {};
 
     bool operator ()(const LLCoordinate& a, const LLCoordinate& b) {
-        double angleA = atan2(centerPoint.second - a.second, centerPoint.first - a.first) * 180 / M_PI;
-        double angleB = atan2(centerPoint.second - b.second, centerPoint.first - b.first) * 180 / M_PI;
+        int angleA = atan2(centerPoint.second - a.second, centerPoint.first - a.first) * 180 / M_PI;
+        int angleB = atan2(centerPoint.second - b.second, centerPoint.first - b.first) * 180 / M_PI;
 
-        // TODO: adjust angles as needed to end up with final sorted array as follows:
+        // adjust angles as needed to end up with final sorted array as follows:
         // [topLeft, topRight, bottomRight, bottomLeft]
+        angleA = (angleA + 360) % 360;
+        angleB = (angleB + 360) % 360;
 
-        return angleA < angleB;
+        return angleA > angleB;
     }
 };
 
-void 
+void
 Limelight::sortCorners(LLRectangle& rectCorners) {
     // sorts corners in place
     // rectCorners is a vector with 4 pairs -> each pair is a coordinate (x, y)
-    
+
     // based on: https://stackoverflow.com/questions/22385776/how-to-best-sort-the-corners-of-a-rectangle-without-knowing-the-width-or-height
     // and https://github.com/Mechanical-Advantage/RobotCode2022/blob/main/src/main/java/frc/robot/subsystems/vision/Vision.java
 
@@ -248,11 +250,10 @@ Limelight::sortCorners(LLRectangle& rectCorners) {
 
     // sort by angle between center and point
     sort(rectCorners.begin(), rectCorners.end(), AngleComparator(centerPoint));
-    // TODO: test this ^^
 
-    // TODO: switch last two values of array?
-
-    // output: corners are sorted in following order: [top1, top2, bottom1, bottom2]
+    // switch last two values of array?
+    std::swap(rectCorners[2], rectCorners[3]);
+    // output: corners are sorted in following order: [topLeft, topRight, bottomLeft, bottomRight]
 }
 
 std::vector<LL3DCoordinate> 
