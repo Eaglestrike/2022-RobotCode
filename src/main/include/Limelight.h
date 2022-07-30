@@ -7,6 +7,9 @@
 #include "Constants.h"
 #include <math.h>
 
+typedef std::pair<double, double> LLCoordinate;
+typedef std::vector<LLCoordinate> LLRectangle;
+typedef std::tuple<double, double, double> LL3DCoordinate;
 
 class Limelight{
     public:
@@ -14,7 +17,7 @@ class Limelight{
         double getXOff();
         double getYOff();
         bool targetAquired();
-        std::vector<std::vector<std::pair<double, double> > > getCorners();
+        std::vector<LLRectangle> getCorners();
         void setLEDMode(std::string mode);
         double getDist();
         frc::Pose2d getPose(double navx, double turretAngle);
@@ -23,10 +26,7 @@ class Limelight{
         void adjustAngles(double& ax, double& ay);
         double getAdjustedX();
 
-        std::pair<double, double> pixelsToAngle(double px, double py);
-        std::tuple<double, double, double> angleToCoords(double ax, double ay, double targetHeight);
-        void sortCorners(std::vector<std::pair<double, double> >& rectCorners);
-        std::vector<std::tuple<double, double, double> > getCoords();
+        std::vector<LL3DCoordinate> getCoords();
 
     private:
         void ReadPeriodicIn();
@@ -44,4 +44,8 @@ class Limelight{
         const double HUB_HEIGHT = 2.7178; 
         const double CAM_HEIGHT = 0.52324;
         const double CAM_ANGLE = 40; //40 degrees I think
+
+        LLCoordinate pixelsToAngle(double px, double py);
+        LL3DCoordinate angleToCoords(double ax, double ay, double targetHeight);
+        void sortCorners(LLRectangle& rectCorners);
 };

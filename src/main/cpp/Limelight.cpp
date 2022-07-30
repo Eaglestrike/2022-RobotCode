@@ -35,24 +35,23 @@ Limelight::targetAquired(){
 }
 
 // get corners
-std::vector<std::vector<std::pair<double, double> > > 
+std::vector<LLRectangle> 
+// DOES NOT WORK CURRENTLY
 Limelight::getCorners() {
     std::vector<double> corners = network_table->GetEntry("tcornxy").GetDoubleArray(std::vector<double>());
 
-    std::vector<std::vector<std::pair<double, double> > > ans = std::vector<std::vector<std::pair<double, double> > >();
+    std::vector<LLRectangle> ans = std::vector<LLRectangle>();
     
     // TODO: redo because only outputs top left, bottom right -> get working with custom vision pipeline
     // format this array (vector of vectors of pairs)
     // pairs are coordinates (x, y), vectors represent one rectangle, output holds rectangles
     for (int i = 0; i < corners.size(); i += 8) {
-        std::vector<std::pair<double, double>> rectVector = std::vector<std::pair<double, double>>();
+        LLRectangle rectVector = LLRectangle();
         for (int j = i; j < i + 8; j += 2) {
             rectVector.push_back(std::pair(corners[j], corners[j+1]));
         }
         ans.push_back(rectVector);
     }
-
-    // TODO: refactor to use structs?
 
     return ans;
 }
@@ -174,7 +173,7 @@ Limelight::pixelsToAngle(double px, double py) {
 }
 
 // angles to actual x, y, z of point
-std::tuple<double, double, double> 
+LL3DCoordinate
 Limelight::angleToCoords(double ax, double ay, double targetHeight) {
     // From: https://www.chiefdelphi.com/t/calculating-distance-to-vision-target/387183/6
     // and https://www.chiefdelphi.com/t/what-does-limelight-skew-actually-measure/381167/7 
@@ -215,10 +214,10 @@ Limelight::angleToCoords(double ax, double ay, double targetHeight) {
 }
 
 struct AngleComparator {
-    std::pair<double, double> centerPoint;
-    AngleComparator(std::pair<double, double> centerPoint_) : centerPoint(centerPoint_) {};
+    LLCoordinate centerPoint;
+    AngleComparator(LLCoordinate centerPoint_) : centerPoint(centerPoint_) {};
 
-    bool operator ()(const std::pair<double, double>& a, const std::pair<double, double>& b) {
+    bool operator ()(const LLCoordinate& a, const LLCoordinate& b) {
         double angleA = atan2(centerPoint.second - a.second, centerPoint.first - a.first) * 180 / M_PI;
         double angleB = atan2(centerPoint.second - b.second, centerPoint.first - b.first) * 180 / M_PI;
 
@@ -230,7 +229,7 @@ struct AngleComparator {
 };
 
 void 
-Limelight::sortCorners(std::vector<std::pair<double, double> >& rectCorners) {
+Limelight::sortCorners(LLRectangle& rectCorners) {
     // sorts corners in place
     // rectCorners is a vector with 4 pairs -> each pair is a coordinate (x, y)
     
@@ -245,7 +244,7 @@ Limelight::sortCorners(std::vector<std::pair<double, double> >& rectCorners) {
         totalY += rectCorners[i].second;
     }
 
-    std::pair<double, double> centerPoint(totalX / rectCorners.size(), totalY / rectCorners.size());
+    LLCoordinate centerPoint(totalX / rectCorners.size(), totalY / rectCorners.size());
 
     // sort by angle between center and point
     sort(rectCorners.begin(), rectCorners.end(), AngleComparator(centerPoint));
@@ -256,11 +255,11 @@ Limelight::sortCorners(std::vector<std::pair<double, double> >& rectCorners) {
     // output: corners are sorted in following order: [top1, top2, bottom1, bottom2]
 }
 
-std::vector<std::tuple<double, double, double> > 
+std::vector<LL3DCoordinate> 
 Limelight::getCoords() {
-    std::vector<std::vector<std::pair<double, double> > > corners = getCorners();
+    std::vector<LLRectangle> corners = getCorners();
 
-    std::vector<std::tuple<double, double, double> > coords = std::vector<std::tuple<double, double, double> > ();
+    std::vector<LL3DCoordinate> coords = std::vector<LL3DCoordinate> ();
 
     for (int i = 0; i < corners.size(); i++) {
         sortCorners(corners[i]);
