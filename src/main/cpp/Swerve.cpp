@@ -1,10 +1,16 @@
 #include "Swerve.h"
 #include <iostream>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 //wrapper class for wpilib swerve
 //currently a mess cause I was trying to debug it
 
 Swerve::Swerve(AHRS * nx, DataLogger * logger) : m_navx{nx}, m_logger{logger} {
+
+   // outstream.open("/home/lvuser/odometry_out.txt", std::ofstream::out); //TEMPORARY - REMOVE
+   //freopen("/home/lvuser/odometry_out.txt", "w", stdout);
 
     m_fl_pid.EnableContinuousInput(-180, 180);
     m_fr_pid.EnableContinuousInput(-180, 180);
@@ -52,10 +58,10 @@ void Swerve::initializeOdometry(frc::Rotation2d gyroAngle, frc::Pose2d initPose)
 frc::ChassisSpeeds Swerve::getSpeeds() {
   wpi::array<frc::SwerveModuleState, 4> moduleStates(wpi::empty_array);
 
-  std::cout << "talon vel to mps 0: " << talonVelToMps(m_fl_speedMotor.GetSelectedSensorVelocity()).value() << "\n";
-  std::cout << "talon vel to mps 1: " << talonVelToMps(m_fr_speedMotor.GetSelectedSensorVelocity()).value() << "\n";
-  std::cout << "talon vel to mps 2: " << talonVelToMps(m_rl_speedMotor.GetSelectedSensorVelocity()).value() << "\n";
-  std::cout << "talon vel to mps 3: " << talonVelToMps(m_rr_speedMotor.GetSelectedSensorVelocity()).value() << "\n";
+  // std::cout << "talon vel to mps 0: " << talonVelToMps(m_fl_speedMotor.GetSelectedSensorVelocity()).value() << "\n";
+  // std::cout << "talon vel to mps 1: " << talonVelToMps(m_fr_speedMotor.GetSelectedSensorVelocity()).value() << "\n";
+  // std::cout << "talon vel to mps 2: " << talonVelToMps(m_rl_speedMotor.GetSelectedSensorVelocity()).value() << "\n";
+  // std::cout << "talon vel to mps 3: " << talonVelToMps(m_rr_speedMotor.GetSelectedSensorVelocity()).value() << "\n";
 
 
   moduleStates[0] = frc::SwerveModuleState{};
@@ -85,17 +91,23 @@ frc::ChassisSpeeds Swerve::getSpeeds() {
 void Swerve::test1ms() {
 
   m_fl_speedMotor.SetVoltage(units::volt_t{1.0});
-  m_fr_speedMotor.SetVoltage(units::volt_t{1.0});
+  m_fr_speedMotor.SetVoltage(units::volt_t{-1.0});
   m_rl_speedMotor.SetVoltage(units::volt_t{1.0});
-  m_rr_speedMotor.SetVoltage(units::volt_t{1.0});
+  m_rr_speedMotor.SetVoltage(units::volt_t{-1.0});
 
 }
 
 void Swerve::test2_5ms() {
  m_fl_speedMotor.SetVoltage(units::volt_t{4.0});
-  m_fr_speedMotor.SetVoltage(units::volt_t{4.0});
+  m_fr_speedMotor.SetVoltage(units::volt_t{-4.0});
   m_rl_speedMotor.SetVoltage(units::volt_t{4.0});
   m_rr_speedMotor.SetVoltage(units::volt_t{4.0});
+
+  // frc::SmartDashboard::PutNumber("fl speed:", m_fl_speedMotor.GetSelectedSensorVelocity());
+  // frc::SmartDashboard::PutNumber("fr speed:", m_fr_speedMotor.GetSelectedSensorVelocity());
+  // frc::SmartDashboard::PutNumber("rl speed:", m_rl_speedMotor.GetSelectedSensorVelocity());
+  // frc::SmartDashboard::PutNumber("rr speed:", m_rr_speedMotor.GetSelectedSensorVelocity());
+
 }
 
 void Swerve::test4ms() {
@@ -163,17 +175,23 @@ void Swerve::SetModulesStraight() {
 void Swerve::Periodic(units::meters_per_second_t dx, units::meters_per_second_t dy, units::radians_per_second_t dtheta, 
 units::degree_t navx_yaw) {
 
-  frc::SmartDashboard::PutNumber("fl pos: ", m_fl_speedMotor.GetSelectedSensorPosition());
-  frc::SmartDashboard::PutNumber("fr pos: ", m_fr_speedMotor.GetSelectedSensorPosition());
-  frc::SmartDashboard::PutNumber("rl pos: ", m_rl_speedMotor.GetSelectedSensorPosition());
-  frc::SmartDashboard::PutNumber("rr pos: ", m_rr_speedMotor.GetSelectedSensorPosition());
+  // frc::SmartDashboard::PutNumber("fl pos: ", m_fl_speedMotor.GetSelectedSensorPosition());
+  // frc::SmartDashboard::PutNumber("fr pos: ", m_fr_speedMotor.GetSelectedSensorPosition());
+  // frc::SmartDashboard::PutNumber("rl pos: ", m_rl_speedMotor.GetSelectedSensorPosition());
+  // frc::SmartDashboard::PutNumber("rr pos: ", m_rr_speedMotor.GetSelectedSensorPosition());
 
-  if (abs(dy.value()) < 0.35) dy = units::meters_per_second_t{0};
+  // frc::SmartDashboard::PutNumber("Dx 1", dx.value());
+  // frc::SmartDashboard::PutNumber("Dy 1", dy.value());
 
-  // frc::SmartDashboard::PutNumber("Dx", dx.value());
-  // frc::SmartDashboard::PutNumber("Dy", dy.value());
-  // frc::SmartDashboard::PutNumber("Dtheta", dtheta.value());
-  // frc::SmartDashboard::PutNumber("navx yaw", navx_yaw.value());
+
+  //in mps, not joystck units
+  if (abs(dy.value()) < 0.5) dy = units::meters_per_second_t{0};
+  if (abs(dx.value()) < 0.5) dx = units::meters_per_second_t{0};
+
+  frc::SmartDashboard::PutNumber("Dx", dx.value());
+  frc::SmartDashboard::PutNumber("Dy", dy.value());
+  frc::SmartDashboard::PutNumber("Dtheta", dtheta.value());
+  frc::SmartDashboard::PutNumber("navx yaw", navx_yaw.value());
 
 
   // The desired field relative speed here is dx meters per second
@@ -188,11 +206,33 @@ units::degree_t navx_yaw) {
   // individual SwerveModuleState components.
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds);
 
+   wpi::array<frc::SwerveModuleState, 4> moduleStates(wpi::empty_array);
 
-  odometry->Update(navx_yaw, fl, fr, bl, br);
+  moduleStates[0] = frc::SwerveModuleState{};
+  moduleStates[0].speed = talonVelToMps(m_fl_speedMotor.GetSelectedSensorVelocity());
+  moduleStates[0].angle = frc::Rotation2d{units::angle::degree_t{m_fl_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
+
+  moduleStates[1] = frc::SwerveModuleState{};
+  moduleStates[1].speed = talonVelToMps(m_fr_speedMotor.GetSelectedSensorVelocity());
+  moduleStates[1].angle = frc::Rotation2d{units::angle::degree_t{m_fr_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
+    
+  moduleStates[2] = frc::SwerveModuleState{};
+  moduleStates[2].speed = talonVelToMps(m_rl_speedMotor.GetSelectedSensorVelocity());
+  moduleStates[2].angle = frc::Rotation2d{units::angle::degree_t{m_rl_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
+
+  moduleStates[3] = frc::SwerveModuleState{};
+  moduleStates[3].speed = talonVelToMps(m_rr_speedMotor.GetSelectedSensorVelocity());
+  moduleStates[3].angle = frc::Rotation2d{units::angle::degree_t{m_rr_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
+
+
+  std::cout << odometry->GetPose().X().value() << "\t" << odometry->GetPose().Y().value() << "\n";
+ // outstream << odometry->GetPose().X().value() << "\t" << odometry->GetPose().Y().value() << "\n";
+
+  odometry->Update(navx_yaw, moduleStates);
 
   frc::SmartDashboard::PutNumber("odometry x", odometry->GetPose().X().value());
   frc::SmartDashboard::PutNumber("odometry y", odometry->GetPose().Y().value());
+
 
 
   // //raw reported encoder reading, convrted to degrees

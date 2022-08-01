@@ -43,6 +43,8 @@ class Swerve {
 
     DataLogger * m_logger{nullptr};
 
+    std::ofstream outstream; //TEMPORARY - REMOVE
+
     AHRS * m_navx;
 
     double ticksToDeg(double ticks) { 

@@ -133,7 +133,7 @@ Robot::TeleopPeriodic() {
   double dx = -l_joy.GetX();
   double dy = -l_joy.GetY();
   double dtheta = r_joy.GetX();
-  dx = abs(dx) < 0.05 ? 0.0: dx;
+  dx = abs(dx) < 0.3 ? 0.0: dx;
   dy = abs(dy) < 0.05 ? 0.0: dy;
   dtheta = abs(dtheta) < 0.05 ? 0.0: dtheta;
 
@@ -144,33 +144,33 @@ Robot::TeleopPeriodic() {
   m_swerve.Periodic(
     units::meters_per_second_t{dy},
     units::meters_per_second_t{dx},
-    units::radians_per_second_t{dtheta},
+    units::radians_per_second_t{0.7*dtheta},
     units::degree_t{m_navx->GetYaw()});
 
     frc::Pose2d pose = m_limelight->getPose(m_navx->GetYaw(), m_shooter.getTurretAngle());
-    frc::SmartDashboard::PutNumber("Pose x", pose.X().value());
-    frc::SmartDashboard::PutNumber("Pose y", pose.Y().value());
+   // frc::SmartDashboard::PutNumber("Pose x", pose.X().value());
+   // frc::SmartDashboard::PutNumber("Pose y", pose.Y().value());
 
-    //A
-    if (xbox.GetRawButton(1)) {
-      m_swerve.test1ms();
-      m_swerve.SetModulesStraight();
-    }
-    else if (xbox.GetRawButton(2)) {
-      m_swerve.test2_5ms();
-      m_swerve.SetModulesStraight();
-    }
-    else if (xbox.GetRawButton(3)) {
-      m_swerve.test4ms();
-      m_swerve.SetModulesStraight();
-    }
-    else {
-       m_swerve.Periodic(
-    units::meters_per_second_t{dy},
-    units::meters_per_second_t{dx},
-    units::radians_per_second_t{dtheta},
-    units::degree_t{m_navx->GetYaw()});
-    }
+   // A
+    // if (xbox.GetRawButton(1)) {
+    //   m_swerve.test1ms();
+    //   m_swerve.SetModulesStraight();
+    // }
+    // else if (xbox.GetRawButton(2)) { //B
+    //   m_swerve.test2_5ms();
+    //   m_swerve.SetModulesStraight();
+    // }
+    // else if (xbox.GetRawButton(3)) { //X
+    //   m_swerve.test4ms();
+    //   m_swerve.SetModulesStraight();
+    // }
+    // else {
+    //    m_swerve.Periodic(
+    // units::meters_per_second_t{dy},
+    // units::meters_per_second_t{dx},
+    // units::radians_per_second_t{dtheta},
+    // units::degree_t{m_navx->GetYaw()});
+    // }
 
 
     frc::ChassisSpeeds speeds = m_swerve.getSpeeds();
