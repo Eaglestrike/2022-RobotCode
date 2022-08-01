@@ -39,7 +39,7 @@ std::vector<LLRectangle>
 // DOES NOT WORK CURRENTLY
 Limelight::getCorners() {
     std::vector<double> corners = network_table->GetEntry("tcornxy").GetDoubleArray(std::vector<double>());
-
+    corners = {75, 181,83, 181,83, 177,75, 177,93, 179,93, 182,102, 184,102, 181,111, 183,111, 186,119, 189,119, 186}; // TODO: get rid of this later (for testing)
     std::vector<LLRectangle> ans = std::vector<LLRectangle>();
     
     // TODO: redo because only outputs top left, bottom right -> get working with custom vision pipeline
@@ -48,7 +48,7 @@ Limelight::getCorners() {
     for (int i = 0; i < corners.size(); i += 8) {
         LLRectangle rectVector = LLRectangle();
         for (int j = i; j < i + 8; j += 2) {
-            rectVector.push_back(std::pair(corners[j], corners[j+1]));
+            rectVector.push_back(std::make_pair(corners[j], corners[j+1]));
         }
         ans.push_back(rectVector);
     }
@@ -168,7 +168,7 @@ Limelight::pixelsToAngle(double px, double py) {
     double ax = atan2(1, x); 
     double ay = atan2(1, y);
 
-    std::pair ans(ax, ay);
+    std::pair<double, double> ans(ax, ay);
     return ans;
 }
 
@@ -210,7 +210,14 @@ Limelight::angleToCoords(double ax, double ay, double targetHeight) {
     y += GeneralConstants::cameraHeight;
     z += GeneralConstants::cameraHeight;
     
-    return std::tuple(x, y, z);
+    return std::make_tuple(x, y, z);
+}
+
+int angleBetween(const LLCoordinate point, const LLCoordinate centerPoint) {
+    int angleA = atan2(centerPoint.second - point.second, centerPoint.first - point.first) * 180 / M_PI;
+    angleA = (angleA + 360) % 360;
+
+    return angleA;
 }
 
 struct AngleComparator {
@@ -218,15 +225,7 @@ struct AngleComparator {
     AngleComparator(LLCoordinate centerPoint_) : centerPoint(centerPoint_) {};
 
     bool operator ()(const LLCoordinate& a, const LLCoordinate& b) {
-        int angleA = atan2(centerPoint.second - a.second, centerPoint.first - a.first) * 180 / M_PI;
-        int angleB = atan2(centerPoint.second - b.second, centerPoint.first - b.first) * 180 / M_PI;
-
-        // adjust angles as needed to end up with final sorted array as follows:
-        // [topLeft, topRight, bottomRight, bottomLeft]
-        angleA = (angleA + 360) % 360;
-        angleB = (angleB + 360) % 360;
-
-        return angleA > angleB;
+        return angleBetween(a, centerPoint) > angleBetween(b, centerPoint);
     }
 };
 
