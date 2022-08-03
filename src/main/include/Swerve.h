@@ -41,11 +41,11 @@ class Swerve {
 
     private:
 
+    AHRS * m_navx;
+    
     DataLogger * m_logger{nullptr};
 
     std::ofstream outstream; //TEMPORARY - REMOVE
-
-    AHRS * m_navx;
 
     double ticksToDeg(double ticks) { 
         return frc::InputModulus(ticks, -1024.0, 1024.0) / 1024.0 * 180.0; //SHOULD result in being between -180 and 180
