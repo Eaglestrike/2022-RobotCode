@@ -193,7 +193,7 @@ Robot::TeleopPeriodic() {
     units::radians_per_second_t{0.7*dtheta},
     units::degree_t{m_navx->GetYaw()});
     
-    frc::Pose2d pose = m_limelight->getPose(m_navx->GetYaw(), m_shooter.getTurretAngle());
+    frc::Pose2d pose = m_limelight->getPose(m_navx->GetYaw(), m_shooter->getTurretAngle());
    // frc::SmartDashboard::PutNumber("Pose x", pose.X().value());
    // frc::SmartDashboard::PutNumber("Pose y", pose.Y().value());
 
@@ -220,8 +220,8 @@ Robot::TeleopPeriodic() {
     // frc::SmartDashboard::PutNumber("x speed", speeds.vx.value());
     // frc::SmartDashboard::PutNumber("y speed", speeds.vy.value());
 
-    m_logger->get_float64("x_vel") = speeds.vx.value();
-    m_logger->get_float64("y_vel") = speeds.vy.value();
+    // m_logger->get_float64("x_vel") = speeds.vx.value();
+    // m_logger->get_float64("y_vel") = speeds.vy.value();
 
   return; //for swerve testing, don't want to do other stuff
 
