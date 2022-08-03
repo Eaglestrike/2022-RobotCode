@@ -179,7 +179,7 @@ Robot::TeleopPeriodic() {
   double dx = -l_joy.GetX();
   double dy = -l_joy.GetY();
   double dtheta = r_joy.GetX();
-  dx = abs(dx) < 0.05 ? 0.0: dx;
+  dx = abs(dx) < 0.3 ? 0.0: dx;
   dy = abs(dy) < 0.05 ? 0.0: dy;
   dtheta = abs(dtheta) < 0.05 ? 0.0: dtheta;
 
@@ -190,14 +190,14 @@ Robot::TeleopPeriodic() {
   m_swerve->Periodic(
     units::meters_per_second_t{dy},
     units::meters_per_second_t{dx},
-    units::radians_per_second_t{dtheta},
+    units::radians_per_second_t{0.7*dtheta},
     units::degree_t{m_navx->GetYaw()});
+    
+    frc::Pose2d pose = m_limelight->getPose(m_navx->GetYaw(), m_shooter.getTurretAngle());
+   // frc::SmartDashboard::PutNumber("Pose x", pose.X().value());
+   // frc::SmartDashboard::PutNumber("Pose y", pose.Y().value());
 
-    frc::Pose2d pose = m_limelight->getPose(m_navx->GetYaw(), m_shooter->getTurretAngle());
-    frc::SmartDashboard::PutNumber("Pose x", pose.X().value());
-    frc::SmartDashboard::PutNumber("Pose y", pose.Y().value());
-
-    // //A
+   // A
     // if (xbox.GetRawButton(1)) {
     //   m_swerve->test1ms();
     // }
@@ -220,8 +220,8 @@ Robot::TeleopPeriodic() {
     // frc::SmartDashboard::PutNumber("x speed", speeds.vx.value());
     // frc::SmartDashboard::PutNumber("y speed", speeds.vy.value());
 
-    // m_logger->get_float64("x_vel") = speeds.vx.value();
-    // m_logger->get_float64("y_vel") = speeds.vy.value();
+    m_logger->get_float64("x_vel") = speeds.vx.value();
+    m_logger->get_float64("y_vel") = speeds.vy.value();
 
   return; //for swerve testing, don't want to do other stuff
 

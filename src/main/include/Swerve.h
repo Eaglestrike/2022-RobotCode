@@ -36,6 +36,8 @@ class Swerve {
         void test2_5ms();
         void test4ms();
 
+        void SetModulesStraight();
+
 
     private:
 
@@ -43,6 +45,7 @@ class Swerve {
     
     DataLogger * m_logger{nullptr};
 
+    std::ofstream outstream; //TEMPORARY - REMOVE
 
     double ticksToDeg(double ticks) { 
         return frc::InputModulus(ticks, -1024.0, 1024.0) / 1024.0 * 180.0; //SHOULD result in being between -180 and 180
@@ -55,9 +58,9 @@ class Swerve {
     //converts raw talon velocity to meters per second
     //raw velocity units are ticks per 100ms
     units::meters_per_second_t talonVelToMps(double vel) {
-        double wheel_radius = 0.05;
+        double wheel_radius = 0.05; //in meters
         double meters_per_rev = wheel_radius*2*M_PI; //wheel circumberence
-        double ticks_per_rev = 2048;
+        double ticks_per_rev = 12650;
         return units::meters_per_second_t{vel / 0.1 * (meters_per_rev / ticks_per_rev)};
 
     }

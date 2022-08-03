@@ -1,5 +1,6 @@
 //actually I made the limelight class
 #include "Limelight.h"
+#include <iostream>
 
 
 Limelight::Limelight(){
@@ -93,6 +94,12 @@ frc::Pose2d Limelight::getPose(double navx, double turretAngle) {
     // frc::SmartDashboard::PutNumber("angleToGoal", angleToGoal);
     // frc::SmartDashboard::PutNumber("Pose x", x);
     // frc::SmartDashboard::PutNumber("Pose y", y);
+
+
+    // std::vector<double> v = network_table->GetNumberArray("tcornxy", wpi::span<double, std::size_t{0}>{});
+    // for (double d : v) std::cout << d << "\n";
+    // std::cout << "\n";
+
 
     return frc::Pose2d{units::meter_t{x}, units::meter_t{y}, frc::Rotation2d{units::degree_t{navx}}};
 }
