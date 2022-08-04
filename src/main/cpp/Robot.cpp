@@ -2,6 +2,7 @@
 #include <iostream>
 #include <frc/smartdashboard/SmartDashboard.h>
 
+//initialize data to log
 static const DataLogger::DataFields datalog_fields = {
   // {"swerve.fl.raw_yaw", DataLogger::DataType::FLOAT64},
   // {"swerve.fl.calib_yaw", DataLogger::DataType::FLOAT64},
@@ -40,16 +41,17 @@ static const DataLogger::DataFields datalog_fields = {
 void 
 Robot::RobotInit() {
 
+  //to know if we're blue or red because we can't shoot wrong color balls
   m_chooser.SetDefaultOption("Blue", blueAlliance);
-  m_chooser.AddOption("RED", redAlliance);
+  m_chooser.AddOption("Red", redAlliance);
   frc::SmartDashboard::PutData("Alliance Color", &m_chooser);
 
-  //select auto mode
-
+  //select auto mode (TODO: auto)
   frc::SmartDashboard::PutData("Auto Mode", &m_autoMode);
   
   camera = frc::CameraServer::GetInstance()->StartAutomaticCapture();
 
+  //instentiate classes
   try {
     m_limelight = new Limelight();
   } catch (const std::exception& e) {
@@ -80,7 +82,7 @@ Robot::RobotInit() {
   } catch (const std::exception& e) {
     std::cout << e.what() << std::endl;
   }
-
+  //don't start in climbing mode
   m_climbing = false;
 
 }
@@ -98,21 +100,16 @@ Robot::RobotPeriodic() {
 void 
 Robot::AutonomousInit() {
 
-  //call periodic method of appropriate auto
-
   m_shooter->Zero();
   m_swerve->initializeOdometry(frc::Rotation2d{units::degree_t{m_navx->GetYaw()}}, initPose);
   //initialize auto 
-  m_time = 0;
-  //do i need swerve initialization?
-  m_intake.Deploy();
+  m_intake.Deploy(); //keep this or no?
   m_shooter->setState(Shooter::State::IDLE);
   m_intake.setState(Intake::State::IDLE);
   m_shooter->enablelimelight();
   
   PDH.ClearStickyFaults();
   m_navx->Reset();
-  m_shooter->enablelimelight();
 }
 
 
@@ -120,7 +117,6 @@ Robot::AutonomousInit() {
 // Calls appropriate subsystem functions based on state
 void 
 Robot::AutonomousPeriodic() {
-  m_time += m_timeStep;
   double yaw = m_navx->GetYaw();
 
   //auto FSM periodic
@@ -142,7 +138,6 @@ Robot::TeleopInit() {
     m_shooter->setColor(false);
   }
 
-  m_time = 0;
   m_navx->Reset();
 
   m_shooter->setState(Shooter::State::IDLE);
@@ -167,19 +162,17 @@ Robot::TeleopInit() {
 
 
 // Called every 20 ms during teleop
+// runs and calls all robot actions
 void 
 Robot::TeleopPeriodic() {
 
-  m_logger->publish(); //should probably go at the end, just putting here to avoid premature returns
-   
-  m_time += m_timeStep;
+  m_logger->publish(); //should probably go at the end, just putting here to accomodate premature returns
 
-  //Get joystick values, apply deadband (if the abs val is < 0.05 it's probably wind or smth)
-  
+  //Get joystick values, apply deadband
   double dx = -l_joy.GetX();
   double dy = -l_joy.GetY();
   double dtheta = r_joy.GetX();
-  dx = abs(dx) < 0.3 ? 0.0: dx;
+  dx = abs(dx) < 0.05 ? 0.0: dx; //TODO: used to be 0.3, think that's a mistake?
   dy = abs(dy) < 0.05 ? 0.0: dy;
   dtheta = abs(dtheta) < 0.05 ? 0.0: dtheta;
 
@@ -190,13 +183,15 @@ Robot::TeleopPeriodic() {
   m_swerve->Periodic(
     units::meters_per_second_t{dy},
     units::meters_per_second_t{dx},
-    units::radians_per_second_t{0.7*dtheta},
+    units::radians_per_second_t{0.7*dtheta}, 
     units::degree_t{m_navx->GetYaw()});
     
-    frc::Pose2d pose = m_limelight->getPose(m_navx->GetYaw(), m_shooter->getTurretAngle());
+   //Limelight pose test 
+   // frc::Pose2d pose = m_limelight->getPose(m_navx->GetYaw(), m_shooter->getTurretAngle());
    // frc::SmartDashboard::PutNumber("Pose x", pose.X().value());
    // frc::SmartDashboard::PutNumber("Pose y", pose.Y().value());
 
+  //Swerve speed test (TODO: remake if we're going to do again because current implementation is terrible)
    // A
     // if (xbox.GetRawButton(1)) {
     //   m_swerve->test1ms();
@@ -214,7 +209,6 @@ Robot::TeleopPeriodic() {
     //   units::radians_per_second_t{0},
     //   units::degree_t{m_navx->GetYaw()});
     // }
-
 
     // frc::ChassisSpeeds speeds = m_swerve->getSpeeds();
     // frc::SmartDashboard::PutNumber("x speed", speeds.vx.value());
@@ -292,32 +286,36 @@ Robot::TeleopPeriodic() {
   
 }
 
+
 void Robot::climbFSM() {
-    m_time_climb +=m_timeStep;
-    if(m_time_climb < 0.75){
-      m_shooter->Climb();
-    }
-    else if(xbox.GetRawButtonPressed(2)){
-      m_climber.ExtendsecondStage();
-    }
-    else if(xbox.GetRawButtonPressed(3)){
-      m_climber.ExtendfirstStage();
-    }
-    else if(abs(xbox.GetRawAxis(1)) > 0.05){
-      out = xbox.GetRawAxis(1);
-      m_climber.armExtension(out);
-    }
-    else if(abs(xbox.GetRawAxis(4)) > 0.2 ){
-      m_shooter->Manual(xbox.GetRawAxis(4));
-      m_shooter->setState(Shooter::State::MANUAL);
-    }
-    else {
-      m_shooter->Manual(0);
-      m_climber.armExtension(0);
-    }
+    // m_time_climb +=m_timeStep;
+    // if(m_time_climb < 0.75){
+    //   m_shooter->Climb();
+    // }
+    // else if(xbox.GetRawButtonPressed(2)){
+    //   m_climber.ExtendsecondStage();
+    // }
+    // else if(xbox.GetRawButtonPressed(3)){
+    //   m_climber.ExtendfirstStage();
+    // }
+    // else if(abs(xbox.GetRawAxis(1)) > 0.05){
+    //   out = xbox.GetRawAxis(1);
+    //   m_climber.armExtension(out);
+    // }
+    // else if(abs(xbox.GetRawAxis(4)) > 0.2 ){
+    //   m_shooter->Manual(xbox.GetRawAxis(4));
+    //   m_shooter->setState(Shooter::State::MANUAL);
+    // }
+    // else {
+    //   m_shooter->Manual(0);
+    //   m_climber.armExtension(0);
+    // }
 }
 
-// Not used but feel free to add stuff here
+
+//test init and periodic can be called during a separate testing mode
+//disabled init and periodic are called at the start/during disabled mode
+
 void 
 Robot::TestInit() {}
 
@@ -329,9 +327,10 @@ Robot::DisabledInit() {}
 
 void 
 Robot::DisabledPeriodic() {
- // m_swerve->DisabledPeriodic(nullptr);
+
 }
 
+//deconstructor, delete all classes to ensure they don't clog up memory
 Robot::~Robot() {
   delete m_limelight;
   delete m_navx;
