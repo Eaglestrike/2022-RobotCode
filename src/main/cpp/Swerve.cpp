@@ -31,10 +31,10 @@ Swerve::Swerve(AHRS * nx, DataLogger * logger) : m_navx{nx}, m_logger{logger} {
     m_rl_angleMotor.SetNeutralMode(NeutralMode::Brake);
     m_rr_angleMotor.SetNeutralMode(NeutralMode::Brake);
 
-    m_fl_speedMotor.SetNeutralMode(NeutralMode::Brake);
-    m_fr_speedMotor.SetNeutralMode(NeutralMode::Brake);
-    m_rl_speedMotor.SetNeutralMode(NeutralMode::Brake);
-    m_rr_speedMotor.SetNeutralMode(NeutralMode::Brake);
+    m_fl_speedMotor.SetNeutralMode(NeutralMode::Coast);
+    m_fr_speedMotor.SetNeutralMode(NeutralMode::Coast);
+    m_rl_speedMotor.SetNeutralMode(NeutralMode::Coast);
+    m_rr_speedMotor.SetNeutralMode(NeutralMode::Coast);
 
 
     m_fl_speedMotor.SetSelectedSensorPosition(0);
@@ -52,7 +52,12 @@ void Swerve::initializeOdometry(frc::Rotation2d gyroAngle, frc::Pose2d initPose)
 
 //get the robot's speed (as a 2d vector)
 frc::ChassisSpeeds Swerve::getSpeeds() {
-  return m_kinematics.ToChassisSpeeds(GetRealModuleStates());
+  frc::ChassisSpeeds speeds = m_kinematics.ToChassisSpeeds(GetRealModuleStates());
+  frc::Translation2d t{units::meter_t{speeds.vx.value()}, units::meter_t{speeds.vy.value()}}; //yes i know this is bad but it's required for wpilib vector rotation
+  t.RotateBy(frc::Rotation2d{units::degree_t{m_navx->GetYaw()}});
+  speeds.vx = units::meters_per_second_t{t.X().value()};
+  speeds.vy = units::meters_per_second_t{t.Y().value()};
+  return speeds;
 }
 
 //returns an object that contains the speed and angle of each swerve module
@@ -62,19 +67,19 @@ wpi::array<frc::SwerveModuleState, 4> Swerve::GetRealModuleStates() {
 
   moduleStates[0] = frc::SwerveModuleState{};
   moduleStates[0].speed = talonVelToMps(m_fl_speedMotor.GetSelectedSensorVelocity());
-  moduleStates[0].angle = frc::Rotation2d{units::angle::degree_t{m_fl_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
+  moduleStates[0].angle = frc::Rotation2d{units::angle::degree_t{m_fl_canCoder.GetAbsolutePosition() + DriveConstants::FLOFF}};
 
   moduleStates[1] = frc::SwerveModuleState{};
   moduleStates[1].speed = talonVelToMps(m_fr_speedMotor.GetSelectedSensorVelocity());
-  moduleStates[1].angle = frc::Rotation2d{units::angle::degree_t{m_fr_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
+  moduleStates[1].angle = frc::Rotation2d{units::angle::degree_t{m_fr_canCoder.GetAbsolutePosition() + DriveConstants::FROFF}};
     
   moduleStates[2] = frc::SwerveModuleState{};
   moduleStates[2].speed = talonVelToMps(m_rl_speedMotor.GetSelectedSensorVelocity());
-  moduleStates[2].angle = frc::Rotation2d{units::angle::degree_t{m_rl_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
+  moduleStates[2].angle = frc::Rotation2d{units::angle::degree_t{m_rl_canCoder.GetAbsolutePosition() + DriveConstants::BLOFF}};
 
   moduleStates[3] = frc::SwerveModuleState{};
   moduleStates[3].speed = talonVelToMps(m_rr_speedMotor.GetSelectedSensorVelocity());
-  moduleStates[3].angle = frc::Rotation2d{units::angle::degree_t{m_rr_canCoder.GetAbsolutePosition() + m_navx->GetYaw()}};
+  moduleStates[3].angle = frc::Rotation2d{units::angle::degree_t{m_rr_canCoder.GetAbsolutePosition() + DriveConstants::BROFF}};
 
   return moduleStates;
 }
@@ -121,6 +126,7 @@ units::degree_t navx_yaw) {
   // individual SwerveModuleState components.
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds);
   
+  std::cout << "odom x: " << odometry->GetPose().X().value() << "\t" << " odom y: " << odometry->GetPose().Y().value() << "\n";
   frc::SmartDashboard::PutNumber("odometry x", odometry->GetPose().X().value());
   frc::SmartDashboard::PutNumber("odometry y", odometry->GetPose().Y().value());
   std::cout << odometry->GetPose().X().value() << "\t" << odometry->GetPose().Y().value() << "\n";

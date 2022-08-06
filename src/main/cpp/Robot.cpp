@@ -52,36 +52,39 @@ Robot::RobotInit() {
   camera = frc::CameraServer::GetInstance()->StartAutomaticCapture();
 
   //instentiate classes
+ // std::cout << "Here before initialization\n";
   try {
     m_limelight = new Limelight();
   } catch (const std::exception& e) {
     std::cout << e.what() << std::endl;
   }
-  
+ // std::cout << "Here after limelight\n";
   try {
     m_navx = new AHRS(frc::SPI::Port::kMXP);
   } catch(const std::exception& e) {
     std::cout << e.what() <<std::endl;
   }
-
+ // std::cout << "Here after navx\n";
   std::string path = "/home/lvuser/robotlog.log";
   try {
     m_logger = new DataLogger(path, datalog_fields);
   } catch (const std::exception& e){
     std::cout << e.what() <<std::endl;
   }
-
+ // std::cout << "Here after logger\n";
   try {
     m_swerve = new Swerve(m_navx, m_logger);
   } catch (const std::exception& e) {
     std::cout << e.what() << std::endl;
   }
-
+ // std::cout << "Here after swerve\n";
   try {
     m_shooter = new Shooter(m_swerve, m_limelight);
   } catch (const std::exception& e) {
     std::cout << e.what() << std::endl;
   }
+ // std::cout << "Here after shooter\n";
+ // std::cout << "Here after initialization\n";
   //don't start in climbing mode
   m_climbing = false;
 
@@ -157,7 +160,6 @@ Robot::TeleopInit() {
   //m_shooter->Periodic(false);
   m_intake.Periodic();
   m_climber.Initialize();
-
 }
 
 
@@ -180,11 +182,13 @@ Robot::TeleopPeriodic() {
   joy_val_to_mps(dy);
   joy_rot_to_rps(dtheta);
 
-  m_swerve->Periodic(
-    units::meters_per_second_t{dy},
-    units::meters_per_second_t{dx},
-    units::radians_per_second_t{0.7*dtheta}, 
-    units::degree_t{m_navx->GetYaw()});
+  // m_swerve->Periodic(
+  //   units::meters_per_second_t{dy},
+  //   units::meters_per_second_t{dx},
+  //   units::radians_per_second_t{0.7*dtheta}, 
+  //   units::degree_t{m_navx->GetYaw()});
+
+//    std::cout << "In periodic\n";
     
    //Limelight pose test 
    // frc::Pose2d pose = m_limelight->getPose(m_navx->GetYaw(), m_shooter->getTurretAngle());
@@ -192,23 +196,36 @@ Robot::TeleopPeriodic() {
    // frc::SmartDashboard::PutNumber("Pose y", pose.Y().value());
 
   //Swerve speed test (TODO: remake if we're going to do again because current implementation is terrible)
-   // A
-    // if (xbox.GetRawButton(1)) {
-    //   m_swerve->test1ms();
-    // }
-    // else if (xbox.GetRawButton(2)) {
-    //   m_swerve->test2_5ms();
-    // }
-    // else if (xbox.GetRawButton(3)) {
-    //   m_swerve->test4ms();
-    // }
-    // else {
-    //    m_swerve->Periodic(
-    //   units::meters_per_second_t{0},
-    //   units::meters_per_second_t{0},
-    //   units::radians_per_second_t{0},
-    //   units::degree_t{m_navx->GetYaw()});
-    // }
+  // A
+    if (xbox.GetRawButton(1)) {
+       m_swerve->Periodic(
+        units::meters_per_second_t{1},
+        units::meters_per_second_t{0},
+        units::radians_per_second_t{0}, 
+        units::degree_t{m_navx->GetYaw()});
+    }
+    else if (xbox.GetRawButton(2)) {
+       m_swerve->Periodic(
+        units::meters_per_second_t{1.5},
+        units::meters_per_second_t{0},
+        units::radians_per_second_t{0}, 
+        units::degree_t{m_navx->GetYaw()});
+    }
+    else if (xbox.GetRawButton(3)) {
+      m_swerve->Periodic(
+        units::meters_per_second_t{2},
+        units::meters_per_second_t{0},
+        units::radians_per_second_t{0}, 
+        units::degree_t{m_navx->GetYaw()});
+    }
+    else {
+      m_swerve->Periodic(
+      units::meters_per_second_t{dy},
+      units::meters_per_second_t{dx},
+      units::radians_per_second_t{0.7*dtheta}, 
+      units::degree_t{m_navx->GetYaw()});
+    }
+
 
     // frc::ChassisSpeeds speeds = m_swerve->getSpeeds();
     // frc::SmartDashboard::PutNumber("x speed", speeds.vx.value());
@@ -326,9 +343,7 @@ void
 Robot::DisabledInit() {}
 
 void 
-Robot::DisabledPeriodic() {
-
-}
+Robot::DisabledPeriodic() {}
 
 //deconstructor, delete all classes to ensure they don't clog up memory
 Robot::~Robot() {
