@@ -16,6 +16,7 @@
 #include <frc/MathUtil.h>
 #include <AHRS.h>
 #include <vector>
+#include "SwerveModule.h"
 
 class Swerve {
     public:
@@ -24,87 +25,40 @@ class Swerve {
         units::radians_per_second_t joy_theta, units::degree_t navx_yaw);
 
         frc::ChassisSpeeds getSpeeds();
-        frc::Pose2d getPose() { return odometry->GetPose(); }
+        frc::Pose2d getPose() { return odometry_->GetPose(); }
 
         void initializeOdometry(frc::Rotation2d gyroAngle, frc::Pose2d initPose);
-        void updateOdometry(frc::Rotation2d robotAngle, frc::Pose2d robotPose) { odometry->ResetPosition(robotPose, robotAngle); }
+        void updateOdometry(frc::Rotation2d robotAngle, frc::Pose2d robotPose) { odometry_->ResetPosition(robotPose, robotAngle); }
 
         std::vector<TalonFX *> getTalons(); //for simulation
 
-        void test1ms();
-        void test2_5ms();
-        void test4ms();
+        wpi::array<frc::SwerveModuleState, 4> getRealModuleStates(); //real as upposed to goal
 
-        void SetModulesStraight();
-
-        wpi::array<frc::SwerveModuleState, 4> GetRealModuleStates(); //real as upposed to goal
 
     private:
-
-
 
     AHRS * m_navx;
     
     DataLogger * m_logger{nullptr};
 
-    double ticksToDeg(double ticks) { 
-        return frc::InputModulus(ticks, -1024.0, 1024.0) / 1024.0 * 180.0; //SHOULD result in being between -180 and 180
-    }
-
     void SetPID();
-
-    double aPrevError_, aIntegralError_, dPrevError_, dIntegralError_;
-
-    //converts raw talon velocity to meters per second
-    //raw velocity units are ticks per 100ms
-    units::meters_per_second_t talonVelToMps(double vel) {
-        double wheel_radius = 0.05; //in meters
-        double meters_per_rev = wheel_radius*2*M_PI; //wheel circumberence
-        double ticks_per_rev = 12650;
-        return units::meters_per_second_t{vel / 0.1 * (meters_per_rev / ticks_per_rev)};
-    }
-
-        // Swerve module system
-    // SwerveDrive m_swerve;
-    // Locations for the swerve drive modules relative to the robot center.
-    frc::Translation2d m_frontLeftLocation{0.3683_m, 0.3683_m};
-    frc::Translation2d m_frontRightLocation{0.3683_m, -0.3683_m};
-    frc::Translation2d m_backLeftLocation{-0.3683_m, 0.3683_m};
-    frc::Translation2d m_backRightLocation{-0.3683_m, -0.3683_m};
 
     // Creating my kinematics object using the module locations.
     frc::SwerveDriveKinematics<4> m_kinematics{
-        m_frontLeftLocation, m_frontRightLocation,
-        m_backLeftLocation, m_backRightLocation
+        frc::Translation2d{0.3683_m, 0.3683_m}, frc::Translation2d{0.3683_m, -0.3683_m},
+        frc::Translation2d{-0.3683_m, 0.3683_m}, frc::Translation2d{-0.3683_m, -0.3683_m}
     };
 
-    // Underlying swerve module sensors/actuators
-    WPI_TalonFX  m_fl_angleMotor{DriveConstants::FLanglePort, "Drivebase"};
-    WPI_TalonFX  m_fl_speedMotor{DriveConstants::FLspeedPort, "Drivebase"};
-    WPI_CANCoder m_fl_canCoder  {DriveConstants::FLencoder,   "Drivebase"};
-    WPI_TalonFX  m_fr_angleMotor{DriveConstants::FRanglePort, "Drivebase"};
-    WPI_TalonFX  m_fr_speedMotor{DriveConstants::FRspeedPort, "Drivebase"};
-    WPI_CANCoder m_fr_canCoder  {DriveConstants::FRencoder,   "Drivebase"};
-    WPI_TalonFX  m_rl_angleMotor{DriveConstants::BLanglePort, "Drivebase"};
-    WPI_TalonFX  m_rl_speedMotor{DriveConstants::BLspeedPort, "Drivebase"};
-    WPI_CANCoder m_rl_canCoder  {DriveConstants::BLencoder,   "Drivebase"};
-    WPI_TalonFX  m_rr_angleMotor{DriveConstants::BRanglePort, "Drivebase"};
-    WPI_TalonFX  m_rr_speedMotor{DriveConstants::BRspeedPort, "Drivebase"};
-    WPI_CANCoder m_rr_canCoder  {DriveConstants::BRencoder,   "Drivebase"};
+    SwerveModule flModule_{DriveConstants::FLanglePort, DriveConstants::FLspeedPort, DriveConstants::FLencoder, false, DriveConstants::FLOFF};
+    SwerveModule frModule_{DriveConstants::FRanglePort, DriveConstants::FRspeedPort, DriveConstants::FRencoder, true, DriveConstants::FROFF};
+    SwerveModule blModule_{DriveConstants::BLanglePort, DriveConstants::BLspeedPort, DriveConstants::BLencoder, true, DriveConstants::BLOFF};
+    SwerveModule brModule_{DriveConstants::BRanglePort, DriveConstants::BRspeedPort, DriveConstants::BRencoder, false, DriveConstants::BROFF};
 
     // Swerving PID controllers
-    frc2::PIDController m_fl_pid{DriveConstants::P , DriveConstants::I, DriveConstants::D};
-    frc2::PIDController m_fr_pid{DriveConstants::P , DriveConstants::I, DriveConstants::D};
-    frc2::PIDController m_rl_pid{DriveConstants::P , DriveConstants::I, DriveConstants::D};
-    frc2::PIDController m_rr_pid{DriveConstants::P , DriveConstants::I, DriveConstants::D};
+    frc2::PIDController angPID_{DriveConstants::P , DriveConstants::I, DriveConstants::D};
+    frc2::PIDController speedPID_{DriveConstants::sP , DriveConstants::sI, DriveConstants::sD};
 
-    frc2::PIDController m_fl_speed_pid{DriveConstants::sP , DriveConstants::sI, DriveConstants::sD};
-    frc2::PIDController m_fr_speed_pid{DriveConstants::sP , DriveConstants::sI, DriveConstants::sD};
-    frc2::PIDController m_rl_speed_pid{DriveConstants::sP , DriveConstants::sI, DriveConstants::sD};
-    frc2::PIDController m_rr_speed_pid{DriveConstants::sP , DriveConstants::sI, DriveConstants::sD};
+     frc::ChassisSpeeds speeds_;
 
-
-     frc::ChassisSpeeds speeds;
-
-     frc::SwerveDriveOdometry<4> * odometry; //will need to be initialized later with selected robot start pose
+     frc::SwerveDriveOdometry<4> * odometry_; //will need to be initialized later with selected robot start pose
 };
