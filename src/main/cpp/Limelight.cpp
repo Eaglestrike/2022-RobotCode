@@ -213,8 +213,17 @@ Limelight::angleToCoords(double ax, double ay, double targetHeight) {
     return std::make_tuple(x, y, z);
 }
 
+// relative to x-axis
 int angleBetween(const LLCoordinate point, const LLCoordinate centerPoint) {
     int angleA = atan2(centerPoint.second - point.second, centerPoint.first - point.first) * 180 / M_PI;
+    angleA = (angleA + 360) % 360;
+
+    return angleA;
+}
+
+// relative to y-axis
+int angleBetweenY(const LLCoordinate point, const LLCoordinate centerPoint) {
+    int angleA = atan2(centerPoint.first - point.first, centerPoint.second - point.second) * 180 / M_PI;
     angleA = (angleA + 360) % 360;
 
     return angleA;
@@ -229,30 +238,98 @@ struct AngleComparator {
     }
 };
 
-void
-Limelight::sortCorners(LLRectangle& rectCorners) {
-    // sorts corners in place
+struct SortingCorner {
+    LLCoordinate corner;
+    int angle;
+    int index;
+    bool set = false;
+
+    SortingCorner(int index, LLCoordinate corner, LLCoordinate centerPoint) {
+        this->index = index;
+        this->corner = corner;
+        this->angle = angleBetweenY(corner, centerPoint);
+    }
+};
+
+bool sortSortingCornersAbs(const SortingCorner& a, const SortingCorner& b) {
+    return abs(a.angle) < abs(b.angle);
+} 
+
+LLRectangle
+Limelight::sortCorners(LLRectangle rectCorners, const LLCoordinate centerPoint) {
+    if (rectCorners.empty()) {
+        return;
+    }
     // rectCorners is a vector with 4 pairs -> each pair is a coordinate (x, y)
+    int topLeftIndex = -1;
+    int topRightIndex = -1;
+    std::vector<LLCoordinate> ans(4, {-1, -1});
 
-    // based on: https://stackoverflow.com/questions/22385776/how-to-best-sort-the-corners-of-a-rectangle-without-knowing-the-width-or-height
-    // and https://github.com/Mechanical-Advantage/RobotCode2022/blob/main/src/main/java/frc/robot/subsystems/vision/Vision.java
-
-    // calculate center point
-    double totalX = 0;
-    double totalY = 0;
+    std::vector<SortingCorner> sortingCorners = std::vector<SortingCorner>();
     for (int i = 0; i < rectCorners.size(); i++) {
-        totalX += rectCorners[i].first;
-        totalY += rectCorners[i].second;
+        sortingCorners.push_back(SortingCorner(i, rectCorners[i], centerPoint));
     }
 
-    LLCoordinate centerPoint(totalX / rectCorners.size(), totalY / rectCorners.size());
+    // sort sorting corners by absolute value
+    sort(sortingCorners.begin(), sortingCorners.end(), sortSortingCornersAbs);
 
-    // sort by angle between center and point
-    sort(rectCorners.begin(), rectCorners.end(), AngleComparator(centerPoint));
+    SortingCorner highestCorner = sortingCorners[0];
+    highestCorner.set = true;
+    
+    // check if top left or top right
+    // top left
+    if (highestCorner.angle < 0) {
+        topLeftIndex = highestCorner.index;
+    }
+    // top right
+    else {
+        topRightIndex = highestCorner.index;
+    }
 
-    // switch last two values of array?
-    std::swap(rectCorners[2], rectCorners[3]);
+    // search corners for missing top corner
+    int counter = 2;
+    for (int i = 1; i < sortingCorners.size(); i++) {
+        // sorting corner already found
+        if (sortingCorners[i].set) {
+            continue;
+        }
+        // only search angles < 0 b/c top left not found yet
+        if (topLeftIndex == -1) {
+            if (sortingCorners[i].angle < 0) {
+                topLeftIndex = sortingCorners[i].index;
+                sortingCorners[i].set = true;
+            }
+        }
+        // only search angles > 0 b/c top right not found yet
+        else if (topRightIndex == -1) {
+            if (sortingCorners[i].angle > 0) {
+                topRightIndex = sortingCorners[i].index;
+                sortingCorners[i].set = true;
+            }
+        }
+
+        // if not top left/right, set to back corners
+        if (counter <= 3) {
+            ans[i] = rectCorners[sortingCorners[i].index];
+            counter ++;
+        }
+        else {
+            std::cout << "Something went wrong... more than 2 corners on bottom\n";
+        }
+    }
+
+
+    // should have top left and top right corners by now (set them)
+    if (topLeftIndex != -1) {
+        ans[0] = rectCorners[topLeftIndex];
+    }
+    if (topRightIndex != -1) {
+        ans[1] = rectCorners[topRightIndex];
+    }
+
     // output: corners are sorted in following order: [topLeft, topRight, bottomLeft, bottomRight]
+    // or [top1, top2, bottom1, bottom2]
+    return ans;
 }
 
 std::vector<LL3DCoordinate> 
@@ -262,7 +339,8 @@ Limelight::getCoords() {
     std::vector<LL3DCoordinate> coords = std::vector<LL3DCoordinate> ();
 
     for (int i = 0; i < corners.size(); i++) {
-        sortCorners(corners[i]);
+        // TODO: get this to work
+        // corners[i] = sortCorners(corners[i]);
 
         // if (corners[i].size() != 4) {
         //     std::cout << "Something went wrong... rectangle array corners is: " << corners[i].size();

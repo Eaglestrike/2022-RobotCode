@@ -6,17 +6,21 @@
 #include <frc/geometry/Pose2d.h>
 #include "Constants.h"
 #include <math.h>
+#include <iostream>
 
 typedef std::pair<double, double> LLCoordinate;
 typedef std::vector<LLCoordinate> LLRectangle;
 typedef std::tuple<double, double, double> LL3DCoordinate;
+typedef std::pair<double, double> LLAnglePair;
 
 class Limelight{
     public:
         Limelight();
+
         double getXOff();
         double getYOff();
         bool targetAquired();
+
         std::vector<LLRectangle> getCorners();
         void setLEDMode(std::string mode);
         double getDist();
@@ -47,5 +51,5 @@ class Limelight{
 
         LLCoordinate pixelsToAngle(double px, double py);
         LL3DCoordinate angleToCoords(double ax, double ay, double targetHeight);
-        void sortCorners(LLRectangle& rectCorners);
+        LLRectangle sortCorners(LLRectangle rectCorners, const LLCoordinate centerPoint);
 };
