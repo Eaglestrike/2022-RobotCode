@@ -51,5 +51,5 @@ class Limelight{
 
         LLCoordinate pixelsToAngle(double px, double py);
         LL3DCoordinate angleToCoords(double ax, double ay, double targetHeight);
-        LLRectangle sortCorners(LLRectangle rectCorners, const LLCoordinate centerPoint);
+        LLRectangle sortCorners(LLRectangle rectCorners);
 };

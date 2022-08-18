@@ -39,19 +39,39 @@ std::vector<LLRectangle>
 // DOES NOT WORK CURRENTLY
 Limelight::getCorners() {
     std::vector<double> corners = network_table->GetEntry("tcornxy").GetDoubleArray(std::vector<double>());
-    corners = {75, 181,83, 181,83, 177,75, 177,93, 179,93, 182,102, 184,102, 181,111, 183,111, 186,119, 189,119, 186}; // TODO: get rid of this later (for testing)
+    // corners = {75, 181,83, 181,83, 177,75, 177,93, 179,93, 182,102, 184,102, 181,111, 183,111, 186,119, 189,119, 186}; // TODO: get rid of this later (for testing)
     std::vector<LLRectangle> ans = std::vector<LLRectangle>();
     
     // TODO: redo because only outputs top left, bottom right -> get working with custom vision pipeline
     // format this array (vector of vectors of pairs)
     // pairs are coordinates (x, y), vectors represent one rectangle, output holds rectangles
-    for (int i = 0; i < corners.size(); i += 8) {
-        LLRectangle rectVector = LLRectangle();
-        for (int j = i; j < i + 8; j += 2) {
-            rectVector.push_back(std::make_pair(corners[j], corners[j+1]));
+    // center of rectangle is first point in array
+    // for (int i = 0; i < corners.size(); i += 8) {
+    //     LLRectangle rectVector = LLRectangle();
+    //     for (int j = i; j < i + 8; j += 2) {
+    //         rectVector.push_back(std::make_pair(corners[j], corners[j+1]));
+    //     }
+    //     ans.push_back(rectVector);
+    // }
+
+    ans = {
+        {
+            {26, 200}, 
+            {30, 198}, {22, 202}, {29, 201}
+        }, 
+        {
+            {82, 203},
+            {78, 200}, {78, 203}, {85, 205}, {85, 202}
+        }, 
+        {
+            {65, 197},
+            {60, 196}, {60, 199}, {69, 201}, {69, 198}
+        },
+        {
+            {45, 198},
+            {40, 196}, {40, 199}, {49, 199}, {49, 196}
         }
-        ans.push_back(rectVector);
-    }
+    };
 
     return ans;
 }
@@ -224,7 +244,6 @@ int angleBetween(const LLCoordinate point, const LLCoordinate centerPoint) {
 // relative to y-axis
 int angleBetweenY(const LLCoordinate point, const LLCoordinate centerPoint) {
     int angleA = atan2(centerPoint.first - point.first, centerPoint.second - point.second) * 180 / M_PI;
-    angleA = (angleA + 360) % 360;
 
     return angleA;
 }
@@ -248,25 +267,36 @@ struct SortingCorner {
         this->index = index;
         this->corner = corner;
         this->angle = angleBetweenY(corner, centerPoint);
+        // std::cout << "(" << corner.first << ", " << corner.second << ") - angle: " << this->angle << "\n";
     }
 };
 
 bool sortSortingCornersAbs(const SortingCorner& a, const SortingCorner& b) {
     return abs(a.angle) < abs(b.angle);
-} 
+}
 
 LLRectangle
-Limelight::sortCorners(LLRectangle rectCorners, const LLCoordinate centerPoint) {
+Limelight::sortCorners(LLRectangle rectCorners) {
     if (rectCorners.empty()) {
-        return;
+        return rectCorners;
     }
+
+    // lower bound threshhold for what counts as a "top" corner
+    int TOP_THRESHHOLD = 90;
+    if (rectCorners.size() == 5) { // full corner set -> looser restrictions
+        TOP_THRESHHOLD = 180;
+    }
+
+    // assume centerPoint is first point in rectCorners arr
+    const LLCoordinate centerPoint = rectCorners[0];
+
     // rectCorners is a vector with 4 pairs -> each pair is a coordinate (x, y)
     int topLeftIndex = -1;
     int topRightIndex = -1;
     std::vector<LLCoordinate> ans(4, {-1, -1});
 
     std::vector<SortingCorner> sortingCorners = std::vector<SortingCorner>();
-    for (int i = 0; i < rectCorners.size(); i++) {
+    for (int i = 1; i < rectCorners.size(); i++) {
         sortingCorners.push_back(SortingCorner(i, rectCorners[i], centerPoint));
     }
 
@@ -274,16 +304,18 @@ Limelight::sortCorners(LLRectangle rectCorners, const LLCoordinate centerPoint) 
     sort(sortingCorners.begin(), sortingCorners.end(), sortSortingCornersAbs);
 
     SortingCorner highestCorner = sortingCorners[0];
-    highestCorner.set = true;
-    
-    // check if top left or top right
-    // top left
-    if (highestCorner.angle < 0) {
-        topLeftIndex = highestCorner.index;
-    }
-    // top right
-    else {
-        topRightIndex = highestCorner.index;
+    if (abs(highestCorner.angle) <= TOP_THRESHHOLD) {
+        highestCorner.set = true;
+
+        // check if top left or top right
+        // top left
+        if (highestCorner.angle < 0) {
+            topLeftIndex = highestCorner.index;
+        }
+            // top right
+        else {
+            topRightIndex = highestCorner.index;
+        }
     }
 
     // search corners for missing top corner
@@ -293,24 +325,29 @@ Limelight::sortCorners(LLRectangle rectCorners, const LLCoordinate centerPoint) 
         if (sortingCorners[i].set) {
             continue;
         }
-        // only search angles < 0 b/c top left not found yet
-        if (topLeftIndex == -1) {
-            if (sortingCorners[i].angle < 0) {
-                topLeftIndex = sortingCorners[i].index;
-                sortingCorners[i].set = true;
+
+        if (abs(sortingCorners[i].angle) <= TOP_THRESHHOLD) {
+            // only search angles < 0 b/c top left not found yet
+            if (topLeftIndex == -1) {
+                if (sortingCorners[i].angle < 0) {
+                    topLeftIndex = sortingCorners[i].index;
+                    sortingCorners[i].set = true;
+                    continue;
+                }
             }
-        }
-        // only search angles > 0 b/c top right not found yet
-        else if (topRightIndex == -1) {
-            if (sortingCorners[i].angle > 0) {
-                topRightIndex = sortingCorners[i].index;
-                sortingCorners[i].set = true;
+                // only search angles > 0 b/c top right not found yet
+            else if (topRightIndex == -1) {
+                if (sortingCorners[i].angle > 0) {
+                    topRightIndex = sortingCorners[i].index;
+                    sortingCorners[i].set = true;
+                    continue;
+                }
             }
         }
 
         // if not top left/right, set to back corners
         if (counter <= 3) {
-            ans[i] = rectCorners[sortingCorners[i].index];
+            ans[counter] = rectCorners[sortingCorners[i].index];
             counter ++;
         }
         else {
