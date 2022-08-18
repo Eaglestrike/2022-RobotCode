@@ -164,7 +164,7 @@ Limelight::setLEDMode(std::string mode){
 
 // Pixels to Angles
 // returns the angle from the camera to the pixel
-std::pair<double, double> 
+std::pair<double, double>
 Limelight::pixelsToAngle(double px, double py) {
     // From here: https://docs.limelightvision.io/en/latest/theory.html#from-pixels-to-angles
     const double H_FOV = 54;
@@ -185,7 +185,7 @@ Limelight::pixelsToAngle(double px, double py) {
     double y = vph/2 * ny;
 
     // calc angles
-    double ax = atan2(1, x); 
+    double ax = atan2(1, x);
     double ay = atan2(1, y);
 
     std::pair<double, double> ans(ax, ay);
@@ -196,9 +196,9 @@ Limelight::pixelsToAngle(double px, double py) {
 LL3DCoordinate
 Limelight::angleToCoords(double ax, double ay, double targetHeight) {
     // From: https://www.chiefdelphi.com/t/calculating-distance-to-vision-target/387183/6
-    // and https://www.chiefdelphi.com/t/what-does-limelight-skew-actually-measure/381167/7 
+    // and https://www.chiefdelphi.com/t/what-does-limelight-skew-actually-measure/381167/7
 
-    // ax and ay are the angles from the camera to the point 
+    // ax and ay are the angles from the camera to the point
     // make sure x rotation is around y-axis
     // make sure y rotation is around x-axis
     double x = tan(ax);
@@ -214,13 +214,15 @@ Limelight::angleToCoords(double ax, double ay, double targetHeight) {
 
     // apply transformations to 3d vector (compensate for pitch) -> rotate down by camera pitch
     // multiply [x, y, z] vector by rotation matrix around x-axis
-    double theta = -GeneralConstants::cameraPitch * M_PI / 180; // for testing
-    x = x*1 + y*0 + z*0; // technically not necessary, but just for understandability
-    y = x*0 + y*cos(theta) + z*(-sin(theta));
-    z = x*0 + y*sin(theta) + z*cos(theta);
+    double theta = -GeneralConstants::cameraPitch * M_PI / 180; // convert to radians
+    double newX = x*1 + y*0 + z*0; // technically not necessary, but just for understandability
+    double newY = x*0 + y*cos(theta) + z*(-sin(theta));
+    double newZ = x*0 + y*sin(theta) + z*cos(theta);
+
+    x = newX; y = newY; z = newZ;
 
     // denormalize coordinates via known height
-    double scale = (targetHeight - GeneralConstants::cameraHeight) / y;    
+    double scale = (targetHeight - GeneralConstants::cameraHeight) / y;
 
     x *= scale;
     y *= scale;
@@ -229,7 +231,7 @@ Limelight::angleToCoords(double ax, double ay, double targetHeight) {
     x += GeneralConstants::cameraHeight;
     y += GeneralConstants::cameraHeight;
     z += GeneralConstants::cameraHeight;
-    
+
     return std::make_tuple(x, y, z);
 }
 
@@ -369,7 +371,7 @@ Limelight::sortCorners(LLRectangle rectCorners) {
     return ans;
 }
 
-std::vector<LL3DCoordinate> 
+std::vector<LL3DCoordinate>
 Limelight::getCoords() {
     std::vector<LLRectangle> corners = getCorners();
 
@@ -377,18 +379,21 @@ Limelight::getCoords() {
 
     for (int i = 0; i < corners.size(); i++) {
         // TODO: get this to work
-        // corners[i] = sortCorners(corners[i]);
+         corners[i] = sortCorners(corners[i]);
 
         // if (corners[i].size() != 4) {
         //     std::cout << "Something went wrong... rectangle array corners is: " << corners[i].size();
         // }
 
         for (int j = 0; j < corners[i].size(); j++) {
+            if (corners[i][j].first == -1 || corners[i][j].second == -1) {
+                continue;
+            }
             std::pair<double, double> anglePair = pixelsToAngle(corners[i][j].first, corners[i][j].second);
             coords.push_back(
                 angleToCoords(
-                    anglePair.first, 
-                    anglePair.second, 
+                    anglePair.first,
+                    anglePair.second,
                     j < 2 ? GeneralConstants::targetHeightUpper : GeneralConstants::targetHeightLower
                 )
             );
